@@ -3,8 +3,8 @@ import { brand } from "@/lib/brand";
 import { Reveal } from "./Reveal";
 
 export function FinalCta({
-  title = "Build your music business.",
-  body = "Join independent musicians running real careers with an AI business team — approval-first.",
+  title = "Ready to Own Your Career?",
+  body = "Stop waiting for a label. Start running your music like a CEO.",
 }: {
   title?: string;
   body?: string;
@@ -30,7 +30,7 @@ export function FinalCta({
           href="/api/auth/login?signup=1&return=/onboarding"
           className="btn btn--gold btn--lg mt-9"
         >
-          Become an Artispreneur
+          Create Your Workspace &rarr;
         </a>
       </Reveal>
     </section>

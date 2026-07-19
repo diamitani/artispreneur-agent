@@ -65,9 +65,9 @@ export function LandingHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.08, ease }}
           >
-            Hire your AI
+            Your Music Business
             <br />
-            business team.
+            <span className="text-[color:var(--color-gold)]">Operating System</span>
           </motion.h1>
 
           <motion.p
@@ -76,8 +76,8 @@ export function LandingHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.16, ease }}
           >
-            Tell your Agent what you&apos;re trying to accomplish. It drafts the plan and the work
-            — you approve before anything ships.
+            AI agents that handle your PROs, distribution, licensing, legal, finance, and
+            management — so you can focus on making music.
           </motion.p>
 
           <motion.div
@@ -90,11 +90,31 @@ export function LandingHero() {
               href="/api/auth/login?signup=1&return=/onboarding"
               className="btn btn--primary btn--lg"
             >
-              Start for Free
+              Get Started Free &rarr;
             </a>
-            <a href="/features" className="btn btn--outline-on-dark btn--lg">
-              Explore Features
+            <a href="#agents" className="btn btn--outline-on-dark btn--lg">
+              See the Agents
             </a>
+          </motion.div>
+
+          <motion.div
+            className="mt-8 flex gap-8"
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <div>
+              <p className="text-2xl font-extrabold text-white">6</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-white/45">AI Agents</p>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-white">16</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-white/45">Courses</p>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-white">$0</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-white/45">To Start</p>
+            </div>
           </motion.div>
 
           <motion.p
