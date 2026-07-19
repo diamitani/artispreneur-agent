@@ -12,6 +12,7 @@ import { recordUsage } from "@/lib/agent/usage-ledger";
 import { getSessionUser } from "@/lib/auth";
 import { agentProjectScope, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
 import { buildHermesSystemPrompt } from "@/lib/hermes/runtime";
+import { getComposioTools, isComposioConfigured } from "@/lib/composio";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -78,10 +79,16 @@ export async function POST(req: Request) {
   const modelId = getAgentModelId();
   const bedrock = createBedrockProvider();
 
+  const tools = isComposioConfigured()
+    ? getComposioTools({ entityId: projectId })
+    : undefined;
+
   const result = streamText({
     model: bedrock(modelId),
     system,
     messages: await convertToModelMessages(body.messages),
+    tools,
+    maxSteps: tools ? 5 : 1,
     temperature: 0.6,
     maxOutputTokens: 4096,
     onFinish: async ({ usage }) => {
