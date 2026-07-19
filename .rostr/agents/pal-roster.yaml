@@ -1,0 +1,53 @@
+# PAL Roster Agent — Agent by Artispreneur
+# Trigger: every new user signup / onboarding submit
+# Endpoint: POST /api/pal/intake
+
+agent:
+  name: pal-roster
+  display_name: PAL Roster Agent
+  version: "2.0"
+  type: compiler
+  phase: PreD
+  framework: ROSTR
+
+mission: >
+  Compile each new artist's onboarding answers through PAL stages L1–L5 into a
+  Workspace Configuration Object, Master Soul.md, brand prompts, active specialist
+  roster, and NPAO next-action plan. Never execute commercial actions — only compile.
+
+trigger:
+  events:
+    - user.signup.completed
+    - onboarding.submitted
+    - soul.recompile.requested
+  webhook: /api/pal/intake
+  method: POST
+
+inputs:
+  - user_id
+  - onboarding_answers (schema: onboarding-questions.ts)
+
+outputs:
+  - master_soul_md
+  - artist_profile.json
+  - permissions.yaml
+  - active_roster
+  - npao_plan
+  - brand_prompts
+  - completeness_score
+
+runtime:
+  model: deterministic-first
+  llm_enrichment: optional
+  temperature: 0.2
+  timeout_seconds: 30
+
+guardrails:
+  - Soft-gate: compile draft Soul even if fields are missing; list gaps.
+  - Never invent ownership, splits, or clearances.
+  - Never send, publish, distribute, or pay.
+  - Approval-first is the default permission mode.
+  - Activate only specialists mapped to chosen priority surfaces (max foundation + priorities).
+
+npao_order: N → A → P → O
+pal_stages: [L1_extract, L2_compose, L3_optimize, L4_compile, L5_handoff]

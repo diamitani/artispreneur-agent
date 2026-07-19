@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  /* Artispreneur Design System — light workspace kit */
+  --red: #c0272d;
+  --gold: #f5c100;
+  --parchment: #f9f6ef;
+  --ink: #1a1a1a;
+  --muted: #8a8070;
+  --border: #e8e3d9;
+  --white: #ffffff;
+  --gold-tint: #fff8d6;
+  --surface: #ffffff;
+  --bg: #f9f6ef;
+
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-body: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-red: var(--red);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-parchment: var(--parchment);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(192, 39, 45, 0.15);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.12);
+  border-radius: 999px;
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500" role="img" aria-label="Artispreneur">
+  <title>Artispreneur</title>
+  <defs>
+    <linearGradient id="laurelGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#FFD63D"/>
+      <stop offset="55%" stop-color="#F5C100"/>
+      <stop offset="100%" stop-color="#D9A800"/>
+    </linearGradient>
+    <symbol id="leaf" viewBox="-30 -12 60 24" overflow="visible">
+      <!-- Leaf shape: pointed teardrop with center vein -->
+      <path d="M -28 0 Q -14 -11 14 -8 Q 26 -4 28 0 Q 26 4 14 8 Q -14 11 -28 0 Z" fill="url(#laurelGold)"/>
+      <path d="M -26 0 L 26 0" stroke="#B8860B" stroke-width="0.8" stroke-linecap="round" opacity="0.4"/>
+    </symbol>
+  </defs>
+
+  <!-- Left laurel branch (top → bottom) -->
+  <g>
+    <use href="#leaf" x="158" y="115" transform="rotate(-72 158 115)"/>
+    <use href="#leaf" x="125" y="158" transform="rotate(-52 125 158)"/>
+    <use href="#leaf" x="103" y="205" transform="rotate(-32 103 205)"/>
+    <use href="#leaf" x="92"  y="255" transform="rotate(-10 92 255)"/>
+    <use href="#leaf" x="95"  y="305" transform="rotate(15 95 305)"/>
+    <use href="#leaf" x="110" y="350" transform="rotate(40 110 350)"/>
+    <use href="#leaf" x="140" y="388" transform="rotate(62 140 388)"/>
+    <use href="#leaf" x="180" y="412" transform="rotate(80 180 412)"/>
+  </g>
+
+  <!-- Right laurel branch (mirrored) -->
+  <g>
+    <use href="#leaf" x="342" y="115" transform="rotate(72 342 115)"/>
+    <use href="#leaf" x="375" y="158" transform="rotate(52 375 158)"/>
+    <use href="#leaf" x="397" y="205" transform="rotate(32 397 205)"/>
+    <use href="#leaf" x="408" y="255" transform="rotate(10 408 255)"/>
+    <use href="#leaf" x="405" y="305" transform="rotate(-15 405 305)"/>
+    <use href="#leaf" x="390" y="350" transform="rotate(-40 390 350)"/>
+    <use href="#leaf" x="360" y="388" transform="rotate(-62 360 388)"/>
+    <use href="#leaf" x="320" y="412" transform="rotate(-80 320 412)"/>
+  </g>
+
+  <!-- The Red A — bold serif, classical -->
+  <text x="250" y="345"
+        text-anchor="middle"
+        font-family="Playfair Display, Didot, 'Bodoni 72', Georgia, serif"
+        font-weight="900"
+        font-size="290"
+        fill="#C0272D"
+        letter-spacing="-4">A</text>
+</svg>
