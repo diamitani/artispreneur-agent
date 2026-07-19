@@ -20,14 +20,15 @@ Diamitani Industries                 ← org (holding)
                           └── uploads/
 ```
 
-**Disk / future S3 key:**
+**Hub key (fs under `.data/` or S3 when `HUB_BACKEND=s3`):**
 
 ```
-.data/orgs/diamitani-industries/tenants/artispreneur-com/products/agent/
+orgs/diamitani-industries/tenants/artispreneur-com/products/agent/
   users/{sub}/projects/{projectId}/
 ```
 
-Code: `src/lib/tenancy/hierarchy.ts`, `user-shell.ts`
+On login: `ensureUserShell()` → hub workspace + DynamoDB `USER#` / `PROJECT#` / `AGENT#hermes`  
+See `docs/AWS_INSTANCE.md`. Code: `hierarchy.ts`, `user-shell.ts`, `hub/store.ts`, `aws/instance-registry.ts`
 
 ---
 

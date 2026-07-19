@@ -1,19 +1,21 @@
 /**
  * Provision the Diamitani → Artispreneur → Agent user shell on first OAuth login.
- * Local: .data/...  Prod target: S3 + DynamoDB USER# record (multi-tenant blueprint).
+ *
+ * Managed under the AWS instance system:
+ *   Hub (fs|S3)  → workspace files
+ *   DynamoDB     → USER# / PROJECT# / AGENT#hermes control plane
  */
 
-import { mkdir, writeFile, access } from "fs/promises";
-import path from "path";
 import {
   ORG,
   PRODUCT,
   TENANT,
   agentProjectScope,
-  workspaceFsRoot,
   workspaceLogicalPath,
 } from "./hierarchy";
 import { ensureWorkspaceApiKey } from "@/lib/agent/workspace-api-key";
+import { hubEnsureWorkspace, hubExists, hubWriteJson, hubBackendLabel } from "@/lib/hub/store";
+import { ensureAwsInstance } from "@/lib/aws/instance-registry";
 
 export async function ensureUserShell(input: {
   userId: string;
@@ -22,52 +24,51 @@ export async function ensureUserShell(input: {
   projectId: string;
 }) {
   const scope = agentProjectScope(input.userId, input.projectId);
-  const root = workspaceFsRoot(scope);
-  const configDir = path.join(root, "00-config");
+  const workspacePath = workspaceLogicalPath(scope);
 
-  await mkdir(configDir, { recursive: true });
-  await mkdir(path.join(root, "projects"), { recursive: true });
-  await mkdir(path.join(root, "uploads"), { recursive: true });
+  await hubEnsureWorkspace(scope);
 
-  const identityPath = path.join(configDir, "identity.json");
-  try {
-    await access(identityPath);
-  } catch {
-    await writeFile(
-      identityPath,
-      JSON.stringify(
-        {
-          org: ORG,
-          tenant: TENANT,
-          product: PRODUCT,
-          user: {
-            cognito_sub: input.userId,
-            email: input.email,
-            name: input.name ?? null,
-          },
-          project_id: input.projectId,
-          workspace_path: workspaceLogicalPath(scope),
-          created_at: new Date().toISOString(),
-          auth_provider: "aws_cognito",
-          llm: {
-            provider: "amazon_bedrock",
-            model: process.env.BEDROCK_MODEL_ID || "deepseek.v3-v1:0",
-          },
-        },
-        null,
-        2,
-      ),
-      "utf8",
-    );
+  if (!(await hubExists(scope, "00-config/identity.json"))) {
+    await hubWriteJson(scope, "00-config/identity.json", {
+      org: ORG,
+      tenant: TENANT,
+      product: PRODUCT,
+      user: {
+        cognito_sub: input.userId,
+        email: input.email,
+        name: input.name ?? null,
+      },
+      project_id: input.projectId,
+      workspace_path: workspacePath,
+      created_at: new Date().toISOString(),
+      auth_provider: "aws_cognito",
+      instance: {
+        hub_backend: hubBackendLabel(),
+        control_plane: "dynamodb_USER#",
+        runtime: "hermes+pal-rostr",
+      },
+      llm: {
+        provider: "amazon_bedrock",
+        model: process.env.BEDROCK_MODEL_ID || "deepseek.v3-v1:0",
+      },
+    });
   }
 
-  // Long trackable apa_* key for this customer workspace (separate from AWS platform creds)
+  const instance = await ensureAwsInstance({
+    userId: input.userId,
+    email: input.email,
+    name: input.name,
+    projectId: input.projectId,
+    workspacePath,
+  });
+
   const apiKey = await ensureWorkspaceApiKey(input.userId, input.projectId);
 
   return {
-    root,
-    workspacePath: workspaceLogicalPath(scope),
+    workspacePath,
     projectId: input.projectId,
+    hub_backend: hubBackendLabel(),
+    instance,
     apiKey,
   };
 }

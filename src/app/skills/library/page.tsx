@@ -30,6 +30,13 @@ type HermesSnap = {
   active_skills: { slug: string; name: string; specialist_id?: string }[];
   runtime: string;
   owned_count: number;
+  aws_instance?: {
+    hub_backend: string;
+    s3_bucket: string | null;
+    dynamodb_table: string | null;
+    dynamodb_enabled: boolean;
+    region: string;
+  };
 };
 
 export default function SkillsLibraryPage() {
@@ -121,19 +128,18 @@ export default function SkillsLibraryPage() {
 
       <main className="container-page py-10">
         <p className="type-mono-label text-[color:var(--color-crimson)]">
-          HERMES · PAL / ROSTR RUNTIME
+          AWS INSTANCE · HERMES · PAL / ROSTR
         </p>
         <h1 className="mt-2 font-heading text-3xl text-[color:var(--color-black)]">
           Your Skills Library
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-[color:var(--color-gray-mid)]">
-          Owned packs live in your vault. Installed packs load into Hermes — the
-          Master Agent powered by your PAL-compiled Soul and ROSTR specialist
-          roster.
+          Packs are stored on your AWS instance hub. Installed packs load into
+          Hermes (Bedrock) with your PAL-compiled Soul and ROSTR roster.
         </p>
 
         {hermes && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-4">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <Stat label="Owned" value={String(skills.length)} />
             <Stat label="Active in Hermes" value={String(activeCount)} />
             <Stat
@@ -146,6 +152,10 @@ export default function SkillsLibraryPage() {
               value={
                 hermes.completeness != null ? `${hermes.completeness}%` : "—"
               }
+            />
+            <Stat
+              label="Hub"
+              value={(hermes.aws_instance?.hub_backend || "fs").toUpperCase()}
             />
           </div>
         )}

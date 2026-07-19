@@ -1,24 +1,25 @@
 /**
  * Customer workspace Agent API keys — long-lived, trackable, separate from AWS/Bedrock platform creds.
  *
- * Format: apa_{live|test}_{64 hex chars}  (~131 chars)
- * Auth header: Authorization: Bearer apa_...  OR  X-Artispreneur-Agent-Key: apa_...
- *
- * Only SHA-256 hashes are stored. Plaintext is returned once on create.
+ * Format: apa_{live|test}_{96 hex}
+ * Indexed in AWS instance registry (DynamoDB KEY# or hub global/).
  */
 
 import { createHash, randomBytes } from "crypto";
-import { mkdir, readFile, writeFile, unlink } from "fs/promises";
-import path from "path";
 import {
   agentProjectScope,
-  workspaceFsRoot,
   workspaceLogicalPath,
 } from "@/lib/tenancy/hierarchy";
+import {
+  hubExists,
+  hubReadJson,
+  hubWriteJson,
+} from "@/lib/hub/store";
+import { getApiKeyIndex, putApiKeyIndex } from "@/lib/aws/instance-registry";
 
 export type WorkspaceApiKeyRecord = {
   key_id: string;
-  key_prefix: string; // first chars for display e.g. apa_live_a3f2…
+  key_prefix: string;
   key_hash: string;
   label: string;
   user_id: string;
@@ -31,11 +32,8 @@ export type WorkspaceApiKeyRecord = {
 };
 
 export type IssuedWorkspaceApiKey = WorkspaceApiKeyRecord & {
-  /** Plaintext — shown once. Never persisted after issue. */
   api_key: string;
 };
-
-const KEY_INDEX_DIR = () => path.join(process.cwd(), ".data", "agent-keys", "by-hash");
 
 function envTag(): "live" | "test" {
   return process.env.NODE_ENV === "production" ? "live" : "test";
@@ -45,59 +43,38 @@ export function hashApiKey(apiKey: string): string {
   return createHash("sha256").update(apiKey).digest("hex");
 }
 
-/** Generate a long trackable customer workspace key */
 export function generateWorkspaceApiKey(env: "live" | "test" = envTag()): string {
-  const body = randomBytes(48).toString("hex"); // 96 hex chars
+  const body = randomBytes(48).toString("hex");
   return `apa_${env}_${body}`;
 }
 
-function keysFile(userId: string, projectId: string) {
-  return path.join(workspaceFsRoot(agentProjectScope(userId, projectId)), "00-config", "api-keys.json");
-}
-
-function onceFile(userId: string, projectId: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "00-config",
-    "api-key.once.json",
-  );
-}
-
 async function readKeyList(userId: string, projectId: string): Promise<WorkspaceApiKeyRecord[]> {
-  try {
-    const raw = await readFile(keysFile(userId, projectId), "utf8");
-    const data = JSON.parse(raw) as { keys?: WorkspaceApiKeyRecord[] };
-    return data.keys ?? [];
-  } catch {
-    return [];
-  }
+  const scope = agentProjectScope(userId, projectId);
+  const data = await hubReadJson<{ keys?: WorkspaceApiKeyRecord[] }>(
+    scope,
+    "00-config/api-keys.json",
+  );
+  return data?.keys ?? [];
 }
 
 async function writeKeyList(userId: string, projectId: string, keys: WorkspaceApiKeyRecord[]) {
-  const file = keysFile(userId, projectId);
-  await mkdir(path.dirname(file), { recursive: true });
-  await writeFile(file, JSON.stringify({ keys, updated_at: new Date().toISOString() }, null, 2), "utf8");
+  const scope = agentProjectScope(userId, projectId);
+  await hubWriteJson(scope, "00-config/api-keys.json", {
+    keys,
+    updated_at: new Date().toISOString(),
+  });
 }
 
 async function indexKey(record: WorkspaceApiKeyRecord) {
-  const dir = KEY_INDEX_DIR();
-  await mkdir(dir, { recursive: true });
-  await writeFile(
-    path.join(dir, `${record.key_hash}.json`),
-    JSON.stringify(
-      {
-        key_id: record.key_id,
-        user_id: record.user_id,
-        project_id: record.project_id,
-        workspace_path: record.workspace_path,
-        key_prefix: record.key_prefix,
-        revoked_at: record.revoked_at,
-      },
-      null,
-      2,
-    ),
-    "utf8",
-  );
+  await putApiKeyIndex({
+    keyHash: record.key_hash,
+    keyId: record.key_id,
+    userId: record.user_id,
+    projectId: record.project_id,
+    workspacePath: record.workspace_path,
+    keyPrefix: record.key_prefix,
+    revokedAt: record.revoked_at,
+  });
 }
 
 export async function issueWorkspaceApiKey(input: {
@@ -131,23 +108,13 @@ export async function issueWorkspaceApiKey(input: {
   await writeKeyList(input.userId, input.projectId, keys);
   await indexKey(record);
 
-  // One-time reveal file for UI (deleted after read)
-  const once = onceFile(input.userId, input.projectId);
-  await writeFile(
-    once,
-    JSON.stringify(
-      {
-        api_key,
-        key_id,
-        key_prefix,
-        created_at: record.created_at,
-        note: "Copy now — this file is deleted after first reveal via API.",
-      },
-      null,
-      2,
-    ),
-    "utf8",
-  );
+  await hubWriteJson(scope, "00-config/api-key.once.json", {
+    api_key,
+    key_id,
+    key_prefix,
+    created_at: record.created_at,
+    note: "Copy now — this file is deleted after first reveal via API.",
+  });
 
   return { ...record, api_key };
 }
@@ -162,14 +129,23 @@ export async function listWorkspaceApiKeys(userId: string, projectId: string) {
 }
 
 export async function revealOnceApiKey(userId: string, projectId: string) {
-  const file = onceFile(userId, projectId);
-  try {
-    const raw = await readFile(file, "utf8");
-    await unlink(file).catch(() => undefined);
-    return JSON.parse(raw) as { api_key: string; key_id: string; key_prefix: string };
-  } catch {
-    return null;
-  }
+  const scope = agentProjectScope(userId, projectId);
+  const data = await hubReadJson<{
+    api_key?: string;
+    key_id?: string;
+    key_prefix?: string;
+    revealed?: boolean;
+  }>(scope, "00-config/api-key.once.json");
+  if (!data?.api_key || !data.key_id || !data.key_prefix) return null;
+  await hubWriteJson(scope, "00-config/api-key.once.json", {
+    revealed: true,
+    at: new Date().toISOString(),
+  });
+  return {
+    api_key: data.api_key,
+    key_id: data.key_id,
+    key_prefix: data.key_prefix,
+  };
 }
 
 export async function revokeWorkspaceApiKey(userId: string, projectId: string, keyId: string) {
@@ -195,36 +171,23 @@ export async function resolveWorkspaceApiKey(
 ): Promise<ResolvedWorkspaceKey | null> {
   if (!apiKey.startsWith("apa_")) return null;
   const key_hash = hashApiKey(apiKey);
-  try {
-    const raw = await readFile(path.join(KEY_INDEX_DIR(), `${key_hash}.json`), "utf8");
-    const idx = JSON.parse(raw) as {
-      key_id: string;
-      user_id: string;
-      project_id: string;
-      workspace_path: string;
-      key_prefix: string;
-      revoked_at: string | null;
-    };
-    if (idx.revoked_at) return null;
+  const idx = await getApiKeyIndex(key_hash);
+  if (!idx || idx.revoked_at) return null;
 
-    // Touch last_used
-    const keys = await readKeyList(idx.user_id, idx.project_id);
-    const i = keys.findIndex((k) => k.key_hash === key_hash);
-    if (i >= 0) {
-      keys[i] = { ...keys[i], last_used_at: new Date().toISOString() };
-      await writeKeyList(idx.user_id, idx.project_id, keys);
-    }
-
-    return {
-      keyId: idx.key_id,
-      userId: idx.user_id,
-      projectId: idx.project_id,
-      workspacePath: idx.workspace_path,
-      keyPrefix: idx.key_prefix,
-    };
-  } catch {
-    return null;
+  const keys = await readKeyList(idx.user_id, idx.project_id);
+  const i = keys.findIndex((k) => k.key_hash === key_hash);
+  if (i >= 0) {
+    keys[i] = { ...keys[i], last_used_at: new Date().toISOString() };
+    await writeKeyList(idx.user_id, idx.project_id, keys);
   }
+
+  return {
+    keyId: idx.key_id,
+    userId: idx.user_id,
+    projectId: idx.project_id,
+    workspacePath: idx.workspace_path,
+    keyPrefix: idx.key_prefix,
+  };
 }
 
 export function extractApiKeyFromRequest(req: Request): string | null {
@@ -237,7 +200,6 @@ export function extractApiKeyFromRequest(req: Request): string | null {
   return null;
 }
 
-/** Ensure workspace has at least one active key; issue if none. */
 export async function ensureWorkspaceApiKey(userId: string, projectId: string) {
   const keys = await readKeyList(userId, projectId);
   const active = keys.filter((k) => !k.revoked_at);
@@ -251,6 +213,15 @@ export async function ensureWorkspaceApiKey(userId: string, projectId: string) {
       }),
     };
   }
-  const issued = await issueWorkspaceApiKey({ userId, projectId, label: "Default Workspace Agent" });
+  const issued = await issueWorkspaceApiKey({
+    userId,
+    projectId,
+    label: "Default Workspace Agent",
+  });
   return { issued: true as const, key: issued };
+}
+
+export async function workspaceHasApiKeys(userId: string, projectId: string) {
+  const scope = agentProjectScope(userId, projectId);
+  return hubExists(scope, "00-config/api-keys.json");
 }

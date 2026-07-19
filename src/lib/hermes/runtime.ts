@@ -1,24 +1,30 @@
 /**
  * Hermes Agent runtime — product shell for Agent by Artispreneur.
  *
- * Backend model:
- *   Hermes (workspace agent) = Bedrock DeepSeek chat
- *   Runtime brain            = PAL / ROSTR (Soul + NPAO + specialist roster)
- *   Capability packs         = Skills Library (installed SKILL.md)
+ * Managed under the AWS instance system:
+ *   Hub (fs|S3)     → Soul, skills, PAL artifacts
+ *   DynamoDB        → USER# / PROJECT# / AGENT#hermes
+ *   Bedrock         → DeepSeek LLM
+ *   PAL / ROSTR     → compilation + NPAO routing
  */
 
-import { readFile } from "fs/promises";
-import path from "path";
 import { MASTER_AGENT_SYSTEM } from "@/lib/agent/bedrock";
-import { agentProjectScope, workspaceFsRoot, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
+import { agentProjectScope, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
 import { loadIntakeFromDisk, getIntake } from "@/lib/rostr/intake-store";
 import {
   listOwnedSkills,
   listInstalledSkillBodies,
   type OwnedSkill,
 } from "@/lib/skills/library-store";
-import { getSkillById, type SkillProduct } from "@/lib/skills/catalog";
+import { getSkillById } from "@/lib/skills/catalog";
 import type { SpecialistId } from "@/lib/rostr/specialists";
+import { hubReadText, hubBackendLabel } from "@/lib/hub/store";
+import {
+  getAwsHermesAgent,
+  getAwsInstanceProject,
+  instancePlaneStatus,
+  syncInstanceRuntime,
+} from "@/lib/aws/instance-registry";
 
 const MAX_SKILL_CHARS = 3500;
 const MAX_SOUL_CHARS = 6000;
@@ -43,6 +49,7 @@ export type HermesRuntimeSnapshot = {
     installed_at?: string;
   }[];
   runtime: "hermes+pal-rostr";
+  aws_instance: ReturnType<typeof instancePlaneStatus>;
 };
 
 export async function getHermesSnapshot(
@@ -59,19 +66,23 @@ export async function getHermesSnapshot(
 
   let soulLoaded = false;
   let soulChars = 0;
-  try {
-    const soul = await readFile(
-      path.join(workspaceFsRoot(scope), "00-config", "master-soul.md"),
-      "utf8",
-    );
-    soulLoaded = soul.trim().length > 0;
+  const soul = await hubReadText(scope, "00-config/master-soul.md");
+  if (soul?.trim()) {
+    soulLoaded = true;
     soulChars = soul.length;
-  } catch {
-    if (pal?.master_soul_md) {
-      soulLoaded = true;
-      soulChars = pal.master_soul_md.length;
-    }
+  } else if (pal?.master_soul_md) {
+    soulLoaded = true;
+    soulChars = pal.master_soul_md.length;
   }
+
+  // Best-effort sync to instance control plane
+  await syncInstanceRuntime({
+    userId,
+    projectId,
+    completeness: pal?.workspace_config?.completeness ?? null,
+    soulLoaded,
+    activeSkillSlugs: active.map((s) => s.slug),
+  }).catch(() => undefined);
 
   return {
     workspace_path: workspaceLogicalPath(scope),
@@ -99,23 +110,19 @@ export async function getHermesSnapshot(
       };
     }),
     runtime: "hermes+pal-rostr",
+    aws_instance: instancePlaneStatus(),
   };
 }
 
 async function loadSoulMarkdown(userId: string, projectId: string): Promise<string | null> {
   const scope = agentProjectScope(userId, projectId);
-  try {
-    return await readFile(
-      path.join(workspaceFsRoot(scope), "00-config", "master-soul.md"),
-      "utf8",
-    );
-  } catch {
-    const pal =
-      getIntake(projectId) ||
-      getIntake(userId) ||
-      (await loadIntakeFromDisk(userId, projectId));
-    return pal?.master_soul_md ?? null;
-  }
+  const soul = await hubReadText(scope, "00-config/master-soul.md");
+  if (soul?.trim()) return soul;
+  const pal =
+    getIntake(projectId) ||
+    getIntake(userId) ||
+    (await loadIntakeFromDisk(userId, projectId));
+  return pal?.master_soul_md ?? null;
 }
 
 function clip(text: string, max: number) {
@@ -123,9 +130,6 @@ function clip(text: string, max: number) {
   return `${text.slice(0, max)}\n\n…[truncated for context budget]`;
 }
 
-/**
- * Build Hermes system prompt: base rules + PAL Soul + roster/NPAO + active skill packs.
- */
 export async function buildHermesSystemPrompt(
   userId: string,
   projectId: string,
@@ -137,14 +141,23 @@ export async function buildHermesSystemPrompt(
     (await loadIntakeFromDisk(userId, projectId));
   const soul = await loadSoulMarkdown(userId, projectId);
   const skillBodies = await listInstalledSkillBodies(userId, projectId);
+  const instanceProject = await getAwsInstanceProject(userId, projectId);
+  const hermesAgent = await getAwsHermesAgent(userId);
 
   const parts: string[] = [
     MASTER_AGENT_SYSTEM,
     "",
-    "## Hermes runtime",
+    "## Hermes runtime (AWS instance)",
     "You are running as the Hermes Agent inside Agent by Artispreneur.",
     "Your operating system is ROSTR: PAL-compiled Soul, NPAO task routing, specialist roster, and installed Skills Library packs.",
     `Workspace: ${snapshot.workspace_path}`,
+    `Hub backend: ${hubBackendLabel()}`,
+    instanceProject
+      ? `Instance project plan: ${instanceProject.plan} · s3_prefix: ${instanceProject.s3_prefix}`
+      : "Instance project: provisioning on first login.",
+    hermesAgent
+      ? `Control plane AGENT#hermes · model ${hermesAgent.model_id}`
+      : "Control plane AGENT#hermes: pending sync.",
     "When a skill pack is active, follow its Runtime protocol for matching requests. Route domain work to the named specialist role conceptually; you remain the manager drafting outputs.",
   ];
 
@@ -194,14 +207,6 @@ export async function buildHermesSystemPrompt(
   }
 
   return { system: parts.join("\n"), snapshot };
-}
-
-export function skillProductMeta(skill: SkillProduct) {
-  return {
-    id: skill.id,
-    slug: skill.slug,
-    specialistId: skill.specialistId,
-  };
 }
 
 export type { OwnedSkill };

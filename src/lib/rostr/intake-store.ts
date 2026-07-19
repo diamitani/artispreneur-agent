@@ -1,21 +1,20 @@
 /**
- * Intake store — memory + hierarchical Rostr Hub on disk.
+ * Intake store — memory + Rostr Hub (fs|S3) under AWS instance hierarchy.
  *
- * Path:
- * .data/orgs/diamitani-industries/tenants/artispreneur-com/products/agent/
+ * Path key:
+ * orgs/diamitani-industries/tenants/artispreneur-com/products/agent/
  *   users/{cognitoSub}/projects/{projectId}/00-config/
  *
- * Prod target: same key layout on S3 + DynamoDB USER# index.
+ * Control plane: DynamoDB USER# / PROJECT# sync via syncInstanceRuntime.
  */
 
-import { mkdir, writeFile, readFile } from "fs/promises";
-import path from "path";
 import type { PalCompilationResult } from "./pal-compiler";
 import {
   agentProjectScope,
-  workspaceFsRoot,
   workspaceLogicalPath,
 } from "@/lib/tenancy/hierarchy";
+import { hubReadJson, hubWriteJson, hubWriteText } from "@/lib/hub/store";
+import { syncInstanceRuntime } from "@/lib/aws/instance-registry";
 
 const memory = new Map<string, PalCompilationResult>();
 
@@ -39,12 +38,6 @@ function scopeForResult(result: PalCompilationResult) {
 /** Persist compiled artifacts under hierarchical Agent project workspace */
 export async function persistIntakeToDisk(result: PalCompilationResult) {
   const scope = scopeForResult(result);
-  const root = workspaceFsRoot(scope);
-  const configDir = path.join(root, "00-config");
-
-  await mkdir(configDir, { recursive: true });
-  await mkdir(path.join(root, "03-agent-workflows"), { recursive: true });
-
   const tenancy = {
     workspace_path: workspaceLogicalPath(scope),
     org_id: scope.orgId,
@@ -54,48 +47,29 @@ export async function persistIntakeToDisk(result: PalCompilationResult) {
     project_id: scope.projectId,
   };
 
-  await writeFile(path.join(configDir, "master-soul.md"), result.master_soul_md, "utf8");
-  await writeFile(
-    path.join(configDir, "artist-profile.json"),
-    JSON.stringify(result.workspace_config.artist_profile, null, 2),
-    "utf8",
-  );
-  await writeFile(
-    path.join(configDir, "workspace-config.json"),
-    JSON.stringify({ ...result.workspace_config, tenancy }, null, 2),
-    "utf8",
-  );
-  await writeFile(
-    path.join(configDir, "tenancy.json"),
-    JSON.stringify(tenancy, null, 2),
-    "utf8",
-  );
-  await writeFile(
-    path.join(configDir, "permissions.yaml"),
+  await hubWriteText(scope, "00-config/master-soul.md", result.master_soul_md);
+  await hubWriteJson(scope, "00-config/artist-profile.json", result.workspace_config.artist_profile);
+  await hubWriteJson(scope, "00-config/workspace-config.json", {
+    ...result.workspace_config,
+    tenancy,
+  });
+  await hubWriteJson(scope, "00-config/tenancy.json", tenancy);
+  await hubWriteText(
+    scope,
+    "00-config/permissions.yaml",
     `default_mode: ${result.workspace_config.permissions.default_mode}\napproval_required: true\n`,
-    "utf8",
   );
-  await writeFile(
-    path.join(root, "03-agent-workflows", "npao-plan.json"),
-    JSON.stringify(result.npao_plan, null, 2),
-    "utf8",
-  );
-  await writeFile(
-    path.join(configDir, "pal-compilation.json"),
-    JSON.stringify({ ...result, tenancy }, null, 2),
-    "utf8",
-  );
+  await hubWriteJson(scope, "03-agent-workflows/npao-plan.json", result.npao_plan);
+  await hubWriteJson(scope, "00-config/pal-compilation.json", { ...result, tenancy });
 
-  // Legacy alias for older loaders
-  const legacy = path.join(process.cwd(), ".data", "workspaces", result.workspace_config.artist_id);
-  await mkdir(path.join(legacy, "00-config"), { recursive: true });
-  await writeFile(
-    path.join(legacy, "00-config", "pal-compilation.json"),
-    JSON.stringify({ ...result, tenancy, hub_path: configDir }, null, 2),
-    "utf8",
-  );
+  await syncInstanceRuntime({
+    userId: result.user_id,
+    projectId: result.workspace_config.artist_id,
+    completeness: result.workspace_config.completeness ?? null,
+    soulLoaded: Boolean(result.master_soul_md?.trim()),
+  }).catch((e) => console.error("[instance-sync pal]", e));
 
-  return configDir;
+  return workspaceLogicalPath(scope) + "/00-config";
 }
 
 export async function loadIntakeFromDisk(
@@ -103,11 +77,5 @@ export async function loadIntakeFromDisk(
   projectId: string,
 ): Promise<PalCompilationResult | null> {
   const scope = agentProjectScope(userId, projectId);
-  const file = path.join(workspaceFsRoot(scope), "00-config", "pal-compilation.json");
-  try {
-    const raw = await readFile(file, "utf8");
-    return JSON.parse(raw) as PalCompilationResult;
-  } catch {
-    return null;
-  }
+  return hubReadJson<PalCompilationResult>(scope, "00-config/pal-compilation.json");
 }

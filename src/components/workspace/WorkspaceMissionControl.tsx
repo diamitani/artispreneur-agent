@@ -11,6 +11,7 @@ type HermesSnap = {
   soul_loaded: boolean;
   active_skills: { slug: string; name: string; specialist_id?: string }[];
   runtime: string;
+  aws_instance?: { hub_backend: string; dynamodb_enabled: boolean };
 };
 
 /**
@@ -89,7 +90,9 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
               </div>
               <p className="font-mono text-[10px] text-[color:var(--color-gray-mid)]">
                 Diamitani → Artispreneur → Agent · {name} ·{" "}
-                {result.workspace_config.completeness}%
+                {result.workspace_config.completeness}% · hub:{" "}
+                {hermes?.aws_instance?.hub_backend || "fs"}
+                {hermes?.aws_instance?.dynamodb_enabled ? " · DDB" : ""}
               </p>
             </div>
           </div>

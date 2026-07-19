@@ -204,7 +204,8 @@ flowchart LR
 | Mission Control handoff | Shipped (light) |
 | Hermes Agent (Bedrock DeepSeek + PAL/ROSTR) | Shipped (`/api/agent/chat` + `/api/hermes/runtime`) |
 | Skills Library → Hermes install | Shipped (`/skills/library`, pack bodies in `packs.ts`) |
-| Workspace `apa_*` API keys + usage ledger | Shipped |
+| AWS instance plane (Hub fs\|S3 + DynamoDB USER#) | Shipped (`docs/AWS_INSTANCE.md`, `/api/aws/instance`) |
+| Workspace `apa_*` API keys + usage ledger | Shipped (hub + KEY# index) |
 | Full Hermes shell (projects board, vault UI) | Partial — chat + skills live; projects board next |
 | Composio integrations | Planned |
-| Durable multi-tenant hub (DynamoDB/S3) | Planned (AWS blueprint) |
+| Lightsail / Step Functions per-user VPS | Deferred (blueprint) |

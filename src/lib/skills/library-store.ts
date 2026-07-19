@@ -1,13 +1,16 @@
 /**
  * Per-workspace Skills Library — owned / installed digital skill packs.
- *
- * Own  → claim or Stripe fulfill (vault pack written)
- * Install → activate in Hermes runtime (loaded into chat system prompt)
+ * Persisted via AWS instance hub (fs|S3). Install state syncs to DynamoDB AGENT#hermes.
  */
 
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
-import { agentProjectScope, workspaceFsRoot } from "@/lib/tenancy/hierarchy";
+import { agentProjectScope } from "@/lib/tenancy/hierarchy";
+import {
+  hubReadJson,
+  hubReadText,
+  hubWriteJson,
+  hubWriteText,
+} from "@/lib/hub/store";
+import { syncInstanceRuntime } from "@/lib/aws/instance-registry";
 import { getSkillById, type SkillProduct } from "./catalog";
 import { renderSkillPackMarkdown } from "./packs";
 
@@ -28,6 +31,7 @@ type LibraryFile = {
   project_id: string;
   skills: OwnedSkill[];
   updated_at: string;
+  hub?: string;
 };
 
 type HermesSkillsRegistry = {
@@ -38,80 +42,67 @@ type HermesSkillsRegistry = {
   updated_at: string;
 };
 
-function libraryPath(userId: string, projectId: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "00-config",
-    "skills-library.json",
-  );
-}
-
-function hermesRegistryPath(userId: string, projectId: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "00-config",
-    "hermes-skills.json",
-  );
-}
-
-function packDir(userId: string, projectId: string, slug: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "skills",
-    slug,
-  );
-}
-
 async function readLibrary(userId: string, projectId: string): Promise<LibraryFile> {
-  try {
-    return JSON.parse(await readFile(libraryPath(userId, projectId), "utf8")) as LibraryFile;
-  } catch {
-    return { user_id: userId, project_id: projectId, skills: [], updated_at: new Date().toISOString() };
-  }
+  const scope = agentProjectScope(userId, projectId);
+  const lib = await hubReadJson<LibraryFile>(scope, "00-config/skills-library.json");
+  return (
+    lib ?? {
+      user_id: userId,
+      project_id: projectId,
+      skills: [],
+      updated_at: new Date().toISOString(),
+    }
+  );
 }
 
 async function writeLibrary(lib: LibraryFile) {
-  const file = libraryPath(lib.user_id, lib.project_id);
-  await mkdir(path.dirname(file), { recursive: true });
+  const scope = agentProjectScope(lib.user_id, lib.project_id);
   lib.updated_at = new Date().toISOString();
-  await writeFile(file, JSON.stringify(lib, null, 2), "utf8");
+  lib.hub = "aws-instance";
+  await hubWriteJson(scope, "00-config/skills-library.json", lib);
   await syncHermesRegistry(lib);
 }
 
 async function syncHermesRegistry(lib: LibraryFile) {
+  const scope = agentProjectScope(lib.user_id, lib.project_id);
+  const active = lib.skills.filter((s) => s.installed).map((s) => s.slug);
   const registry: HermesSkillsRegistry = {
     runtime: "hermes+pal-rostr",
     user_id: lib.user_id,
     project_id: lib.project_id,
-    active: lib.skills.filter((s) => s.installed).map((s) => s.slug),
+    active,
     updated_at: new Date().toISOString(),
   };
-  const file = hermesRegistryPath(lib.user_id, lib.project_id);
-  await mkdir(path.dirname(file), { recursive: true });
-  await writeFile(file, JSON.stringify(registry, null, 2), "utf8");
+  await hubWriteJson(scope, "00-config/hermes-skills.json", registry);
+  await syncInstanceRuntime({
+    userId: lib.user_id,
+    projectId: lib.project_id,
+    activeSkillSlugs: active,
+  }).catch((e) => console.error("[instance-sync skills]", e));
 }
 
-async function writePackFiles(userId: string, projectId: string, skill: SkillProduct, owned: OwnedSkill) {
-  const dir = packDir(userId, projectId, skill.slug);
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, "SKILL.md"), renderSkillPackMarkdown(skill), "utf8");
-  await writeFile(
-    path.join(dir, "manifest.json"),
-    JSON.stringify(
-      {
-        id: skill.id,
-        slug: skill.slug,
-        version: skill.version,
-        specialist_id: skill.specialistId,
-        acquired_at: owned.acquired_at,
-        source: owned.source,
-        runtime: "hermes+pal-rostr",
-      },
-      null,
-      2,
-    ),
-    "utf8",
+async function writePackFiles(
+  userId: string,
+  projectId: string,
+  skill: SkillProduct,
+  owned: OwnedSkill,
+) {
+  const scope = agentProjectScope(userId, projectId);
+  await hubWriteText(
+    scope,
+    `skills/${skill.slug}/SKILL.md`,
+    renderSkillPackMarkdown(skill),
   );
+  await hubWriteJson(scope, `skills/${skill.slug}/manifest.json`, {
+    id: skill.id,
+    slug: skill.slug,
+    version: skill.version,
+    specialist_id: skill.specialistId,
+    acquired_at: owned.acquired_at,
+    source: owned.source,
+    runtime: "hermes+pal-rostr",
+    hub: "aws-instance",
+  });
 }
 
 export async function listOwnedSkills(userId: string, projectId: string) {
@@ -123,22 +114,16 @@ export async function ownsSkill(userId: string, projectId: string, skillId: stri
   return lib.skills.some((s) => s.skill_id === skillId);
 }
 
-/**
- * Claim / fulfill a skill into the library.
- * Free claims auto-install into Hermes so the pack is immediately usable.
- */
 export async function addSkillToLibrary(input: {
   userId: string;
   projectId: string;
   skill: SkillProduct;
   source: OwnedSkill["source"];
   stripeSessionId?: string;
-  /** Default: true for free_claim, false for paid until webhook confirms */
   autoInstall?: boolean;
 }) {
   const lib = await readLibrary(input.userId, input.projectId);
   if (lib.skills.some((s) => s.skill_id === input.skill.id)) {
-    // Refresh pack body if already owned
     const existing = lib.skills.find((s) => s.skill_id === input.skill.id)!;
     await writePackFiles(input.userId, input.projectId, input.skill, existing);
     return { alreadyOwned: true as const, skill: existing };
@@ -198,24 +183,21 @@ export async function enrichOwned(userId: string, projectId: string) {
   }));
 }
 
-/** Read SKILL.md bodies for packs currently installed in Hermes */
 export async function listInstalledSkillBodies(userId: string, projectId: string) {
   const owned = await listOwnedSkills(userId, projectId);
   const installed = owned.filter((s) => s.installed);
+  const scope = agentProjectScope(userId, projectId);
   const out: { skill_id: string; slug: string; name: string; body: string }[] = [];
 
   for (const s of installed) {
     const product = getSkillById(s.skill_id);
-    const file = path.join(packDir(userId, projectId, s.slug), "SKILL.md");
-    try {
-      const body = await readFile(file, "utf8");
+    const body = await hubReadText(scope, `skills/${s.slug}/SKILL.md`);
+    if (body) {
       out.push({ skill_id: s.skill_id, slug: s.slug, name: s.name, body });
-    } catch {
-      if (product) {
-        const body = renderSkillPackMarkdown(product);
-        await writePackFiles(userId, projectId, product, s);
-        out.push({ skill_id: s.skill_id, slug: s.slug, name: s.name, body });
-      }
+    } else if (product) {
+      const rendered = renderSkillPackMarkdown(product);
+      await writePackFiles(userId, projectId, product, s);
+      out.push({ skill_id: s.skill_id, slug: s.slug, name: s.name, body: rendered });
     }
   }
 

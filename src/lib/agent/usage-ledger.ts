@@ -1,11 +1,15 @@
 /**
  * Per-workspace Agent usage ledger — keyed by customer apa_* API key + project.
- * Local JSONL; prod target = DynamoDB bedrock-usage table.
+ * Hub (fs|S3) JSONL + summary; DynamoDB USAGE#{day} when instance table is set.
  */
 
-import { appendFile, mkdir, readFile } from "fs/promises";
-import path from "path";
-import { agentProjectScope, workspaceFsRoot } from "@/lib/tenancy/hierarchy";
+import { agentProjectScope } from "@/lib/tenancy/hierarchy";
+import {
+  hubAppendJsonl,
+  hubReadJson,
+  hubWriteJson,
+} from "@/lib/hub/store";
+import { touchInstanceUsageDay } from "@/lib/aws/instance-registry";
 
 export type UsageEvent = {
   at: string;
@@ -22,28 +26,13 @@ export type UsageEvent = {
   route: string;
 };
 
-/** Rough DeepSeek V3 Bedrock pricing (adjust when AWS publishes exact rates) */
 function estimateCost(input: number, output: number) {
   return (input / 1000) * 0.00135 + (output / 1000) * 0.00405;
 }
 
-function ledgerPath(userId: string, projectId: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "00-config",
-    "usage.jsonl",
-  );
-}
-
-function summaryPath(userId: string, projectId: string) {
-  return path.join(
-    workspaceFsRoot(agentProjectScope(userId, projectId)),
-    "00-config",
-    "usage-summary.json",
-  );
-}
-
-export async function recordUsage(event: Omit<UsageEvent, "at" | "estimated_cost_usd" | "total_tokens">) {
+export async function recordUsage(
+  event: Omit<UsageEvent, "at" | "estimated_cost_usd" | "total_tokens">,
+) {
   const full: UsageEvent = {
     ...event,
     at: new Date().toISOString(),
@@ -51,25 +40,31 @@ export async function recordUsage(event: Omit<UsageEvent, "at" | "estimated_cost
     estimated_cost_usd: estimateCost(event.input_tokens, event.output_tokens),
   };
 
-  const file = ledgerPath(event.user_id, event.project_id);
-  await mkdir(path.dirname(file), { recursive: true });
-  await appendFile(file, `${JSON.stringify(full)}\n`, "utf8");
+  const scope = agentProjectScope(event.user_id, event.project_id);
+  await hubAppendJsonl(scope, "00-config/usage.jsonl", full);
 
-  // Rolling summary
-  let summary = {
+  type Summary = {
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+    estimated_cost_usd: number;
+    calls: number;
+    last_at: string | null;
+    model_id: string;
+  };
+
+  let summary: Summary = {
     input_tokens: 0,
     output_tokens: 0,
     total_tokens: 0,
     estimated_cost_usd: 0,
     calls: 0,
-    last_at: null as string | null,
+    last_at: null,
     model_id: event.model_id,
   };
-  try {
-    summary = { ...summary, ...JSON.parse(await readFile(summaryPath(event.user_id, event.project_id), "utf8")) };
-  } catch {
-    /* new */
-  }
+  const prev = await hubReadJson<Summary>(scope, "00-config/usage-summary.json");
+  if (prev) summary = { ...summary, ...prev };
+
   summary.input_tokens += full.input_tokens;
   summary.output_tokens += full.output_tokens;
   summary.total_tokens += full.total_tokens;
@@ -80,23 +75,31 @@ export async function recordUsage(event: Omit<UsageEvent, "at" | "estimated_cost
   summary.last_at = full.at;
   summary.model_id = event.model_id;
 
-  const { writeFile } = await import("fs/promises");
-  await writeFile(summaryPath(event.user_id, event.project_id), JSON.stringify(summary, null, 2), "utf8");
+  await hubWriteJson(scope, "00-config/usage-summary.json", summary);
+
+  const day = full.at.slice(0, 10);
+  await touchInstanceUsageDay({
+    userId: event.user_id,
+    projectId: event.project_id,
+    day,
+    inputTokens: full.input_tokens,
+    outputTokens: full.output_tokens,
+    costUsd: full.estimated_cost_usd,
+  }).catch(() => undefined);
 
   return full;
 }
 
 export async function getUsageSummary(userId: string, projectId: string) {
-  try {
-    return JSON.parse(await readFile(summaryPath(userId, projectId), "utf8"));
-  } catch {
-    return {
+  const scope = agentProjectScope(userId, projectId);
+  return (
+    (await hubReadJson(scope, "00-config/usage-summary.json")) ?? {
       input_tokens: 0,
       output_tokens: 0,
       total_tokens: 0,
       estimated_cost_usd: 0,
       calls: 0,
       last_at: null,
-    };
-  }
+    }
+  );
 }
