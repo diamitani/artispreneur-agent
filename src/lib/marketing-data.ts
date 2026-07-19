@@ -1,4 +1,102 @@
-/** Content mirrored from Artispreneur Agent.dc.html — product source of truth */
+/** SaaS marketing content — PAL site-spec + product source of truth */
+
+export const NAV_LINKS = [
+  { href: "/features", label: "Features" },
+  { href: "/skills", label: "Skills" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
+  { href: "/faq", label: "FAQ" },
+] as const;
+
+export const PROBLEM_PAINS = [
+  {
+    label: "01",
+    title: "Ops bury the music",
+    body: "EPKs, outreach, splits, and release calendars live in twelve tabs — none of them talk to each other.",
+  },
+  {
+    label: "02",
+    title: "Generic AI forgets you",
+    body: "Chatbots don't know your genre, boundaries, or release date. Every answer starts from zero.",
+  },
+  {
+    label: "03",
+    title: "One wrong send costs trust",
+    body: "Pitch emails and deal language need a human gate. Autonomy without approval is a liability.",
+  },
+] as const;
+
+export const SOLUTION_PILLARS = [
+  {
+    tag: "PAL",
+    title: "Compile your intent",
+    body: "Short onboarding becomes a Master Soul, roster, and NPAO plan — not a generic prompt.",
+  },
+  {
+    tag: "HERMES",
+    title: "Run the business day",
+    body: "Chat with your chief of staff on Bedrock DeepSeek. Specialists draft; you approve.",
+  },
+  {
+    tag: "SKILLS",
+    title: "Install real playbooks",
+    body: "Marketplace packs drop into your vault and activate in Hermes — EPK, release, outreach, rights.",
+  },
+] as const;
+
+export const FEATURE_BLOCKS = [
+  {
+    id: "hermes",
+    eyebrow: "Hermes Agent",
+    title: "A manager-grade chief of staff",
+    body: "Ask in plain language. Hermes routes to the right specialist, drafts the artifact, and waits for your approval before anything ships.",
+    points: [
+      "Bedrock DeepSeek on Artispreneur infra",
+      "Soul + roster + Skills in every turn",
+      "Workspace apa_* keys + usage ledger",
+    ],
+  },
+  {
+    id: "pal",
+    eyebrow: "PAL / ROSTR",
+    title: "Onboarding that becomes an OS",
+    body: "PAL compiles your answers into soul.md, artist profile, specialist roster, and a first NPAO plan — the runtime brain for Hermes.",
+    points: [
+      "Soft-gate Mission Control",
+      "7 specialist agents day one",
+      "Recompile when goals change",
+    ],
+  },
+  {
+    id: "skills",
+    eyebrow: "Skills Library",
+    title: "Capability packs you can install",
+    body: "Browse like a store. Claim free packs at launch. Install into Hermes so playbooks load on every chat.",
+    points: [
+      "EPK, contracts, release, outreach, finance",
+      "Stripe + HubSpot ready for paid",
+      "AWS hub vault under your instance",
+    ],
+  },
+  {
+    id: "aws",
+    eyebrow: "AWS Instance",
+    title: "Multi-tenant by design",
+    body: "Diamitani → Artispreneur → Agent → your Cognito user → project workspace. Hub on S3, control plane on DynamoDB USER#.",
+    points: [
+      "Cognito OAuth (not Mantle)",
+      "Hierarchical Rostr Hub paths",
+      "Approval-first audit posture",
+    ],
+  },
+] as const;
+
+export const SOCIAL_PROOF = [
+  { value: "7", label: "Specialist agents" },
+  { value: "PAL", label: "Compiled Soul runtime" },
+  { value: "$0", label: "Starter forever" },
+  { value: "0", label: "Sends without approval" },
+] as const;
 
 export const HOW_STEPS = [
   {
@@ -181,7 +279,19 @@ export const FAQS = [
   },
   {
     q: "What is soul.md?",
-    a: "It's your operating profile — identity, goals, brand voice, boundaries, and current priorities — generated from your onboarding answers. Every agent reads it before working for you, so nothing you get back is generic. You can edit it anytime in your Knowledge Vault.",
+    a: "It's your operating profile — identity, goals, brand voice, boundaries, and current priorities — generated from your PAL onboarding answers. Hermes and every specialist read it before working for you, so nothing you get back is generic. You can recompile anytime.",
+  },
+  {
+    q: "What is Hermes?",
+    a: "Hermes is the Master Agent runtime inside Agent by Artispreneur. It runs on Amazon Bedrock (DeepSeek), loads your PAL-compiled Soul, specialist roster, and installed Skills Library packs, then drafts work for your approval.",
+  },
+  {
+    q: "How do Skills work?",
+    a: "Skills are digital playbooks in the marketplace. Claim or purchase a pack, install it into your library, and Hermes injects the SKILL.md protocol into chat. Free during launch.",
+  },
+  {
+    q: "Is my workspace on AWS?",
+    a: "Yes. Identity is Cognito. Your hub (Soul, skills, usage) lives under the Diamitani → Artispreneur → Agent hierarchy on the instance hub (S3 in production, local fs in dev). Control plane records use DynamoDB USER# keys.",
   },
   {
     q: "Is this legal or tax advice?",
@@ -193,6 +303,6 @@ export const FAQS = [
   },
   {
     q: "Can I bring my own model keys?",
-    a: "Yes. Paid plans support BYOK through encrypted secrets storage. Your usage is marked accordingly, but workspace safety rules, action limits, and audit logging still apply.",
+    a: "Yes. Paid plans support BYOK through encrypted secrets storage. Your usage is marked accordingly, but workspace safety rules, action limits, and audit logging still apply. Platform Bedrock credentials are never shared with customers.",
   },
 ];

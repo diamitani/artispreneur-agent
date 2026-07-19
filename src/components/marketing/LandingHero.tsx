@@ -92,8 +92,8 @@ export function LandingHero() {
             >
               Start for Free
             </a>
-            <a href="#how" className="btn btn--outline-on-dark btn--lg">
-              See How It Works
+            <a href="/features" className="btn btn--outline-on-dark btn--lg">
+              Explore Features
             </a>
           </motion.div>
 

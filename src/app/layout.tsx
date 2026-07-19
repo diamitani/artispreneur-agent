@@ -25,9 +25,17 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Artispreneur Agent — Hire your AI business team",
+  title: {
+    default: "Agent by Artispreneur — Hire your AI business team",
+    template: "%s · Artispreneur Agent",
+  },
   description:
-    "Tell your Artispreneur Agent what you're trying to accomplish. It builds the plan, activates the right specialist, and returns finished work for your approval.",
+    "Hermes Agent for independent musicians. PAL-compiled Soul, specialist roster, Skills Library — approval-first on AWS. Art Means Business.",
+  openGraph: {
+    title: "Agent by Artispreneur",
+    description: "Hire your AI business team. Approval-first. Art Means Business.",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

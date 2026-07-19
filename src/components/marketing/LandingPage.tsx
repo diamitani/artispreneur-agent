@@ -1,49 +1,165 @@
-import Image from "next/image";
 import Link from "next/link";
-import { brand } from "@/lib/brand";
 import {
   AGENT_CARDS,
-  FAQS,
+  COURSE_CHIPS,
   HOW_STEPS,
   MODE_CARDS,
-  PRICE_BOTTOM,
-  PRICE_TOP,
+  PROBLEM_PAINS,
+  SOCIAL_PROOF,
+  SOLUTION_PILLARS,
   TRUST_POINTS,
 } from "@/lib/marketing-data";
 import { SKILLS_CATALOG } from "@/lib/skills/catalog";
-import { Nav } from "./Nav";
-import { Footer } from "./Footer";
+import { MarketingShell } from "./MarketingShell";
 import { LandingHero } from "./LandingHero";
 import { TerminalShowcase } from "./TerminalShowcase";
 import { Reveal, RevealItem, RevealStagger } from "./Reveal";
+import { PricingGrid } from "./PricingGrid";
+import { FaqList } from "./FaqList";
+import { FinalCta } from "./FinalCta";
 
 export function LandingPage() {
   return (
-    <div className="grain">
-      <Nav />
-      <main>
-        <LandingHero />
-        <div className="bg-white pb-8 pt-2 md:pb-12">
-          <TerminalShowcase />
-        </div>
-        <HowSection />
-        <AgentsSection />
-        <ApprovalSection />
-        <ModesSection />
-        <SkillsTeaser />
-        <PricingSection />
-        <AcademySection />
-        <FaqSection />
-        <FinalCta />
-      </main>
-      <Footer />
-    </div>
+    <MarketingShell>
+      <LandingHero />
+      <ProofStrip />
+      <div className="bg-white pb-8 pt-2 md:pb-12">
+        <TerminalShowcase />
+      </div>
+      <ProblemSection />
+      <SolutionSection />
+      <HowSection />
+      <AgentsSection />
+      <ApprovalSection />
+      <ModesSection />
+      <SkillsTeaser />
+      <PricingTeaser />
+      <AcademySection />
+      <FaqTeaser />
+      <FinalCta />
+    </MarketingShell>
+  );
+}
+
+function ProofStrip() {
+  return (
+    <section className="border-b border-[color:var(--color-border)] bg-white">
+      <div className="container-page grid grid-cols-2 gap-6 py-8 md:grid-cols-4 md:gap-4 md:py-10">
+        {SOCIAL_PROOF.map((s, i) => (
+          <Reveal key={s.label} delay={i * 0.05} className="text-center md:text-left">
+            <p className="font-heading text-3xl text-[color:var(--color-crimson)] md:text-4xl">
+              {s.value}
+            </p>
+            <p className="mt-1 text-xs font-medium uppercase tracking-[0.08em] text-[color:var(--color-gray-mid)]">
+              {s.label}
+            </p>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProblemSection() {
+  return (
+    <section className="section bg-[color:var(--color-bg-surface)]">
+      <div className="container-page">
+        <Reveal className="mb-12 max-w-xl md:ml-0">
+          <p className="type-overline mb-2.5">The problem</p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}
+          >
+            The business side eats the art.
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-gray-mid)] md:text-base">
+            You didn&apos;t start making music to become a part-time ops manager. Agent by
+            Artispreneur is the operating system for the work that pays.
+          </p>
+        </Reveal>
+        <RevealStagger className="grid gap-0 md:grid-cols-3">
+          {PROBLEM_PAINS.map((p, i) => (
+            <RevealItem key={p.title}>
+              <article
+                className={`h-full px-6 py-7 md:px-7 ${
+                  i > 0 ? "border-t border-[color:var(--color-border)] md:border-l md:border-t-0" : ""
+                }`}
+              >
+                <p className="type-mono-label mb-3 text-[color:var(--color-crimson)]">{p.label}</p>
+                <h3 className="font-heading text-xl text-[color:var(--color-black)]">{p.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
+                  {p.body}
+                </p>
+              </article>
+            </RevealItem>
+          ))}
+        </RevealStagger>
+      </div>
+    </section>
+  );
+}
+
+function SolutionSection() {
+  return (
+    <section className="section bg-white">
+      <div className="container-page">
+        <Reveal className="mb-12 max-w-xl">
+          <p className="type-overline mb-2.5">The runtime</p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}
+          >
+            PAL compiles. Hermes runs. Skills unlock.
+          </h2>
+        </Reveal>
+        <RevealStagger className="grid gap-4 lg:grid-cols-3">
+          {SOLUTION_PILLARS.map((s, i) => (
+            <RevealItem key={s.tag}>
+              <article
+                className={`h-full p-7 ${
+                  i === 1
+                    ? "rounded-[12px] bg-[color:var(--color-bg-dark)] text-white"
+                    : "rounded-[12px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)]"
+                }`}
+              >
+                <p
+                  className={`type-mono-label mb-3 ${
+                    i === 1 ? "text-[color:var(--color-gold)]" : "text-[color:var(--color-crimson)]"
+                  }`}
+                >
+                  {s.tag}
+                </p>
+                <h3
+                  className={`font-heading text-xl ${
+                    i === 1 ? "text-white" : "text-[color:var(--color-black)]"
+                  }`}
+                >
+                  {s.title}
+                </h3>
+                <p
+                  className={`mt-2.5 text-sm leading-relaxed ${
+                    i === 1 ? "text-white/55" : "text-[color:var(--color-gray-mid)]"
+                  }`}
+                >
+                  {s.body}
+                </p>
+              </article>
+            </RevealItem>
+          ))}
+        </RevealStagger>
+        <Reveal delay={0.1} className="mt-8 text-center">
+          <Link href="/features" className="btn btn--outline btn--md">
+            Explore the product
+          </Link>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
 function HowSection() {
   return (
-    <section id="how" className="section bg-white">
+    <section id="how" className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page">
         <Reveal className="mx-auto mb-14 max-w-[560px] md:ml-0 md:max-w-lg md:text-left">
           <p className="type-overline mb-2.5">The Process</p>
@@ -80,7 +196,7 @@ function HowSection() {
 
 function AgentsSection() {
   return (
-    <section id="agents" className="section bg-[color:var(--color-bg-surface)]">
+    <section id="agents" className="section bg-white">
       <div className="container-page">
         <Reveal className="mb-10 max-w-xl">
           <p className="type-overline mb-2.5">Your Team</p>
@@ -95,10 +211,10 @@ function AgentsSection() {
         <Reveal delay={0.05}>
           <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-[12px] bg-[color:var(--color-bg-dark)] px-7 py-7 text-white">
             <div>
-              <h3 className="font-heading text-[22px]">Artispreneur Master Agent</h3>
+              <h3 className="font-heading text-[22px]">Hermes · Master Agent</h3>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/55">
                 Manager-grade chief of staff. Routes work, drafts plans, keeps every specialist
-                aligned to your soul.md.
+                aligned to your soul.md — on AWS Bedrock DeepSeek.
               </p>
             </div>
             <span className="rounded bg-[color:var(--color-gold)] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-[0.1em] text-[color:var(--color-black)]">
@@ -110,12 +226,12 @@ function AgentsSection() {
         <RevealStagger className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {AGENT_CARDS.map((a) => (
             <RevealItem key={a.name}>
-              <article className="h-full rounded-[10px] border border-transparent bg-white p-6 shadow-[var(--shadow-sm)] transition-[border-color,box-shadow] duration-200 hover:border-[color:var(--color-crimson)]/25 hover:shadow-[var(--shadow-lg)]">
+              <article className="h-full rounded-[10px] border border-transparent bg-[color:var(--color-bg-surface)] p-6 transition-[border-color,box-shadow] duration-200 hover:border-[color:var(--color-crimson)]/25 hover:bg-white hover:shadow-[var(--shadow-lg)]">
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h3 className="font-heading text-[17px] text-[color:var(--color-black)]">
                     {a.name}
                   </h3>
-                  <span className="shrink-0 rounded bg-[color:var(--color-bg-surface)] px-2 py-0.5 font-mono text-[9.5px] font-semibold tracking-wider text-[color:var(--color-gray-mid)]">
+                  <span className="shrink-0 rounded bg-white px-2 py-0.5 font-mono text-[9.5px] font-semibold tracking-wider text-[color:var(--color-gray-mid)]">
                     {a.gate}
                   </span>
                 </div>
@@ -131,7 +247,7 @@ function AgentsSection() {
 
 function ApprovalSection() {
   return (
-    <section className="section bg-white">
+    <section className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
         <Reveal>
           <p className="type-mono-label mb-4 text-[color:var(--color-crimson)]">
@@ -158,7 +274,7 @@ function ApprovalSection() {
           </ul>
         </Reveal>
         <Reveal delay={0.1}>
-          <div className="rounded-[12px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] p-6 md:translate-y-4">
+          <div className="rounded-[12px] border border-[color:var(--color-border)] bg-white p-6 md:translate-y-4">
             <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[color:var(--color-gray-mid)]">
               Approval queue
             </p>
@@ -174,7 +290,7 @@ function ApprovalSection() {
                 <span className="text-sm font-medium text-[color:var(--color-black)]">
                   {item.title}
                 </span>
-                <span className="rounded bg-white px-2 py-0.5 font-mono text-[10px] font-semibold text-[color:var(--color-crimson)]">
+                <span className="rounded bg-[color:var(--color-bg-surface)] px-2 py-0.5 font-mono text-[10px] font-semibold text-[color:var(--color-crimson)]">
                   {item.status}
                 </span>
               </div>
@@ -234,7 +350,8 @@ function SkillsTeaser() {
               Digital skills. Instant install.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
-              Browse skill packs like a store — free during launch.
+              Browse skill packs like a store — free during launch. Install into Hermes on your AWS
+              instance.
             </p>
           </div>
           <Link href="/skills" className="btn btn--primary btn--md">
@@ -262,7 +379,7 @@ function SkillsTeaser() {
   );
 }
 
-function PricingSection() {
+function PricingTeaser() {
   return (
     <section id="pricing" className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page">
@@ -272,97 +389,17 @@ function PricingSection() {
             className="font-heading text-[color:var(--color-black)]"
             style={{ fontSize: "clamp(1.75rem, 4vw, 2.35rem)" }}
           >
-            Start free. Add agents as you grow.
+            Start free. Scale when the roster grows.
           </h2>
+          <p className="mt-3 text-sm text-[color:var(--color-gray-mid)]">
+            Full detail on{" "}
+            <Link href="/pricing" className="font-semibold text-[color:var(--color-crimson)]">
+              the pricing page
+            </Link>
+            .
+          </p>
         </Reveal>
-
-        <RevealStagger className="mx-auto grid max-w-[900px] gap-4 md:grid-cols-3">
-          {PRICE_TOP.map((plan) => (
-            <RevealItem key={plan.name}>
-              <article
-                className={`relative flex h-full flex-col rounded-[12px] p-7 ${
-                  plan.featured
-                    ? "border-[1.5px] border-[color:var(--color-crimson)] bg-[color:var(--color-bg-dark)] text-white md:-translate-y-2"
-                    : "border-[1.5px] border-[color:var(--color-border)] bg-white"
-                }`}
-              >
-                {plan.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[color:var(--color-crimson)] px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-white">
-                    Most popular
-                  </span>
-                )}
-                <p
-                  className={`text-[13px] font-bold uppercase tracking-[0.06em] ${
-                    plan.featured ? "text-white/50" : "text-[color:var(--color-gray-mid)]"
-                  }`}
-                >
-                  {plan.name}
-                </p>
-                <p className="mt-2">
-                  <span
-                    className={`font-heading text-4xl ${
-                      plan.featured ? "text-white" : "text-[color:var(--color-black)]"
-                    }`}
-                  >
-                    {plan.price}
-                  </span>
-                  <span
-                    className={`ml-1 text-[13px] ${
-                      plan.featured ? "text-white/40" : "text-[color:var(--color-gray-subtle)]"
-                    }`}
-                  >
-                    {plan.per}
-                  </span>
-                </p>
-                <p
-                  className={`mt-3 text-sm ${
-                    plan.featured ? "text-white/70" : "text-[color:var(--color-gray-mid)]"
-                  }`}
-                >
-                  {plan.sub}
-                </p>
-                <ul className="mt-6 flex-1 space-y-2.5">
-                  {plan.feats.map((f) => (
-                    <li
-                      key={f}
-                      className={`flex gap-2 text-[13px] ${
-                        plan.featured ? "text-white/70" : "text-[color:var(--color-gray-dark)]"
-                      }`}
-                    >
-                      <span className="font-bold text-[color:var(--color-crimson)]">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="/api/auth/login?signup=1&return=/onboarding"
-                  className={`btn btn--md btn--block mt-6 ${
-                    plan.featured ? "btn--primary" : "btn--outline"
-                  }`}
-                >
-                  {plan.cta}
-                </a>
-              </article>
-            </RevealItem>
-          ))}
-        </RevealStagger>
-
-        <div className="mx-auto mt-6 grid max-w-[900px] gap-3 sm:grid-cols-2">
-          {PRICE_BOTTOM.map((p) => (
-            <div
-              key={p.name}
-              className="flex items-center justify-between rounded-[10px] border border-[color:var(--color-border)] bg-white px-5 py-4"
-            >
-              <span className="text-sm font-semibold text-[color:var(--color-black)]">{p.name}</span>
-              <span className="font-heading text-[19px] text-[color:var(--color-crimson)]">
-                {p.price}
-                <span className="ml-1 font-sans text-[11px] font-normal text-[color:var(--color-gray-mid)]">
-                  {p.per}
-                </span>
-              </span>
-            </div>
-          ))}
-        </div>
+        <PricingGrid showAddons={false} />
       </div>
     </section>
   );
@@ -385,6 +422,16 @@ function AcademySection() {
           <p className="mt-4 max-w-md text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
             Courses become tasks. Tasks become drafts. Drafts wait for your approval.
           </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {COURSE_CHIPS.slice(0, 4).map((c) => (
+              <span
+                key={c}
+                className="rounded-full border border-[color:var(--color-border)] px-3 py-1 text-[11px] font-medium text-[color:var(--color-gray-dark)]"
+              >
+                {c}
+              </span>
+            ))}
+          </div>
           <a
             href="/api/auth/login?signup=1&return=/onboarding"
             className="btn btn--primary btn--md mt-7"
@@ -398,7 +445,7 @@ function AcademySection() {
               { tag: "LESSON", color: "text-[color:var(--color-gray-mid)]", text: "How to register with a PRO" },
               { tag: "TASK", color: "text-[color:var(--color-crimson)]", text: "Draft PRO registration checklist" },
               { tag: "TASK", color: "text-[color:var(--color-crimson)]", text: "Prepare repertoire spreadsheet" },
-              { tag: "DONE", color: "text-[color:var(--ok-ink)]", text: "soul.md updated · Finance Manager notified" },
+              { tag: "DONE", color: "text-[color:var(--color-success)]", text: "soul.md updated · Finance notified" },
             ].map((row) => (
               <div
                 key={row.text}
@@ -415,7 +462,7 @@ function AcademySection() {
   );
 }
 
-function FaqSection() {
+function FaqTeaser() {
   return (
     <section className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page mx-auto max-w-[720px]">
@@ -427,58 +474,13 @@ function FaqSection() {
             Questions, answered.
           </h2>
         </Reveal>
-        <div className="space-y-3">
-          {FAQS.map((item, i) => (
-            <Reveal key={item.q} delay={i * 0.04}>
-              <details className="group rounded-[10px] border border-[color:var(--color-border)] bg-white px-5 py-4">
-                <summary className="cursor-pointer list-none text-[15px] font-semibold text-[color:var(--color-black)] marker:content-none">
-                  <span className="flex items-center justify-between gap-4">
-                    {item.q}
-                    <span className="text-[color:var(--color-crimson)] transition-transform group-open:rotate-45">
-                      +
-                    </span>
-                  </span>
-                </summary>
-                <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
-                  {item.a}
-                </p>
-              </details>
-            </Reveal>
-          ))}
-        </div>
+        <FaqList limit={4} />
+        <Reveal className="mt-8 text-center">
+          <Link href="/faq" className="btn btn--outline btn--md">
+            View all FAQ
+          </Link>
+        </Reveal>
       </div>
-    </section>
-  );
-}
-
-function FinalCta() {
-  return (
-    <section className="section bg-[color:var(--color-bg-brand)] text-center text-white">
-      <Reveal className="container-page mx-auto max-w-[600px]">
-        <Image
-          src={brand.logo.primaryPng}
-          alt=""
-          width={56}
-          height={56}
-          className="mx-auto mb-5 h-14 w-14"
-        />
-        <h2
-          className="font-heading text-white"
-          style={{ fontSize: "clamp(1.85rem, 4vw, 2.6rem)" }}
-        >
-          Build your music business.
-        </h2>
-        <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/75">
-          Join independent musicians running real careers with an AI business team —
-          approval-first.
-        </p>
-        <a
-          href="/api/auth/login?signup=1&return=/onboarding"
-          className="btn btn--gold btn--lg mt-9"
-        >
-          Become an Artispreneur
-        </a>
-      </Reveal>
     </section>
   );
 }
