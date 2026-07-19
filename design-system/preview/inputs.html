@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Components" name="Form Inputs" subtitle="Text, select, error and success states" viewport="700x110" -->
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: #fff; padding: 20px 24px; font-family: 'Inter', sans-serif; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 160px; }
+  label { font-size: 11px; font-weight: 600; color: #444; text-transform: none; letter-spacing: 0; }
+  input, select, textarea {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    border: 1px solid #CCCCCC;
+    border-radius: 6px;
+    color: #111;
+    outline: none;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  input:focus, select:focus { border-color: #CC0000; box-shadow: 0 0 0 3px rgba(204,0,0,0.1); }
+  input.error { border-color: #CC0000; }
+  input.success { border-color: #1A7F4B; }
+  .hint { font-size: 11px; color: #777; }
+  .err { font-size: 11px; color: #CC0000; }
+</style>
+</head><body>
+<div class="row">
+  <div class="field">
+    <label>Artist Name</label>
+    <input type="text" placeholder="e.g. Jay-Z" />
+    <span class="hint">Your stage name</span>
+  </div>
+  <div class="field">
+    <label>Email</label>
+    <input type="email" value="artist@example.com" class="success" />
+  </div>
+  <div class="field">
+    <label>Genre</label>
+    <select><option>Hip-Hop / Rap</option><option>R&B</option><option>Pop</option></select>
+  </div>
+  <div class="field">
+    <label>Business Type</label>
+    <input type="text" placeholder="LLC / C-Corp / Sole Prop" class="error"/>
+    <span class="err">This field is required</span>
+  </div>
+</div>
+</body></html>

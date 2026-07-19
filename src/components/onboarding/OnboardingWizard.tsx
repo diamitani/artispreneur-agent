@@ -311,7 +311,7 @@ function Header({ progress }: { progress: number }) {
   return (
     <div>
       <div className="flex items-center gap-3">
-        <Image src="/artispreneur-mark.svg" alt="Artispreneur" width={36} height={36} />
+        <Image src="/artispreneur-logo.png" alt="Artispreneur" width={36} height={36} />
         <div>
           <p className="text-sm font-semibold text-[color:var(--ink)]">Agent by Artispreneur</p>
           <p className="text-xs text-[color:var(--muted)]">PAL-compiled onboarding</p>

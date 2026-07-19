@@ -1,52 +1,18 @@
-"use client";
-
-import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArtispreneurMark } from "@/components/brand/ArtispreneurMark";
 import { brand } from "@/lib/brand";
+import {
+  AGENT_CARDS,
+  FAQS,
+  HOW_STEPS,
+  MODE_CARDS,
+  PRICE_BOTTOM,
+  PRICE_TOP,
+  TRUST_POINTS,
+} from "@/lib/marketing-data";
+import { SKILLS_CATALOG } from "@/lib/skills/catalog";
 import { Nav } from "./Nav";
 import { Footer } from "./Footer";
-
-const HOW = [
-  {
-    n: "01",
-    title: "Sign up",
-    body: "Create your account. We provision a private workspace namespace — not a shared chatbot thread.",
-  },
-  {
-    n: "02",
-    title: "PAL intake → Master Soul.md",
-    body: "Answer a short ROSTR questionnaire. The PAL Roster Agent compiles your identity, goals, voice, and approval rules.",
-  },
-  {
-    n: "03",
-    title: "Enter Mission Control",
-    body: "Your Master Agent + specialists draft EPK, contracts, releases, and outreach. You approve before anything ships.",
-  },
-];
-
-const FAQ = [
-  {
-    q: "Is this a distributor or a label?",
-    a: "No. Artispreneur is the operating system and AI team that helps independents run the business side — rights, docs, outreach, learning, and catalog — without signing you or replacing DistroKid.",
-  },
-  {
-    q: "What is PAL / Master Soul.md?",
-    a: "PAL is our Prompt Abstraction Layer. Onboarding answers are compiled into Master Soul.md — the file every specialist reads so they sound like your team, not a generic bot.",
-  },
-  {
-    q: "Will agents send emails or distribute music without me?",
-    a: "No. Default mode is approval-first. Agents research and draft freely; rights, outbound, and money actions require your named approval.",
-  },
-  {
-    q: "Who is Agent for?",
-    a: "Independent artists first. Agency and Label modes unlock the same stack for managers and small rosters.",
-  },
-  {
-    q: "What is Cataba?",
-    a: "Cataba is the catalog layer — upload discography, track splits and identifiers, and prep publishing registration with a specialist agent.",
-  },
-];
 
 export function LandingPage() {
   return (
@@ -54,12 +20,13 @@ export function LandingPage() {
       <Nav />
       <main>
         <Hero />
-        <HowItWorks />
-        <TeamSection />
-        <ProductsSection />
+        <HowSection />
+        <AgentsSection />
+        <ApprovalSection />
         <ModesSection />
-        <TrustSection />
+        <SkillsTeaser />
         <PricingSection />
+        <AcademySection />
         <FaqSection />
         <FinalCta />
       </main>
@@ -70,105 +37,109 @@ export function LandingPage() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[min(92dvh,880px)] overflow-hidden bg-[color:var(--color-red)] text-white">
+    <section className="relative overflow-hidden bg-[color:var(--color-bg-dark)] text-white">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
+        className="pointer-events-none absolute -left-20 -top-20 h-[400px] w-[400px] rounded-full bg-[rgba(204,0,0,0.12)]"
       />
       <div
         aria-hidden
-        className="mark-glow absolute -right-[12%] top-[10%] hidden h-[520px] w-[520px] md:block"
-      >
-        <ArtispreneurMark size={520} variant="reversed" className="opacity-90" />
-      </div>
+        className="pointer-events-none absolute -bottom-24 -right-16 h-[350px] w-[350px] rounded-full bg-[rgba(254,208,1,0.07)]"
+      />
 
-      <div className="container-page relative z-10 flex min-h-[min(92dvh,880px)] flex-col justify-center py-20 md:py-28">
-        <p className="eyebrow eyebrow-gold animate-fade-up">Agent by Artispreneur</p>
-        <h1
-          className="font-heading animate-fade-up delay-1 mt-5 max-w-[14ch] text-white"
-          style={{ fontSize: "clamp(2.75rem, 7vw, 5.25rem)" }}
-        >
-          Artispreneur
-        </h1>
-        <p className="animate-fade-up delay-2 mt-2 font-heading text-[clamp(1.35rem,3vw,2rem)] text-[color:var(--color-gold)]">
-          {brand.tagline}
-        </p>
-        <p className="animate-fade-up delay-2 mt-6 max-w-xl text-lg leading-relaxed text-white/90">
-          Your AI business team — compiled around your career. Tell us where you are; get a private
-          workspace, Master Soul, and specialists that draft the next move.
-        </p>
-        <div className="animate-fade-up delay-3 mt-10 flex flex-wrap gap-3">
-          <Link href="/onboarding" className="btn btn--gold btn--lg btn--pill">
-            Start PAL onboarding
-          </Link>
-          <a href="#how" className="btn btn--outline-on-red btn--lg btn--pill">
-            See how it works
-          </a>
+      <div className="container-page relative grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-24">
+        <div>
+          <p className="type-mono-label mb-5 text-[color:var(--color-gold)]">
+            Agent · by Artispreneur
+          </p>
+          <h1
+            className="font-heading text-white"
+            style={{ fontSize: "clamp(2.25rem, 5vw, 3.25rem)", lineHeight: 1.12 }}
+          >
+            Hire your AI
+            <br />
+            business team.
+          </h1>
+          <p className="mt-5 max-w-md text-[clamp(1rem,2vw,1.125rem)] leading-relaxed text-white/60">
+            Tell your Artispreneur Agent what you&apos;re trying to accomplish. It builds the plan,
+            activates the right specialist, and returns finished work for your approval.
+          </p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--lg">
+              Start for Free
+            </a>
+            <a href="#how" className="btn btn--outline-on-dark btn--lg">
+              See How It Works
+            </a>
+          </div>
+          <p className="mt-5 font-heading text-sm italic text-white/45">{brand.tagline}</p>
+          <p className="mt-3 text-xs text-white/35">No credit card required · Free plan available</p>
         </div>
+
+        <TerminalMock />
       </div>
     </section>
   );
 }
 
-function HowItWorks() {
+function TerminalMock() {
   return (
-    <section id="how" className="section bg-[color:var(--color-parchment)]">
-      <div className="container-page">
-        <div className="max-w-2xl">
-          <p className="eyebrow">How it works</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Signup → Soul.md → Workspace
-          </h2>
-          <p className="mt-4 text-[color:var(--color-warm-gray)] leading-relaxed">
-            Same ease as modern agent tools — with Artispreneur branding and ROSTR structure so new AI
-            users always see how intake connects to the team that executes.
-          </p>
-        </div>
-        <ol className="mt-14 grid gap-8 md:grid-cols-3">
-          {HOW.map((step) => (
-            <li key={step.n} className="relative border-t border-[color:var(--color-red)]/25 pt-6">
-              <span className="font-heading text-3xl text-[color:var(--color-red)]">{step.n}</span>
-              <h3 className="font-heading mt-3 text-xl">{step.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-warm-gray)]">
-                {step.body}
-              </p>
-            </li>
-          ))}
-        </ol>
+    <div className="overflow-hidden rounded-[10px] border border-white/10 bg-[#1a1a1a] shadow-[var(--shadow-xl)]">
+      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+        <span className="ml-2 font-mono text-[11px] text-[color:var(--color-gray-mid)]">
+          my-artispreneur-agent — /artispreneurs/patrick-diamitani
+        </span>
       </div>
-    </section>
+      <div className="space-y-0 px-5 py-5 font-mono text-[12.5px] leading-[2] text-white/80">
+        <p>
+          <span className="text-[color:var(--color-gold)]">you</span>
+          <span className="text-white/30"> › </span>
+          Build an EPK and book 3 rooms in NYC this quarter.
+        </p>
+        <p className="text-white/40">⋯ routing to EPK Builder + Directory Outreach</p>
+        <p>
+          <span className="text-[color:var(--color-crimson)]">master</span>
+          <span className="text-white/30"> › </span>
+          Drafted one-sheet + press bio. 12 venues matched. 3 outreach emails ready for approval.
+        </p>
+        <p className="text-[color:var(--color-success)]">
+          ✓ awaiting your approval — nothing sent
+          <span className="cursor-blink" />
+        </p>
+      </div>
+    </div>
   );
 }
 
-function TeamSection() {
+function HowSection() {
   return (
-    <section id="team" className="section bg-[color:var(--color-charcoal)] text-white">
+    <section id="how" className="section bg-white">
       <div className="container-page">
-        <div className="max-w-2xl">
-          <p className="eyebrow eyebrow-gold">Your AI business team</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Seven specialists. One Master Agent.
+        <div className="mx-auto mb-14 max-w-[560px] text-center">
+          <p className="type-overline mb-2.5">The Process</p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.65rem, 4vw, 2.125rem)" }}
+          >
+            From sign-up to a working business team
           </h2>
-          <p className="mt-4 text-white/70 leading-relaxed">
-            Ask in plain language. Master Agent routes through ROSTR — PAL to interpret, NPAO to
-            prioritize, specialists to draft. You stay in the approval seat.
-          </p>
         </div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {brand.specialists.map((s) => (
+        <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
+          {HOW_STEPS.map((s, i) => (
             <article
-              key={s.name}
-              className="border border-white/10 bg-white/[0.03] px-5 py-5 transition-colors hover:border-[color:var(--color-gold)]/40"
+              key={s.num}
+              className={`px-7 py-6 ${
+                i === 0 ? "" : "border-t border-[color:var(--color-border)] sm:border-t-0 lg:border-l"
+              }`}
             >
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[color:var(--color-gold)]">
-                {s.role}
+              <p className="type-mono-label mb-3.5 text-[color:var(--color-crimson)]">{s.num}</p>
+              <h3 className="text-[15px] font-bold text-[color:var(--color-black)]">{s.title}</h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-[color:var(--color-gray-mid)]">
+                {s.desc}
               </p>
-              <h3 className="font-heading mt-2 text-xl text-white">{s.name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/65">{s.body}</p>
             </article>
           ))}
         </div>
@@ -177,43 +148,108 @@ function TeamSection() {
   );
 }
 
-function ProductsSection() {
+function AgentsSection() {
   return (
-    <section id="products" className="section bg-white">
+    <section id="agents" className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page">
-        <div className="max-w-2xl">
-          <p className="eyebrow">The toolkit</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Five products. One Agent workspace.
-          </h2>
-          <p className="mt-4 text-[color:var(--color-warm-gray)] leading-relaxed">
-            Contract, EPK, Directory, Academy, and Cataba — modular tools that feed the same Soul and
-            approval queue.
-          </p>
-        </div>
-        <div className="mt-12 divide-y divide-[color:var(--color-border)] border-y border-[color:var(--color-border)]">
-          {brand.products.map((p, i) => (
-            <article
-              key={p.id}
-              className="grid gap-3 py-8 md:grid-cols-[140px_1fr_auto] md:items-end md:gap-8"
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="type-overline mb-2.5">Your Team</p>
+            <h2
+              className="font-heading text-[color:var(--color-black)]"
+              style={{ fontSize: "clamp(1.65rem, 4vw, 2.125rem)" }}
             >
-              <span className="font-heading text-sm text-[color:var(--color-red)]">
-                0{i + 1}
-              </span>
-              <div>
-                <h3 className="font-heading text-2xl">{p.name}</h3>
-                <p className="mt-1 text-sm font-semibold text-[color:var(--color-charcoal)]">
-                  {p.line}
-                </p>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[color:var(--color-warm-gray)]">
-                  {p.body}
-                </p>
+              Your AI business team
+            </h2>
+          </div>
+        </div>
+
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-[10px] bg-[color:var(--color-bg-dark)] px-7 py-6 text-white">
+          <div>
+            <h3 className="font-heading text-[19px]">Artispreneur Master Agent</h3>
+            <p className="mt-1 max-w-xl text-sm text-white/55">
+              Your manager-grade chief of staff. Routes work, drafts plans, and keeps every
+              specialist aligned to your soul.md.
+            </p>
+          </div>
+          <span className="rounded bg-[color:var(--color-gold)] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-[0.1em] text-[color:var(--color-black)]">
+            EVERY WORKSPACE
+          </span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {AGENT_CARDS.map((a) => (
+            <article
+              key={a.name}
+              className="rounded-[10px] bg-white p-6 shadow-[var(--shadow-sm)] transition-[box-shadow] duration-200 hover:shadow-[var(--shadow-lg)]"
+            >
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <h3 className="font-heading text-[17px] text-[color:var(--color-black)]">
+                  {a.name}
+                </h3>
+                <span className="shrink-0 rounded bg-[color:var(--color-bg-surface)] px-2 py-0.5 font-mono text-[9.5px] font-semibold tracking-wider text-[color:var(--color-gray-mid)]">
+                  {a.gate}
+                </span>
               </div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[color:var(--color-warm-gray)]">
-                {p.priceNote}
-              </p>
+              <p className="text-sm leading-relaxed text-[color:var(--color-gray-mid)]">{a.desc}</p>
             </article>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ApprovalSection() {
+  return (
+    <section className="section bg-white">
+      <div className="container-page grid items-center gap-12 lg:grid-cols-2">
+        <div>
+          <p className="type-mono-label mb-4 text-[color:var(--color-crimson)]">
+            Approval before impact
+          </p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.65rem, 4vw, 2rem)" }}
+          >
+            Your agents draft.
+            <br />
+            Only you send.
+          </h2>
+          <ul className="mt-6 space-y-3">
+            {TRUST_POINTS.map((t) => (
+              <li
+                key={t}
+                className="flex gap-2.5 text-sm leading-relaxed text-[color:var(--color-gray-dark)]"
+              >
+                <span className="font-bold text-[color:var(--color-crimson)]">✓</span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] p-6">
+          <p className="mb-4 text-xs font-bold uppercase tracking-wider text-[color:var(--color-gray-mid)]">
+            Approval queue
+          </p>
+          {[
+            { title: "Venue outreach — Baby's All Right", status: "Ready" },
+            { title: "EPK one-sheet v2", status: "Ready" },
+            { title: "Split sheet — producer deal", status: "Needs review" },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="flex items-center justify-between border-b border-[color:var(--color-border)] py-3 last:border-0"
+            >
+              <span className="text-sm font-medium text-[color:var(--color-black)]">{item.title}</span>
+              <span className="rounded bg-white px-2 py-0.5 font-mono text-[10px] font-semibold text-[color:var(--color-crimson)]">
+                {item.status}
+              </span>
+            </div>
+          ))}
+          <p className="mt-4 font-mono text-[11px] text-[color:var(--color-gray-mid)]">
+            audit: approved by you · 2 of 3 drafts · PR &amp; Outreach Agent
+          </p>
         </div>
       </div>
     </section>
@@ -222,21 +258,27 @@ function ProductsSection() {
 
 function ModesSection() {
   return (
-    <section id="modes" className="section bg-[color:var(--color-parchment)]">
+    <section className="section bg-[color:var(--color-bg-dark)] text-white">
       <div className="container-page">
-        <div className="max-w-2xl">
-          <p className="eyebrow">Built for how you operate</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Artist. Agency. Label.
+        <div className="mx-auto mb-14 max-w-[560px] text-center">
+          <p className="type-overline type-overline--gold mb-2.5">Modes</p>
+          <h2
+            className="font-heading text-white"
+            style={{ fontSize: "clamp(1.65rem, 4vw, 2.125rem)" }}
+          >
+            One platform. Three ways to run it.
           </h2>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {brand.modes.map((m) => (
-            <article key={m.id} className="bg-white px-6 py-8 shadow-[var(--shadow-md,0_4px_12px_rgba(0,0,0,0.06))]">
-              <h3 className="font-heading text-2xl text-[color:var(--color-red)]">{m.name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-warm-gray)]">
-                {m.body}
-              </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {MODE_CARDS.map((m) => (
+            <article
+              key={m.tag}
+              className="rounded-[10px] border border-white/10 bg-white/[0.03] p-7"
+            >
+              <p className="type-mono-label mb-3.5 text-[color:var(--color-gold)]">{m.tag}</p>
+              <h3 className="font-heading text-xl text-white">{m.name}</h3>
+              <p className="mt-2.5 text-sm leading-relaxed text-white/55">{m.desc}</p>
+              <p className="mt-5 font-mono text-[12.5px] text-white/40">{m.foot}</p>
             </article>
           ))}
         </div>
@@ -245,53 +287,43 @@ function ModesSection() {
   );
 }
 
-function TrustSection() {
+function SkillsTeaser() {
+  const featured = SKILLS_CATALOG.filter((s) => s.featured || s.popular).slice(0, 3);
   return (
-    <section className="section bg-white">
-      <div className="container-page grid items-center gap-12 md:grid-cols-2">
-        <div>
-          <p className="eyebrow">Trust & safety</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Approval-first. Always.
-          </h2>
-          <p className="mt-4 text-[color:var(--color-warm-gray)] leading-relaxed">
-            Agents draft. You decide. Rights, money, and outbound never auto-execute — the same
-            discipline majors expect, without the label deal.
-          </p>
-          <ul className="mt-8 space-y-3 text-sm text-[color:var(--color-charcoal)]">
-            {[
-              "Named approval before send, publish, or distribute",
-              "No invented ownership, splits, or clearances",
-              "No promises of playlist adds, sync wins, or stream counts",
-              "Master Soul + audit trail for every major handoff",
-            ].map((item) => (
-              <li key={item} className="flex gap-3">
-                <span className="mt-0.5 text-[color:var(--color-red)]" aria-hidden>
-                  ✓
-                </span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="relative overflow-hidden bg-[color:var(--color-charcoal)] px-8 py-10 text-white">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[color:var(--color-gold)]">
-            Hermes-clear · ROSTR-structured
-          </p>
-          <p className="font-heading mt-4 text-2xl leading-snug">
-            Familiar agent UX. Your brand. Your Soul. Your roster.
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-white/65">
-            If you already use tools like Claude Code or Hermes, Agent feels like home — with music
-            business specialists and Artispreneur guardrails instead of a blank prompt.
-          </p>
-          <div className="mt-8 flex items-center gap-3 border-t border-white/10 pt-6">
-            <ArtispreneurMark size={48} variant="reversed" />
-            <div>
-              <p className="text-sm font-semibold">Master Agent online</p>
-              <p className="text-xs text-white/50">Waiting on your PAL intake</p>
-            </div>
+    <section id="skills" className="section bg-white">
+      <div className="container-page">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="type-overline mb-2.5">Skills Marketplace</p>
+            <h2
+              className="font-heading text-[color:var(--color-black)]"
+              style={{ fontSize: "clamp(1.65rem, 4vw, 2.125rem)" }}
+            >
+              Digital skills. Instant install.
+            </h2>
+            <p className="mt-3 max-w-md text-sm text-[color:var(--color-gray-mid)]">
+              Browse skill packs like a store — free during launch. Stripe + HubSpot ready when you
+              go paid.
+            </p>
           </div>
+          <Link href="/skills" className="btn btn--primary btn--md">
+            Open marketplace
+          </Link>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {featured.map((s) => (
+            <Link
+              key={s.id}
+              href={`/skills/${s.slug}`}
+              className="rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] p-6 transition-shadow hover:shadow-[var(--shadow-lg)]"
+            >
+              <p className="font-mono text-[10px] font-semibold tracking-wider text-[color:var(--color-crimson)]">
+                FREE · DIGITAL DOWNLOAD
+              </p>
+              <h3 className="font-heading mt-2 text-[17px]">{s.name}</h3>
+              <p className="mt-2 text-sm text-[color:var(--color-gray-mid)]">{s.tagline}</p>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -299,58 +331,148 @@ function TrustSection() {
 }
 
 function PricingSection() {
-  const tiers = [brand.pricing.free, brand.pricing.premium, brand.pricing.pro] as const;
   return (
-    <section id="pricing" className="section bg-[color:var(--color-parchment)]">
+    <section id="pricing" className="section bg-[color:var(--color-bg-surface)]">
       <div className="container-page">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">Pricing</p>
-          <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Start free. Grow with the team.
+        <div className="mx-auto mb-12 max-w-[520px] text-center">
+          <p className="type-overline mb-2.5">Pricing</p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.65rem, 4vw, 2.125rem)" }}
+          >
+            Start free. Add agents as you grow.
           </h2>
-          <p className="mt-4 text-[color:var(--color-warm-gray)]">
-            Draft prices — correct them anytime. Roadmap assessment available as a $10 one-time add-on.
+          <p className="mt-3 text-[15px] text-[color:var(--color-gray-mid)]">
+            Invest in your music business — not another generic chatbot.
           </p>
         </div>
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {tiers.map((t) => (
-            <div
-              key={t.name}
-              className={`relative flex flex-col bg-white px-6 py-8 ${
-                t.featured
-                  ? "ring-2 ring-[color:var(--color-gold)] shadow-[0_12px_40px_rgba(245,193,0,0.18)]"
-                  : "border border-[color:var(--color-border)]"
+
+        <div className="mx-auto grid max-w-[900px] gap-4 md:grid-cols-3">
+          {PRICE_TOP.map((plan) => (
+            <article
+              key={plan.name}
+              className={`relative flex flex-col rounded-[10px] p-7 ${
+                plan.featured
+                  ? "border-[1.5px] border-[color:var(--color-crimson)] bg-[color:var(--color-bg-dark)] text-white"
+                  : "border-[1.5px] border-[color:var(--color-border)] bg-white"
               }`}
             >
-              {t.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[color:var(--color-gold)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[color:var(--color-charcoal)]">
+              {plan.featured && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[color:var(--color-crimson)] px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-white">
                   Most popular
                 </span>
               )}
-              <h3 className="font-heading text-2xl">{t.name}</h3>
-              <p className="mt-2 text-sm text-[color:var(--color-warm-gray)]">{t.blurb}</p>
-              <p className="mt-6">
-                <span className="font-heading text-4xl text-[color:var(--color-red)]">
-                  {t.price === 0 ? "$0" : `$${t.price}`}
+              <p
+                className={`text-[13px] font-bold uppercase tracking-[0.06em] ${
+                  plan.featured ? "text-white/50" : "text-[color:var(--color-gray-mid)]"
+                }`}
+              >
+                {plan.name}
+              </p>
+              <p className="mt-2">
+                <span
+                  className={`font-heading text-4xl ${
+                    plan.featured ? "text-white" : "text-[color:var(--color-black)]"
+                  }`}
+                >
+                  {plan.price}
                 </span>
-                <span className="ml-1 text-sm text-[color:var(--color-warm-gray)]">/{t.period}</span>
+                <span
+                  className={`ml-1 text-[13px] ${
+                    plan.featured ? "text-white/40" : "text-[color:var(--color-gray-subtle)]"
+                  }`}
+                >
+                  {plan.per}
+                </span>
+              </p>
+              <p
+                className={`mt-3 text-sm ${
+                  plan.featured ? "text-white/70" : "text-[color:var(--color-gray-mid)]"
+                }`}
+              >
+                {plan.sub}
               </p>
               <ul className="mt-6 flex-1 space-y-2.5">
-                {t.features.map((f) => (
-                  <li key={f} className="flex gap-2 text-sm text-[color:var(--color-charcoal)]">
-                    <span className="text-[color:var(--color-success)]">✓</span>
+                {plan.feats.map((f) => (
+                  <li
+                    key={f}
+                    className={`flex gap-2 text-[13px] ${
+                      plan.featured ? "text-white/70" : "text-[color:var(--color-gray-dark)]"
+                    }`}
+                  >
+                    <span className="font-bold text-[color:var(--color-crimson)]">✓</span>
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/onboarding"
-                className={`btn btn--md btn--block mt-8 ${
-                  t.featured ? "btn--gold" : t.name === "Pro" ? "btn--primary" : "btn--secondary"
+              <a
+                href="/api/auth/login?signup=1&return=/onboarding"
+                className={`btn btn--md btn--block mt-6 ${
+                  plan.featured ? "btn--primary" : "btn--outline"
                 }`}
               >
-                {t.cta}
-              </Link>
+                {plan.cta}
+              </a>
+            </article>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-6 grid max-w-[900px] gap-3 sm:grid-cols-2">
+          {PRICE_BOTTOM.map((p) => (
+            <div
+              key={p.name}
+              className="flex items-center justify-between rounded-[10px] border border-[color:var(--color-border)] bg-white px-5 py-4"
+            >
+              <span className="text-sm font-semibold text-[color:var(--color-black)]">{p.name}</span>
+              <span className="font-heading text-[19px] text-[color:var(--color-crimson)]">
+                {p.price}
+                <span className="ml-1 font-sans text-[11px] font-normal text-[color:var(--color-gray-mid)]">
+                  {p.per}
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AcademySection() {
+  return (
+    <section id="academy" className="section bg-white">
+      <div className="container-page grid items-center gap-12 lg:grid-cols-2">
+        <div>
+          <p className="type-mono-label mb-4 text-[color:var(--color-crimson)]">
+            Artispreneur Academy
+          </p>
+          <h2
+            className="font-heading text-[color:var(--color-black)]"
+            style={{ fontSize: "clamp(1.5rem, 3.5vw, 1.875rem)" }}
+          >
+            Learn it. Then your agent executes it.
+          </h2>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
+            Courses become tasks. Tasks become drafts. Drafts wait for your approval. Education that
+            turns into shipped work.
+          </p>
+          <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--md mt-7">
+            Start learning free
+          </a>
+        </div>
+        <div className="rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] p-5 font-mono text-[12px]">
+          {[
+            { tag: "LESSON", color: "text-[color:var(--color-gray-mid)]", text: "How to register with a PRO" },
+            { tag: "TASK", color: "text-[color:var(--color-crimson)]", text: "Draft PRO registration checklist" },
+            { tag: "TASK", color: "text-[color:var(--color-crimson)]", text: "Prepare repertoire spreadsheet" },
+            { tag: "DONE", color: "text-[color:var(--ok-ink)]", text: "soul.md updated · Finance Manager notified" },
+          ].map((row) => (
+            <div
+              key={row.text}
+              className="flex gap-3 border-b border-[color:var(--color-border)] py-3 last:border-0"
+            >
+              <span className={`w-[70px] shrink-0 font-semibold ${row.color}`}>{row.tag}</span>
+              <span className="text-[color:var(--color-black)]">{row.text}</span>
             </div>
           ))}
         </div>
@@ -360,38 +482,34 @@ function PricingSection() {
 }
 
 function FaqSection() {
-  const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="section bg-white">
-      <div className="container-page max-w-3xl">
-        <p className="eyebrow">FAQ</p>
-        <h2 className="font-heading mt-3" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-          Straight answers
+    <section className="section bg-[color:var(--color-bg-surface)]">
+      <div className="container-page mx-auto max-w-[720px]">
+        <h2
+          className="font-heading mb-9 text-center text-[color:var(--color-black)]"
+          style={{ fontSize: "clamp(1.5rem, 3.5vw, 1.875rem)" }}
+        >
+          Questions, answered.
         </h2>
-        <div className="mt-10 divide-y divide-[color:var(--color-border)] border-y border-[color:var(--color-border)]">
-          {FAQ.map((item, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={item.q}>
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                  aria-expanded={isOpen}
-                >
-                  <span className="font-heading text-lg">{item.q}</span>
-                  <span className="text-[color:var(--color-red)]" aria-hidden>
-                    {isOpen ? "−" : "+"}
+        <div className="space-y-3">
+          {FAQS.map((item) => (
+            <details
+              key={item.q}
+              className="group rounded-[10px] border border-[color:var(--color-border)] bg-white px-5 py-4"
+            >
+              <summary className="cursor-pointer list-none text-[15px] font-semibold text-[color:var(--color-black)] marker:content-none">
+                <span className="flex items-center justify-between gap-4">
+                  {item.q}
+                  <span className="text-[color:var(--color-crimson)] transition-transform group-open:rotate-45">
+                    +
                   </span>
-                </button>
-                {isOpen && (
-                  <p className="pb-5 text-sm leading-relaxed text-[color:var(--color-warm-gray)]">
-                    {item.a}
-                  </p>
-                )}
-              </div>
-            );
-          })}
+                </span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
+                {item.a}
+              </p>
+            </details>
+          ))}
         </div>
       </div>
     </section>
@@ -400,32 +518,27 @@ function FaqSection() {
 
 function FinalCta() {
   return (
-    <section className="section relative overflow-hidden bg-[color:var(--color-red)] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-20 bottom-0 opacity-40 md:opacity-70"
-      >
-        <ArtispreneurMark size={280} variant="reversed" />
-      </div>
-      <div className="container-page relative z-10 grid items-center gap-10 md:grid-cols-[1.2fr_auto]">
-        <div>
-          <p className="eyebrow eyebrow-gold">Ready when you are</p>
-          <h2 className="font-heading mt-3 max-w-xl" style={{ fontSize: "clamp(1.85rem, 4vw, 2.75rem)" }}>
-            Run your career like a business.
-          </h2>
-          <p className="mt-4 max-w-lg text-white/90 leading-relaxed">
-            Start with PAL onboarding. Walk out with Master Soul.md, a specialist roster, and a clear
-            next-action plan.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-          <Link href="/onboarding" className="btn btn--gold btn--lg btn--pill">
-            Get started free →
-          </Link>
-          <Link href="/onboarding" className="btn btn--outline-on-red btn--lg btn--pill">
-            Try Patrick Diamitani demo
-          </Link>
-        </div>
+    <section className="section bg-[color:var(--color-bg-brand)] text-center text-white">
+      <div className="container-page mx-auto max-w-[600px]">
+        <Image
+          src={brand.logo.primaryPng}
+          alt=""
+          width={56}
+          height={56}
+          className="mx-auto mb-5 h-14 w-14"
+        />
+        <h2
+          className="font-heading text-white"
+          style={{ fontSize: "clamp(1.75rem, 4vw, 2.375rem)" }}
+        >
+          Build your music business.
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/75">
+          Join independent musicians running real careers with an AI business team — approval-first.
+        </p>
+        <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--gold btn--lg mt-9">
+          Become an Artispreneur
+        </a>
       </div>
     </section>
   );

@@ -1,14 +1,26 @@
 import { NextResponse } from "next/server";
 import { compilePalIntake, type IntakeAnswers } from "@/lib/rostr/pal-compiler";
 import { persistIntakeToDisk, saveIntakeMemory } from "@/lib/rostr/intake-store";
+import { ensureUserShell } from "@/lib/tenancy/user-shell";
+import { defaultProjectId } from "@/lib/tenancy/hierarchy";
 
 /**
- * Signup → PAL trigger
- * Auth providers (Clerk/Cognito/etc.) can POST here after account creation.
- * If answers aren't ready yet, we create a stub workspace and send the user to /onboarding.
+ * Cognito (or other IdP) post-signup hook.
+ * Prefer browser OAuth via /api/auth/login → /api/auth/callback for interactive users.
+ * This webhook supports Cognito PostConfirmation Lambda / Admin API provisioning.
  */
 export async function POST(req: Request) {
   try {
+    const secret = process.env.PAL_WEBHOOK_SECRET;
+    if (secret) {
+      const provided =
+        req.headers.get("x-pal-webhook-secret") ||
+        req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+      if (provided !== secret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const body = (await req.json()) as {
       userId: string;
       email?: string;
@@ -17,14 +29,30 @@ export async function POST(req: Request) {
     };
 
     if (!body.userId) {
-      return NextResponse.json({ error: "userId required" }, { status: 400 });
+      return NextResponse.json({ error: "userId required (Cognito sub)" }, { status: 400 });
     }
+
+    const projectId = defaultProjectId(
+      body.userId,
+      typeof body.answers?.stage_name === "string"
+        ? body.answers.stage_name
+        : body.name,
+    );
+
+    await ensureUserShell({
+      userId: body.userId,
+      email: body.email || `${body.userId}@users.artispreneur.com`,
+      name: body.name,
+      projectId,
+    });
 
     if (!body.answers || Object.keys(body.answers).length === 0) {
       return NextResponse.json({
         ok: true,
         status: "awaiting_onboarding",
         redirect: "/onboarding",
+        projectId,
+        hierarchy: "diamitani-industries → artispreneur-com → agent",
         message: "Account created. Complete PAL onboarding to compile Master Soul.",
       });
     }
@@ -44,6 +72,7 @@ export async function POST(req: Request) {
       ok: true,
       status: "compiled",
       redirect: `/workspace?artist=${result.workspace_config.artist_id}`,
+      projectId: result.workspace_config.artist_id,
       persistedTo,
       result,
     });

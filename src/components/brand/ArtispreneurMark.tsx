@@ -22,10 +22,10 @@ export function ArtispreneurMark({
 }) {
   const id = `lm-${variant}-${size}`;
   const aColor =
-    variant === "color" ? "#C0272D" : variant === "reversed" ? "#F5C100" : "#FFFFFF";
+    variant === "color" ? "#CC0000" : variant === "reversed" ? "#FED001" : "#FFFFFF";
   const goldStops =
-    variant === "mono-white" ? ["#FFFFFF", "#FFFFFF", "#FFFFFF"] : ["#FFD63D", "#F5C100", "#D9A800"];
-  const veinColor = variant === "mono-white" ? "rgba(255,255,255,0.35)" : "#B8860B";
+    variant === "mono-white" ? ["#FFFFFF", "#FFFFFF", "#FFFFFF"] : ["#FEE55E", "#FED001", "#D4AC00"];
+  const veinColor = variant === "mono-white" ? "rgba(255,255,255,0.35)" : "#D4AC00";
 
   return (
     <svg
@@ -74,7 +74,7 @@ export function ArtispreneurMark({
         x="250"
         y="345"
         textAnchor="middle"
-        fontFamily="Playfair Display, Didot, Georgia, serif"
+        fontFamily="Libre Baskerville, Georgia, serif"
         fontWeight="900"
         fontSize="290"
         fill={aColor}

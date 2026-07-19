@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Spacing" name="Spacing Tokens" subtitle="4px base unit spacing scale" viewport="700x120" -->
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: #fff; padding: 20px; font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+  .token { text-align: center; }
+  .box { border-radius: 4px; background: #CC0000; margin-bottom: 4px; }
+  .label { font-size: 9px; color: #777; }
+  .value { font-size: 9px; font-weight: 600; color: #111; }
+</style>
+</head><body>
+<div class="grid">
+  <div class="token"><div class="box" style="height:4px;"></div><div class="value">4</div><div class="label">--space-1</div></div>
+  <div class="token"><div class="box" style="height:8px;"></div><div class="value">8</div><div class="label">--space-2</div></div>
+  <div class="token"><div class="box" style="height:12px;"></div><div class="value">12</div><div class="label">--space-3</div></div>
+  <div class="token"><div class="box" style="height:16px;"></div><div class="value">16</div><div class="label">--space-4</div></div>
+  <div class="token"><div class="box" style="height:24px;"></div><div class="value">24</div><div class="label">--space-6</div></div>
+  <div class="token"><div class="box" style="height:32px;"></div><div class="value">32</div><div class="label">--space-8</div></div>
+  <div class="token"><div class="box" style="height:48px;"></div><div class="value">48</div><div class="label">--space-12</div></div>
+  <div class="token"><div class="box" style="height:64px;"></div><div class="value">64</div><div class="label">--space-16</div></div>
+</div>
+</body></html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!-- @dsCard group="UI Kit — Marketing" name="Marketing UI Kit" subtitle="Landing page — Hero, Features, Process, Pricing, Sign-up modal" viewport="1280x900" -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artispreneur — AI-Powered Music Business Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script>window.LOGO_DATA_URI="/artispreneur-logo.png";</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; color: #111; background: #fff; }
+  #root { min-height: 100vh; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+function Nav({ onSignup }) {
+  return (
+    <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #EEEEEE' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src={window.LOGO_DATA_URI} alt="Artispreneur" style={{ width: 36, height: 36 }} />
+          <span style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 18, fontWeight: 700, color: '#111', letterSpacing: '-0.01em' }}>Artispreneur</span>
+        </div>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          {['Features', 'Business', 'Pricing', 'Academy'].map(n => (
+            <a key={n} href="#" style={{ fontSize: 14, fontWeight: 500, color: '#444', textDecoration: 'none' }}>{n}</a>
+          ))}
+        </nav>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <a href="#" style={{ fontSize: 14, fontWeight: 600, color: '#111', textDecoration: 'none' }}>Sign In</a>
+          <button onClick={onSignup} style={{ background: '#CC0000', color: '#fff', border: 'none', borderRadius: 6, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>Get Started Free</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Hero({ onSignup }) {
+  return (
+    <section style={{ background: '#111', color: '#fff', padding: '96px 32px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      {/* Decorative circles */}
+      <div style={{ position: 'absolute', top: -80, left: -80, width: 400, height: 400, borderRadius: '50%', background: 'rgba(204,0,0,0.12)' }} />
+      <div style={{ position: 'absolute', bottom: -100, right: -60, width: 350, height: 350, borderRadius: '50%', background: 'rgba(254,208,1,0.07)' }} />
+
+      <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
+        <div style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FED001', background: 'rgba(254,208,1,0.1)', padding: '4px 14px', borderRadius: 4, marginBottom: 24 }}>
+          AI-Powered Record Label
+        </div>
+        <h1 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 24px', color: '#fff' }}>
+          Art Means Business.
+        </h1>
+        <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, margin: '0 auto 40px', maxWidth: 560 }}>
+          Build your music business operating system. We provide independent musicians with AI managers to handle everything from booking, to finance to branding.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={onSignup} style={{ background: '#CC0000', color: '#fff', border: 'none', borderRadius: 6, padding: '14px 32px', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>
+            Start for Free
+          </button>
+          <button style={{ background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)', borderRadius: 6, padding: '14px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>
+            See How It Works
+          </button>
+        </div>
+        <p style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>No credit card required · Free plan available</p>
+      </div>
+    </section>
+  );
+}
+
+function Features() {
+  const features = [
+    { icon: '⚖️', title: 'Legal Business Formation', desc: 'Register your EIN, LLC, or C-Corp. Build your label entity with guided or automated setup.' },
+    { icon: '💰', title: 'Financial Operations', desc: 'Business banking, bookkeeping, and tax support — all in one dashboard.' },
+    { icon: '🎵', title: 'Publishing Administration', desc: 'Register with your PRO, claim unclaimed royalties, and manage your complete music catalogue.' },
+    { icon: '🎨', title: 'Brand Center', desc: 'AI-powered social media, press kits, graphic design, and logo creation.' },
+    { icon: '📅', title: 'Booking Center', desc: 'CRM, outreach sequences, industry directory, and contract templates.' },
+    { icon: '🎓', title: 'Academy', desc: 'Courses, certifications, articles and a video library — knowledge for music entrepreneurs.' },
+  ];
+  return (
+    <section style={{ padding: '80px 32px', background: '#fff' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#CC0000', marginBottom: 10 }}>Everything You Need</div>
+          <h2 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 700, color: '#111', margin: '0 0 14px', letterSpacing: '-0.01em' }}>Your AI-Powered Music Business Team</h2>
+          <p style={{ fontSize: 16, color: '#777', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>Every artist is an entrepreneur. Every artispreneur needs a team. We provide yours.</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+          {features.map((f, i) => (
+            <div key={i} style={{ background: '#F5F5F5', borderRadius: 10, padding: '28px 24px', transition: '150ms ease', cursor: 'default' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.10)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.boxShadow = ''; }}>
+              <div style={{ fontSize: 28, marginBottom: 14 }}>{f.icon}</div>
+              <h3 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 17, fontWeight: 700, color: '#111', margin: '0 0 8px' }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: '#777', lineHeight: 1.7, margin: 0 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SocialProof() {
+  const steps = [
+    { num: '01', title: 'Register Your Business', desc: 'Get your EIN, form an LLC or C-Corp — establish your legal entity.' },
+    { num: '02', title: 'Set Up Your Finances', desc: 'Open a business bank account, connect your bookkeeping, get tax-ready.' },
+    { num: '03', title: 'Claim Your Royalties', desc: 'Register with your PRO, claim unclaimed tracks, build your catalogue.' },
+    { num: '04', title: 'Grow Your Brand', desc: 'Launch social campaigns, distribute your music, book your shows.' },
+  ];
+  return (
+    <section style={{ padding: '80px 32px', background: '#111', color: '#fff' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#FED001', marginBottom: 10 }}>The Process</div>
+          <h2 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 700, color: '#fff', margin: '0 0 14px' }}>From Artist to Entrepreneur</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 0 }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ padding: '24px 28px', borderLeft: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 36, fontWeight: 700, color: '#CC0000', marginBottom: 12, lineHeight: 1 }}>{s.num}</div>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: '0 0 8px' }}>{s.title}</h3>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, margin: 0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing({ onSignup }) {
+  const plans = [
+    { name: 'Free', price: '$0', period: 'forever', features: ['Artist profile', 'Business roadmap', 'EIN registration guide', 'Academy access (limited)', '1 AI manager session/mo'], cta: 'Get Started Free', variant: 'outline' },
+    { name: 'Pro', price: '$49', period: '/month', features: ['Everything in Free', 'Unlimited AI managers', 'Full Business Center', 'Brand & Booking Centers', 'Document generation', 'Priority support'], cta: 'Start Pro Trial', variant: 'primary', featured: true },
+    { name: 'Label', price: '$149', period: '/month', features: ['Everything in Pro', 'Multi-artist management', 'Custom contracts', 'Advanced analytics', 'White-label outputs', 'Dedicated account manager'], cta: 'Contact Sales', variant: 'outline' },
+  ];
+  return (
+    <section style={{ padding: '80px 32px', background: '#F5F5F5' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#CC0000', marginBottom: 10 }}>Pricing</div>
+          <h2 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 700, color: '#111', margin: '0 0 14px' }}>Invest in Your Music Business</h2>
+          <p style={{ fontSize: 15, color: '#777', maxWidth: 440, margin: '0 auto' }}>Start free. Scale as your career grows.</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {plans.map((plan, i) => (
+            <div key={i} style={{ background: plan.featured ? '#111' : '#fff', borderRadius: 10, padding: '28px 24px', border: plan.featured ? '1.5px solid #CC0000' : '1.5px solid #EEEEEE', position: 'relative' }}>
+              {plan.featured && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#CC0000', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 12px', borderRadius: 4, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>MOST POPULAR</div>}
+              <div style={{ fontSize: 13, fontWeight: 700, color: plan.featured ? 'rgba(255,255,255,0.5)' : '#777', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{plan.name}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 20 }}>
+                <span style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 36, fontWeight: 700, color: plan.featured ? '#fff' : '#111' }}>{plan.price}</span>
+                <span style={{ fontSize: 13, color: plan.featured ? 'rgba(255,255,255,0.4)' : '#aaa' }}>{plan.period}</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {plan.features.map((f, j) => (
+                  <li key={j} style={{ display: 'flex', gap: 8, fontSize: 13, color: plan.featured ? 'rgba(255,255,255,0.7)' : '#444', alignItems: 'flex-start' }}>
+                    <span style={{ color: '#CC0000', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={onSignup} style={{ width: '100%', padding: '11px 0', borderRadius: 6, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif", border: 'none', background: plan.featured ? '#CC0000' : 'transparent', color: plan.featured ? '#fff' : '#CC0000', border: plan.featured ? 'none' : '1.5px solid #CC0000' }}>
+                {plan.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CTA({ onSignup }) {
+  return (
+    <section style={{ padding: '80px 32px', background: '#CC0000', textAlign: 'center' }}>
+      <div style={{ maxWidth: 600, margin: '0 auto' }}>
+        <img src={window.LOGO_DATA_URI} alt="" style={{ width: 56, height: 56, marginBottom: 20 }} />
+        <h2 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, color: '#fff', margin: '0 0 16px', letterSpacing: '-0.01em' }}>
+          Every Artist is an Entrepreneur.
+        </h2>
+        <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', margin: '0 0 36px', lineHeight: 1.7 }}>
+          Join thousands of independent musicians building real music businesses on Artispreneur.
+        </p>
+        <button onClick={onSignup} style={{ background: '#FED001', color: '#111', border: 'none', borderRadius: 6, padding: '15px 36px', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>
+          Build Your Music Business
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer style={{ background: '#111', color: '#fff', padding: '48px 32px 32px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 40, flexWrap: 'wrap', gap: 32 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <img src={window.LOGO_DATA_URI} alt="" style={{ width: 28, height: 28 }} />
+              <span style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 15, fontWeight: 700, color: '#fff' }}>Artispreneur</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 200, lineHeight: 1.7, margin: 0 }}>AI-Powered Music Business Platform</p>
+          </div>
+          {[
+            { label: 'Product', links: ['Features', 'Business Center', 'Brand Center', 'Booking Center', 'Academy'] },
+            { label: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
+            { label: 'Legal', links: ['Privacy', 'Terms', 'Cookies'] },
+          ].map(col => (
+            <div key={col.label}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 12 }}>{col.label}</div>
+              {col.links.map(l => <div key={l} style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 8, cursor: 'pointer' }}>{l}</div>)}
+            </div>
+          ))}
+        </div>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>© 2026 Artispreneur. Art Means Business.</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>hello@artispreneur.com</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function SignupModal({ onClose }) {
+  const [step, setStep] = React.useState(1);
+  const [minimal, setMinimal] = React.useState(false);
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 460, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+        <div style={{ background: '#111', padding: '24px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img src={window.LOGO_DATA_URI} alt="" style={{ width: 32, height: 32 }} />
+          <div>
+            <div style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 16, fontWeight: 700, color: '#fff' }}>Create Your Account</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Step {step} of 2 — {step === 1 ? 'Artist Info' : 'Setup'}</div>
+          </div>
+        </div>
+        <div style={{ padding: 28 }}>
+          {step === 1 ? (
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {[['Artist Name / Stage Name', 'text', 'e.g. Jay-Z'], ['Email', 'email', 'you@example.com'], ['Password', 'password', '••••••••']].map(([label, type, ph]) => (
+                  <div key={label}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#444', marginBottom: 5 }}>{label}</div>
+                    <input type={type} placeholder={ph} style={{ width: '100%', padding: '10px 12px', border: '1px solid #DDD', borderRadius: 6, fontSize: 14, fontFamily: "'Inter',sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setStep(2)} style={{ marginTop: 20, width: '100%', background: '#CC0000', color: '#fff', border: 'none', borderRadius: 6, padding: '12px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>Continue</button>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 14, color: '#444', lineHeight: 1.6, marginBottom: 20 }}>How would you like to set up your account?</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+                <div onClick={() => setMinimal(true)} style={{ padding: '14px 16px', border: `1.5px solid ${minimal ? '#CC0000' : '#EEE'}`, borderRadius: 8, cursor: 'pointer', background: minimal ? '#FEE3E3' : '#fff' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>Minimal Setup</div>
+                  <div style={{ fontSize: 12, color: '#777' }}>Get in now, complete your profile later (5 min)</div>
+                </div>
+                <div onClick={() => setMinimal(false)} style={{ padding: '14px 16px', border: `1.5px solid ${!minimal ? '#CC0000' : '#EEE'}`, borderRadius: 8, cursor: 'pointer', background: !minimal ? '#FEE3E3' : '#fff' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>Complete Onboarding</div>
+                  <div style={{ fontSize: 12, color: '#777' }}>Full setup now for best results (5–15 min)</div>
+                </div>
+              </div>
+              <button onClick={onClose} style={{ width: '100%', background: '#CC0000', color: '#fff', border: 'none', borderRadius: 6, padding: '12px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>
+                {minimal ? 'Go to Dashboard →' : 'Start Full Onboarding →'}
+              </button>
+            </>
+          )}
+          <button onClick={onClose} style={{ marginTop: 12, width: '100%', background: 'transparent', border: 'none', fontSize: 13, color: '#aaa', cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [showSignup, setShowSignup] = React.useState(false);
+  return (
+    <>
+      <Nav onSignup={() => setShowSignup(true)} />
+      <Hero onSignup={() => setShowSignup(true)} />
+      <Features />
+      <SocialProof />
+      <Pricing onSignup={() => setShowSignup(true)} />
+      <CTA onSignup={() => setShowSignup(true)} />
+      <Footer />
+      {showSignup && <SignupModal onClose={() => setShowSignup(false)} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

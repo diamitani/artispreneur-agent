@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { compilePalIntake, type IntakeAnswers } from "@/lib/rostr/pal-compiler";
 import { persistIntakeToDisk, saveIntakeMemory } from "@/lib/rostr/intake-store";
 import { PATRICK_DEMO_ANSWERS } from "@/lib/rostr/onboarding-questions";
+import { getSessionUser } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,7 @@ export const runtime = "nodejs";
  * POST /api/pal/intake
  * Body: { userId?: string, answers: IntakeAnswers, seed?: "patrick" }
  *
- * Called on every new-user onboarding submit (and optional recompile).
+ * userId defaults to Cognito session sub when present.
  */
 export async function POST(req: Request) {
   try {
@@ -21,6 +22,8 @@ export async function POST(req: Request) {
       seed?: string;
       persist?: boolean;
     };
+
+    const session = await getSessionUser();
 
     const answers =
       body.seed === "patrick"
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const result = compilePalIntake({
-      userId: body.userId,
+      userId: body.userId || session?.sub,
       answers,
     });
 

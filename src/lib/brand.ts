@@ -1,11 +1,11 @@
 /**
  * Artispreneur — Brand Tokens
- * Source: Brand Guidelines v1.0 + Design System v1.0 + SOUL.md
+ * Source: Knowledge Base / Artispreneur Design System v1.0
  */
 
 export const brand = {
   name: "Artispreneur",
-  product: "Agent by Artispreneur",
+  product: "Artispreneur",
   tagline: "Art Means Business.",
   slogan: "Empowering Artists to Become Entrepreneurs",
   secondaryTagline: "Every Artist is an Entrepreneur.",
@@ -16,168 +16,158 @@ export const brand = {
   },
 
   mission:
-    "Empower artists to become successful entrepreneurs by providing access to essential resources, knowledge, tools, and an AI business team tailored to their creative careers.",
+    "Empower artists to become successful entrepreneurs by providing access to essential resources, knowledge, and tools tailored to their unique creative journeys.",
 
   colors: {
-    red: "#C0272D",
-    redHover: "#A12024",
-    gold: "#F5C100",
-    goldHover: "#D9AB00",
+    crimson: "#CC0000",
+    crimsonDark: "#A30000",
+    gold: "#FED001",
+    goldDark: "#D4AC00",
+    goldLight: "#FEE55E",
+    black: "#111111",
+    charcoal: "#222222",
+    grayDark: "#444444",
+    grayMid: "#777777",
+    grayLight: "#F5F5F5",
     white: "#FFFFFF",
-    charcoal: "#1A1A1A",
-    warmGray: "#4A4A4A",
-    parchment: "#F9F6EF",
-    goldTint: "#FFF8D6",
-    border: "#E5E5E5",
+    border: "#EEEEEE",
   },
 
   logo: {
     primaryPng: "/artispreneur-logo.png",
-    markSvg: "/artispreneur-mark.svg",
-    alt: "Artispreneur — Art Means Business",
+    alt: "Artispreneur — Art Means Business.",
   },
 
   pricing: {
-    free: {
-      name: "Free",
+    starter: {
+      name: "Starter",
       price: 0,
       period: "forever",
       cta: "Start free",
       featured: false,
-      blurb: "PAL intake, starter Soul.md, and limited Master Agent.",
+      blurb: "Academy + Tutor Agent, directory browsing, your first workspace.",
       features: [
-        "PAL onboarding + draft Master Soul",
-        "Mission Control overview",
-        "Academy starter courses",
-        "Directory search (limited)",
-        "Contract & EPK previews",
+        "Academy courses + Tutor Agent",
+        "Master Agent (light model)",
+        "Directory browsing",
+        "Catalog upload on Cataba",
       ],
     },
-    premium: {
-      name: "Premium",
-      price: 9.99,
+    workspace: {
+      name: "Workspace",
+      price: 79,
       period: "month",
-      cta: "Start Premium",
+      cta: "Get the Workspace",
       featured: true,
-      blurb: "Your AI team for day-to-day music business ops.",
+      blurb: "The full AI business team. Every agent, every skill, one command center.",
       features: [
-        "Everything in Free",
-        "Full specialist roster (7 agents)",
-        "EPK Builder + Contract Agent",
-        "Directory outreach drafts",
-        "Approval queue + deliverables vault",
-        "250K AI tokens / month",
+        "All 7 specialist agents + Master Agent",
+        "Approval queue + audit log",
+        "Full Composio integrations (Gmail, Drive, Sheets)",
+        "Priority jobs + larger models",
+        "BYOK supported",
       ],
     },
-    pro: {
-      name: "Pro",
-      price: 19.99,
-      period: "month",
-      cta: "Go Pro",
+    agency: {
+      name: "Agency & Label",
+      price: null,
+      period: "per roster",
+      cta: "Talk to us",
       featured: false,
-      blurb: "Full management stack for serious independents & small labels.",
+      blurb: "Organization hub, staff roles, client workspaces, and the Director agent.",
       features: [
-        "Everything in Premium",
-        "Cataba catalog + publishing prep",
-        "Agency / Label workspace modes",
-        "Priority model routing",
-        "Full Academy + tutor",
-        "1.5M AI tokens / month",
+        "Agency Director / Roster Director",
+        "Client artist workspaces",
+        "Shared playbooks + reporting",
+        "SSO, audit export, dedicated compute options",
       ],
     },
   },
 
   products: [
     {
-      id: "contracts",
-      name: "Contract Builder",
-      line: "Attorney-style drafts. Artist-approved.",
-      body: "Split sheets, booking agreements, producer deals — guided by AI, locked behind your approval.",
-      priceNote: "Included in Premium+",
-    },
-    {
-      id: "epk",
-      name: "EPK Builder",
-      line: "Press kits that get you booked.",
-      body: "Bios, assets, tech rider, and booking contact — generated from your Master Soul and catalog.",
-      priceNote: "Included in Premium+",
-    },
-    {
-      id: "directory",
-      name: "Directory",
-      line: "Blogs, playlists, venues, media.",
-      body: "Search industry contacts, save prospects, and draft outreach — send only when you say so.",
-      priceNote: "Search free · outreach paid",
+      id: "agent",
+      name: "Agent",
+      host: "agent.artispreneur.com",
+      href: "https://agent.artispreneur.com",
+      line: "Your Hermes workspace for the business of music.",
+      body: "Custom Hermes Agent workspace for artists. Ask in plain language, get drafts, and approve before anything ships.",
     },
     {
       id: "academy",
       name: "Academy",
-      line: "Learn it. Then execute it.",
-      body: "Music-business courses with a tutor that turns lessons into tasks inside your workspace.",
-      priceNote: "Starter free · full in Pro",
+      host: "academy.artispreneur.com",
+      href: "https://academy.artispreneur.com",
+      line: "Learn the industry. Then run it.",
+      body: "Online course platform and general media for royalties, contracts, branding, distribution, and career ops.",
     },
     {
-      id: "cataba",
-      name: "Cataba",
-      line: "Your catalog, cleaned for business.",
-      body: "Upload discography, track splits/ISRC, and prep registration — the publishing layer of Agent.",
-      priceNote: "Catalog free · agent in Pro",
-    },
-  ],
-
-  specialists: [
-    {
-      name: "Master Agent",
-      role: "Chief of staff",
-      body: "Understands plain-language asks, runs PAL, and routes work — you never pick an agent first.",
+      id: "epks",
+      name: "EPKs",
+      host: "epks.artispreneur.com",
+      href: "https://epks.artispreneur.com",
+      line: "Press kits and artist microsites.",
+      body: "EPK builder and microsite agent. Bios, assets, tech rider, and booking contact ready to share.",
     },
     {
-      name: "Brand & EPK",
-      role: "Identity & press",
-      body: "Bios, EPK packages, brand voice, and press-ready assets from your Soul.md.",
+      id: "contracts",
+      name: "Contracts",
+      host: "contracts.artispreneur.com",
+      href: "https://contracts.artispreneur.com",
+      line: "Agreements you can actually manage.",
+      body: "Contract builder agent and CMS dashboard for splits, bookings, producer deals, and approvals.",
     },
     {
-      name: "Contracts & Business",
-      role: "Legal ops (guided)",
-      body: "Agreements, splits, LLC/PRO checklists — always human-approved before anything binds.",
+      id: "directory",
+      name: "Directory",
+      host: "directory.artispreneur.com",
+      href: "https://directory.artispreneur.com",
+      line: "Find the room. Then get in it.",
+      body: "Industry directory plus outreach agent and CMS for venues, blogs, playlists, and media contacts.",
     },
     {
-      name: "Release & Distribution",
-      role: "Release ops",
-      body: "Metadata, 42-day calendars, DSP readiness, and delivery approval packets.",
-    },
-    {
-      name: "Press & Outreach",
-      role: "PR / playlist / radio",
-      body: "Target lists and pitch drafts that sit in your approval queue until you send.",
-    },
-    {
-      name: "Booking Manager",
-      role: "Live & DJ",
-      body: "Venue pitches, tech rider, availability, and inquiry pipeline.",
-    },
-    {
-      name: "Finance Manager",
-      role: "Money & royalties",
-      body: "Budgets, royalty staging, and payout packets — never auto-pays.",
+      id: "catalog",
+      name: "Catalog",
+      host: "catalog.artispreneur.com",
+      href: "https://catalog.artispreneur.com",
+      line: "Your masters, cleaned for business.",
+      body: "Artist music catalog agent and CMS workspace for discography, splits, identifiers, and publishing prep.",
     },
   ],
 
-  modes: [
+  pillars: [
     {
-      id: "artist",
-      name: "Artist",
-      body: "Your career, catalog, and next release — one private workspace compiled around you.",
+      id: "royalties",
+      name: "Royalties",
+      body: "Know what you earn, where it comes from, and how to collect it before streams disappear into someone else's spreadsheet.",
     },
     {
-      id: "agency",
-      name: "Agency",
-      body: "Manage or market artists with shared templates, outreach, and approval workflows.",
+      id: "education",
+      name: "Education",
+      body: "Music business literacy that turns into action: PRO setup, release planning, branding, licensing, and taxes.",
     },
     {
-      id: "label",
-      name: "Label",
-      body: "Roster, releases, rights hygiene, and partner reporting under one operating system.",
+      id: "contracts",
+      name: "Contracts",
+      body: "Protect the work with clear agreements, split sheets, and booking paperwork you can review before you sign.",
+    },
+  ],
+
+  useCases: [
+    {
+      id: "business",
+      title: "Create legal business registration",
+      body: "Set up the entity, EIN path, and bank-ready paperwork so your music career can invoice like a company.",
+    },
+    {
+      id: "venues",
+      title: "Look up venues hiring artists near you",
+      body: "Search the Directory for rooms that book your style, save prospects, and draft outreach you approve before send.",
+    },
+    {
+      id: "epk",
+      title: "Create your EPK and social content",
+      body: "Build a press kit and microsite, then turn the same story into posts, bios, and booking-ready assets.",
     },
   ],
 
@@ -188,13 +178,12 @@ export const brand = {
   },
 } as const;
 
-export type Tier = keyof typeof brand.pricing;
+export type ProductId = (typeof brand.products)[number]["id"];
 
-/** ROSTR 5D phase palette — used in workspace / NPAO UI */
 export const PHASE_COLORS = {
   PreD: "#8b7ff5",
   Design: "#4fb6e8",
-  Development: "#f5c100",
+  Development: "#fed001",
   Deployment: "#4fd18b",
   Debugging: "#e8734f",
 } as const;
@@ -202,9 +191,9 @@ export const PHASE_COLORS = {
 export type Phase = keyof typeof PHASE_COLORS;
 
 export const STATUS_COLORS = {
-  ok: "#4fd18b",
-  warn: "#f5c100",
-  block: "#e0503a",
+  ok: "#1a7f4b",
+  warn: "#d97706",
+  block: "#cc0000",
   info: "#4fb6e8",
-  muted: "#8a857a",
+  muted: "#777777",
 } as const;
