@@ -148,8 +148,13 @@ Master Agent routes; specialists draft; **approval-first** for send / rights / m
 APP/
 ├── design-system/          # Brand DS v1.0 (tokens, kits, logo)
 ├── docs/
-│   ├── ARCHITECTURE.md     # This file
-│   └── PAL_INTAKE.md
+│   ├── ARCHITECTURE.md     # This file (shipped system)
+│   ├── WORKSPACE_FLOW.md   # Canonical workspace flow + config schemas (spec)
+│   ├── PRD_WORKSPACE.md    # Workspace PRD: principles, MVP scope, hierarchy
+│   ├── ORG_MODES.md        # Artist / Agency / Label / Enterprise modes
+│   ├── BUILD_PROMPTS.md    # Agency build prompts + delivery plan
+│   ├── PAL_INTAKE.md
+│   └── AWS_INSTANCE.md
 ├── .rostr/agents/          # Agent manifests
 ├── .data/workspaces/       # Local Rostr Hub (gitignored)
 ├── public/                 # Logo, hero
