@@ -65,10 +65,10 @@ export function MasterAgentChat({ artistId }: { artistId?: string }) {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--color-border)] px-4 py-3">
         <div>
           <p className="font-heading text-[15px] text-[color:var(--color-black)]">
-            Master Agent
+            Hermes Agent
           </p>
           <p className="font-mono text-[10px] text-[color:var(--color-gray-mid)]">
-            Bedrock · DeepSeek · approval-first
+            PAL/ROSTR · Skills · Bedrock DeepSeek · approval-first
           </p>
         </div>
         <div className="text-right font-mono text-[10px] text-[color:var(--color-gray-mid)]">

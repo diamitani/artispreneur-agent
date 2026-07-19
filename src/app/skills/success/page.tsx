@@ -32,7 +32,7 @@ export default async function SkillSuccessPage({
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">
             {fulfilled
-              ? "Digital pack installed to your Agent workspace vault. Open your library or jump into Mission Control."
+              ? "Pack written to your vault and activated in Hermes. Open your library or start chatting in Mission Control."
               : "If the skill does not appear yet, refresh your library in a moment."}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

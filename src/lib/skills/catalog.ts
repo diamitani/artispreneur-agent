@@ -2,7 +2,11 @@
  * Skills Marketplace catalog — digital skill packs for Agent workspaces.
  * Prices are $0 during launch (SKILLS_FORCE_FREE / priceCents: 0).
  * Stripe + HubSpot ready when prices go live.
+ *
+ * Installed packs activate in Hermes runtime (PAL / ROSTR + Bedrock).
  */
+
+import type { SpecialistId } from "@/lib/rostr/specialists";
 
 export type SkillCategory =
   | "epk"
@@ -29,6 +33,8 @@ export type SkillProduct = {
   fileSize: string;
   version: string;
   agent: string;
+  /** ROSTR specialist this skill routes to when active in Hermes */
+  specialistId: SpecialistId;
   featured?: boolean;
   popular?: boolean;
   badge?: string;
@@ -67,6 +73,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "184 KB",
     version: "1.2.0",
     agent: "Brand / EPK",
+    specialistId: "brand-epk",
     featured: true,
     popular: true,
     badge: "Bestseller",
@@ -90,6 +97,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "96 KB",
     version: "1.0.1",
     agent: "Contracts",
+    specialistId: "contracts",
     featured: true,
   },
   {
@@ -111,6 +119,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "128 KB",
     version: "1.1.0",
     agent: "Release",
+    specialistId: "release",
     popular: true,
   },
   {
@@ -132,6 +141,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "112 KB",
     version: "1.0.0",
     agent: "Booking / Press",
+    specialistId: "booking",
   },
   {
     id: "skill_pro_setup",
@@ -152,6 +162,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "88 KB",
     version: "1.0.0",
     agent: "Academy Tutor",
+    specialistId: "contracts",
     badge: "Academy",
   },
   {
@@ -173,6 +184,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "104 KB",
     version: "1.0.0",
     agent: "Content",
+    specialistId: "content",
   },
   {
     id: "skill_royalty_staging",
@@ -193,6 +205,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "92 KB",
     version: "1.0.0",
     agent: "Finance",
+    specialistId: "finance",
   },
   {
     id: "skill_split_sheets",
@@ -213,6 +226,7 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     fileSize: "76 KB",
     version: "1.0.2",
     agent: "Contracts / Cataba",
+    specialistId: "contracts",
     popular: true,
   },
 ];

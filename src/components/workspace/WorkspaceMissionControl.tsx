@@ -7,12 +7,18 @@ import type { PalCompilationResult } from "@/lib/rostr/pal-compiler";
 import { brand } from "@/lib/brand";
 import { MasterAgentChat } from "./MasterAgentChat";
 
+type HermesSnap = {
+  soul_loaded: boolean;
+  active_skills: { slug: string; name: string; specialist_id?: string }[];
+  runtime: string;
+};
+
 /**
- * Mission Control — DS dashboard patterns + PAL compilation handoff.
- * Full Hermes shell (chat, projects, vault) lands next.
+ * Mission Control — Hermes shell powered by PAL/ROSTR + Skills Library.
  */
 export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
   const [result, setResult] = useState<PalCompilationResult | null>(null);
+  const [hermes, setHermes] = useState<HermesSnap | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,6 +42,13 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
         setResult(d.result);
       })
       .catch((e) => setError(e.message));
+
+    fetch("/api/hermes/runtime")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.ok) setHermes(d.hermes);
+      })
+      .catch(() => undefined);
   }, [artistId]);
 
   if (error) {
@@ -81,8 +94,17 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/skills" className="text-xs font-semibold text-[color:var(--color-crimson)]">
-              Skills
+            <Link
+              href="/skills/library"
+              className="text-xs font-semibold text-[color:var(--color-crimson)]"
+            >
+              Skills Library
+              {hermes?.active_skills?.length
+                ? ` · ${hermes.active_skills.length}`
+                : ""}
+            </Link>
+            <Link href="/skills" className="text-xs font-semibold text-[color:var(--color-gray-dark)]">
+              Marketplace
             </Link>
             <Link href="/onboarding" className="text-xs font-semibold text-[color:var(--color-gray-dark)]">
               Recompile Soul
@@ -108,8 +130,8 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
               What should we work on, {first}?
             </h1>
             <p className="relative mt-2 max-w-lg text-sm text-white/55">
-              Master Agent on Amazon Bedrock (DeepSeek). Specialists draft; you approve.{" "}
-              {brand.tagline}
+              Hermes on Bedrock DeepSeek — PAL/ROSTR Soul + installed Skills.
+              Specialists draft; you approve. {brand.tagline}
             </p>
           </div>
 
@@ -139,6 +161,40 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
         </section>
 
         <aside className="space-y-4">
+          <div className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-sm)]">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="type-overline">Skills in Hermes</p>
+              <Link
+                href="/skills/library"
+                className="font-mono text-[10px] text-[color:var(--color-crimson)]"
+              >
+                Manage
+              </Link>
+            </div>
+            {hermes?.active_skills?.length ? (
+              <ul className="space-y-2.5">
+                {hermes.active_skills.map((s) => (
+                  <li key={s.slug} className="text-sm">
+                    <span className="font-semibold text-[color:var(--color-black)]">
+                      {s.name}
+                    </span>
+                    <span className="block font-mono text-[10px] text-[color:var(--color-gray-mid)]">
+                      {s.specialist_id || "general"} · active
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-[color:var(--color-gray-mid)]">
+                No packs installed.{" "}
+                <Link href="/skills" className="text-[color:var(--color-crimson)] underline">
+                  Claim skills
+                </Link>{" "}
+                to unlock Hermes capabilities.
+              </p>
+            )}
+          </div>
+
           <div className="rounded-[8px] bg-white p-4 shadow-[var(--shadow-sm)]">
             <p className="type-overline mb-3">Active roster</p>
             <ul className="space-y-2.5">

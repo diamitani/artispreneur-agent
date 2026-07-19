@@ -202,8 +202,9 @@ flowchart LR
 | Cognito OAuth + hierarchy | Shipped (env-gated) |
 | PAL intake + soft gate | Shipped |
 | Mission Control handoff | Shipped (light) |
-| Bedrock DeepSeek Master Agent | Shipped (`/api/agent/chat`) |
+| Hermes Agent (Bedrock DeepSeek + PAL/ROSTR) | Shipped (`/api/agent/chat` + `/api/hermes/runtime`) |
+| Skills Library → Hermes install | Shipped (`/skills/library`, pack bodies in `packs.ts`) |
 | Workspace `apa_*` API keys + usage ledger | Shipped |
-| Full Hermes shell (projects, vault) | Next |
+| Full Hermes shell (projects board, vault UI) | Partial — chat + skills live; projects board next |
 | Composio integrations | Planned |
 | Durable multi-tenant hub (DynamoDB/S3) | Planned (AWS blueprint) |

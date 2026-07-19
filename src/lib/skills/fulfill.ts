@@ -26,6 +26,7 @@ export async function fulfillStripeSession(sessionId: string) {
       skill,
       source: "stripe",
       stripeSessionId: session.id,
+      autoInstall: true,
     });
 
     await trackSkillEvent({

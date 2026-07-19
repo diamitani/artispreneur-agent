@@ -3,7 +3,6 @@ import {
   createBedrockProvider,
   getAgentModelId,
   isBedrockConfigured,
-  MASTER_AGENT_SYSTEM,
 } from "@/lib/agent/bedrock";
 import {
   extractApiKeyFromRequest,
@@ -12,12 +11,13 @@ import {
 import { recordUsage } from "@/lib/agent/usage-ledger";
 import { getSessionUser } from "@/lib/auth";
 import { agentProjectScope, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
+import { buildHermesSystemPrompt } from "@/lib/hermes/runtime";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * Master Agent chat — Amazon Bedrock DeepSeek.
+ * Hermes Agent chat — Amazon Bedrock DeepSeek + PAL/ROSTR runtime + Skills Library.
  *
  * Auth (either):
  * 1. Cognito session cookie (browser Mission Control)
@@ -74,12 +74,13 @@ export async function POST(req: Request) {
     workspacePath = workspaceLogicalPath(agentProjectScope(userId, projectId));
   }
 
+  const { system, snapshot } = await buildHermesSystemPrompt(userId, projectId);
   const modelId = getAgentModelId();
   const bedrock = createBedrockProvider();
 
   const result = streamText({
     model: bedrock(modelId),
-    system: MASTER_AGENT_SYSTEM,
+    system,
     messages: await convertToModelMessages(body.messages),
     temperature: 0.6,
     maxOutputTokens: 4096,
@@ -105,6 +106,8 @@ export async function POST(req: Request) {
       "X-Artispreneur-Model": modelId,
       "X-Artispreneur-Workspace": workspacePath,
       "X-Artispreneur-Key-Prefix": keyPrefix,
+      "X-Artispreneur-Runtime": "hermes+pal-rostr",
+      "X-Artispreneur-Active-Skills": String(snapshot.active_skills.length),
     },
   });
 }
