@@ -19,18 +19,30 @@ export const brand = {
     "Empower artists to become successful entrepreneurs by providing access to essential resources, knowledge, and tools tailored to their unique creative journeys.",
 
   colors: {
-    crimson: "#CC0000",
-    crimsonDark: "#A30000",
-    gold: "#FED001",
-    goldDark: "#D4AC00",
-    goldLight: "#FEE55E",
-    black: "#111111",
-    charcoal: "#222222",
-    grayDark: "#444444",
-    grayMid: "#777777",
-    grayLight: "#F5F5F5",
-    white: "#FFFFFF",
-    border: "#EEEEEE",
+    // v217 dark palette - gold is primary
+    gold: "#c9a227",
+    goldDark: "#a88620",
+    goldLight: "#e8c84a",
+    goldMuted: "rgba(201, 162, 39, 0.12)",
+    // Crimson as secondary/alert
+    crimson: "#ef4444",
+    crimsonDark: "#dc2626",
+    crimsonLight: "#f87171",
+    // Dark surfaces
+    black: "#09090b",
+    surface: "#18181b",
+    card: "#1c1c1f",
+    charcoal: "#0d0d10",
+    grayDark: "#27272a",
+    grayMid: "#3f3f46",
+    grayLight: "#71717a",
+    white: "#fafafa",
+    border: "#27272a",
+    borderLight: "#3f3f46",
+    // Text
+    text: "#fafafa",
+    textMuted: "#a1a1aa",
+    textDim: "#71717a",
   },
 
   logo: {
@@ -182,18 +194,18 @@ export type ProductId = (typeof brand.products)[number]["id"];
 
 export const PHASE_COLORS = {
   PreD: "#8b7ff5",
-  Design: "#4fb6e8",
-  Development: "#fed001",
-  Deployment: "#4fd18b",
-  Debugging: "#e8734f",
+  Design: "#3b82f6",
+  Development: "#c9a227",
+  Deployment: "#22c55e",
+  Debugging: "#f97316",
 } as const;
 
 export type Phase = keyof typeof PHASE_COLORS;
 
 export const STATUS_COLORS = {
-  ok: "#1a7f4b",
-  warn: "#d97706",
-  block: "#cc0000",
-  info: "#4fb6e8",
-  muted: "#777777",
+  ok: "#22c55e",
+  warn: "#f59e0b",
+  block: "#ef4444",
+  info: "#3b82f6",
+  muted: "#71717a",
 } as const;

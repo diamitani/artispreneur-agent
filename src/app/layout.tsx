@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Libre_Baskerville, Inter, JetBrains_Mono } from "next/font/google";
+import { Libre_Baskerville, Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+  weight: ["700", "800", "900"],
+});
 
 const libre = Libre_Baskerville({
   subsets: ["latin"],
@@ -39,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111111",
+  themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
 };
@@ -48,8 +55,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${libre.variable} ${inter.variable} ${jetbrains.variable}`}>
-      <body>{children}</body>
+    <html lang="en" className={`${playfair.variable} ${libre.variable} ${inter.variable} ${jetbrains.variable}`}>
+      <body className="bg-[color:var(--color-bg-page)] text-[color:var(--color-text-primary)]">{children}</body>
     </html>
   );
 }
