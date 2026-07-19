@@ -219,15 +219,46 @@ a {
 }
 
 .section {
-  padding-block: 80px;
+  padding-block: clamp(4.5rem, 10vw, 7.5rem);
 }
 
 @media (max-width: 640px) {
   .container-page {
     padding-inline: 20px;
   }
-  .section {
-    padding-block: 64px;
+}
+
+/* TasteSkill — atmosphere (fixed grain, never on scroll containers) */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .cursor-blink {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Digital product shelf hover */
+.skill-cover {
+  transition: transform var(--transition-slow);
+}
+.group:hover .skill-cover {
+  transform: translateY(-3px) scale(1.01);
+}
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .skill-cover {
+    transform: none;
   }
 }
 
