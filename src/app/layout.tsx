@@ -17,13 +17,13 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "Agent by Artispreneur",
+  title: "Agent by Artispreneur — Art Means Business",
   description:
-    "The AI business team for independent artists. PAL-compiled onboarding, specialist agents, approval-first workflows.",
+    "Your AI business team for independent artists. PAL onboarding, Master Soul.md, contracts, EPK, directory, Academy, and Cataba — approval-first.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f9f6ef",
+  themeColor: "#C0272D",
   width: "device-width",
   initialScale: 1,
 };
