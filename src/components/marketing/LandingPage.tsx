@@ -10,7 +10,7 @@ import {
 } from "@/lib/marketing-data";
 import { SKILLS_CATALOG } from "@/lib/skills/catalog";
 import { MarketingShell } from "./MarketingShell";
-import { LandingHero } from "./LandingHero";
+import { NewHeroChat } from "./NewHeroChat";
 import { Reveal, RevealItem, RevealStagger } from "./Reveal";
 import { PricingGrid } from "./PricingGrid";
 import { FaqList } from "./FaqList";
@@ -19,7 +19,7 @@ import { FinalCta } from "./FinalCta";
 export function LandingPage() {
   return (
     <MarketingShell>
-      <LandingHero />
+      <NewHeroChat />
       <ProofStrip />
       <AgentsSection />
       <DashboardPreviewSection />
