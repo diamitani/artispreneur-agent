@@ -41,7 +41,7 @@ export function Nav() {
 
         <div className="flex items-center gap-2">
           <a
-            href="/api/auth/login?return=/workspace"
+            href="/api/auth/login?return=/dashboard"
             className="btn btn--ghost btn--sm hidden sm:inline-flex"
           >
             Sign in
@@ -80,7 +80,7 @@ export function Nav() {
               </Link>
             ))}
             <a
-              href="/api/auth/login?return=/workspace"
+              href="/api/auth/login?return=/dashboard"
               className="rounded px-2 py-2.5 text-sm font-medium text-[color:var(--color-gray-dark)] sm:hidden"
             >
               Sign in

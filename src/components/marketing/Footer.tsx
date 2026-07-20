@@ -17,7 +17,7 @@ const COMPANY = [
 
 const ACCOUNT = [
   { href: "/api/auth/login?signup=1&return=/onboarding", label: "Sign up" },
-  { href: "/api/auth/login?return=/workspace", label: "Sign in" },
+  { href: "/api/auth/login?return=/dashboard", label: "Sign in" },
   { href: "/skills/library", label: "Skills Library" },
 ];
 

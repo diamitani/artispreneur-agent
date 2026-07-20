@@ -36,7 +36,7 @@ export async function GET(req: Request) {
   const jar = await cookies();
   const savedState = jar.get(OAUTH_STATE_COOKIE)?.value;
   const verifier = jar.get(PKCE_VERIFIER_COOKIE)?.value;
-  const returnTo = jar.get(OAUTH_RETURN_COOKIE)?.value || "/onboarding";
+  const returnTo = jar.get(OAUTH_RETURN_COOKIE)?.value || "/dashboard";
 
   jar.delete(OAUTH_STATE_COOKIE);
   jar.delete(PKCE_VERIFIER_COOKIE);

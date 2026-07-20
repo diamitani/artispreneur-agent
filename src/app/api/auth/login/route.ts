@@ -18,7 +18,7 @@ import { defaultProjectId } from "@/lib/tenancy/hierarchy";
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const returnTo = url.searchParams.get("return") || "/onboarding";
+  const returnTo = url.searchParams.get("return") || "/dashboard";
   const signup = url.searchParams.get("signup") === "1";
   const origin = url.origin;
 

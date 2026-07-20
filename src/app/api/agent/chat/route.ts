@@ -1,4 +1,4 @@
-import { streamText, type UIMessage, convertToModelMessages } from "ai";
+import { streamText, type UIMessage, type ToolSet, convertToModelMessages } from "ai";
 import {
   createBedrockProvider,
   getAgentModelId,
@@ -79,16 +79,14 @@ export async function POST(req: Request) {
   const modelId = getAgentModelId();
   const bedrock = createBedrockProvider();
 
-  const tools = isComposioConfigured()
-    ? getComposioTools({ entityId: projectId })
-    : undefined;
+  const rawTools = getComposioTools({ entityId: projectId });
+  const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
 
   const result = streamText({
     model: bedrock(modelId),
     system,
     messages: await convertToModelMessages(body.messages),
     tools,
-    maxSteps: tools ? 5 : 1,
     temperature: 0.6,
     maxOutputTokens: 4096,
     onFinish: async ({ usage }) => {

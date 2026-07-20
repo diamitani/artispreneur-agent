@@ -1,10 +1,5 @@
-import { WorkspaceMissionControl } from "@/components/workspace/WorkspaceMissionControl";
+import { redirect } from "next/navigation";
 
-export default async function WorkspacePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ artist?: string }>;
-}) {
-  const { artist } = await searchParams;
-  return <WorkspaceMissionControl artistId={artist} />;
+export default function WorkspaceRedirectPage() {
+  redirect("/dashboard");
 }

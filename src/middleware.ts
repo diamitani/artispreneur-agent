@@ -8,7 +8,8 @@ export function middleware(req: NextRequest) {
   const needsAuth =
     pathname.startsWith("/workspace") ||
     pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/skills/library");
+    pathname.startsWith("/skills/library") ||
+    pathname.startsWith("/dashboard");
 
   if (!needsAuth) return NextResponse.next();
 
@@ -40,5 +41,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/workspace/:path*", "/onboarding/:path*", "/skills/library/:path*"],
+  matcher: ["/workspace/:path*", "/onboarding/:path*", "/skills/library/:path*", "/dashboard/:path*"],
 };

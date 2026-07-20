@@ -215,7 +215,7 @@ export function OnboardingWizard() {
           <button
             type="button"
             onClick={() =>
-              router.push(`/workspace?artist=${result.workspace_config.artist_id}`)
+              router.push(`/dashboard`)
             }
             className="mt-8 w-full rounded-xl bg-[color:var(--red)] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a81f24]"
           >
