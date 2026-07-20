@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { AgentWorkspace } from "@/components/workspace/AgentWorkspace";
 
-export default function WorkspaceRedirectPage() {
-  redirect("/dashboard");
+export default function WorkspacePage() {
+  return <AgentWorkspace />;
 }
