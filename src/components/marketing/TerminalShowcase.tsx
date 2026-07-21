@@ -13,24 +13,24 @@ export function TerminalShowcase() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
               <span className="ml-2 font-mono text-[11px] text-[color:var(--color-gray-mid)]">
-                my-artispreneur-agent — /artispreneurs/patrick-diamitani
+                agent — tonight&apos;s session
               </span>
             </div>
             <div className="space-y-0 px-5 py-6 font-mono text-[12.5px] leading-[2] text-white/80 md:px-7">
               <p>
                 <span className="text-[color:var(--color-gold)]">you</span>
                 <span className="text-white/30"> › </span>
-                Build an EPK and book 3 rooms in NYC this quarter.
+                Need an EPK and three NYC rooms this quarter.
               </p>
-              <p className="text-white/40">⋯ routing to EPK Builder + Directory Outreach</p>
+              <p className="text-white/40">⋯ EPK Builder + Booking / Outreach on it</p>
               <p>
-                <span className="text-[color:var(--color-crimson)]">master</span>
+                <span className="text-[color:var(--color-crimson)]">agent</span>
                 <span className="text-white/30"> › </span>
-                Drafted one-sheet + press bio. 12 venues matched. 3 outreach emails ready for
+                One-sheet and press bio drafted. 12 rooms matched. 3 pitches ready for your
                 approval.
               </p>
               <p className="text-[color:var(--color-success)]">
-                ✓ awaiting your approval — nothing sent
+                ✓ waiting on you — nothing sent
                 <span className="cursor-blink" />
               </p>
             </div>

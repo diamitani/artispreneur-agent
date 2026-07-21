@@ -3,8 +3,8 @@ import { brand } from "@/lib/brand";
 import { Reveal } from "./Reveal";
 
 export function FinalCta({
-  title = "Ready to Own Your Career?",
-  body = "Stop waiting for a label. Start running your music like a CEO.",
+  title = "Ready to run the business?",
+  body = "Artists, managers, agencies, and labels — drafts wait for your approval. Keep the art. Own the ops.",
 }: {
   title?: string;
   body?: string;

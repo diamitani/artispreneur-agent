@@ -17,7 +17,7 @@ const COMPANY = [
 
 const ACCOUNT = [
   { href: "/api/auth/login?signup=1&return=/onboarding", label: "Sign up" },
-  { href: "/api/auth/login?return=/dashboard", label: "Sign in" },
+  { href: "/api/auth/login?return=/workspace", label: "Sign in" },
   { href: "/skills/library", label: "Skills Library" },
 ];
 
@@ -35,8 +35,8 @@ export function Footer() {
             <p className="mt-3 max-w-[260px] font-heading text-sm italic text-white/40">
               {brand.tagline}
             </p>
-            <p className="mt-4 font-mono text-[10px] tracking-wider text-white/25">
-              DIAMITANI → ARTISPRENEUR → AGENT
+            <p className="mt-4 text-xs leading-relaxed text-white/30">
+              For artists, managers, agencies &amp; labels.
             </p>
           </div>
 

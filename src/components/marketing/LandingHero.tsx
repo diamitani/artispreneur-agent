@@ -8,14 +8,15 @@ import { HeroChat } from "./HeroChat";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const STATS = [
-  { n: "7", l: "AI Agents" },
-  { n: "PAL", l: "Soul Runtime" },
-  { n: "$0", l: "To Start" },
+  { n: "7", l: "Specialists" },
+  { n: "You", l: "Approve sends" },
+  { n: "$0", l: "To start" },
 ];
 
 const AUDIENCE_PILLS = [
-  { label: "Independent Artists", desc: "Your AI business team — PROs, contracts, releases." },
-  { label: "Labels & Rosters", desc: "Manage every artist workspace from one command center." },
+  { label: "Independent Artists", desc: "EPKs, PROs, contracts, releases — drafted for your approval." },
+  { label: "Managers & Agencies", desc: "Client workspaces, shared playbooks, approvals that respect the artist." },
+  { label: "Labels & Rosters", desc: "Release calendar, rights, and ops across every house you run." },
 ];
 
 export function LandingHero() {
@@ -110,13 +111,13 @@ export function LandingHero() {
             >
               <p className="max-w-md text-[clamp(1rem,1.8vw,1.125rem)] leading-relaxed text-white/65">
                 <span className="font-semibold text-white">Independent artists:</span>{" "}
-                AI agents handle your PROs, distribution, licensing, contracts, and finances —
-                so you can focus on making music.
+                EPKs, PROs, deals, releases, and money — drafted for your approval so you can
+                stay in the booth.
               </p>
               <p className="max-w-md text-[clamp(0.9rem,1.6vw,1rem)] leading-relaxed text-white/50">
-                <span className="font-semibold text-white/70">Labels & rosters:</span>{" "}
-                One command center to run agent tasks, approvals, and reporting across every
-                artist workspace you manage.
+                <span className="font-semibold text-white/70">Managers, agencies &amp; labels:</span>{" "}
+                One command center for client houses, approvals, and roster ops — without
+                steamrolling artist voice.
               </p>
             </motion.div>
 

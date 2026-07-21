@@ -22,7 +22,7 @@ const DEMO_RESPONSES: Record<string, string> = {
     "Distribution comparison:\n\n• UnitedMasters — 100% royalties, marketing tools\n• DistroKid — unlimited uploads, fast delivery\n• TuneCore — publishing admin included\n• CD Baby — one-time fee, wide sync licensing\n\nWhat's your next release?",
   llc: "LLC setup — I'll walk you through:\n\n1. Name availability check\n2. State filing + Articles of Organization\n3. Operating Agreement draft\n4. EIN application with the IRS\n\nWhich state are you in?",
   roster:
-    "For roster management I can:\n\n• Maintain individual artist profiles & soul.md\n• Coordinate agent tasks across artists\n• Generate shared split sheets & deal memos\n• Track approvals across the full roster\n\nHow many artists are on the roster?",
+    "For roster management I can:\n\n• Keep each artist's brief current\n• Coordinate work across artist houses\n• Draft shared split sheets & deal memos\n• Track approvals across the full roster\n\nHow many artists are on the roster?",
   label:
     "Label operations mode — I'll help you:\n\n• Run agent tasks across multiple artist workspaces\n• Draft deal memos, contracts, and schedules\n• Track releases, royalties, and payouts\n• Manage the approval queue across your team\n\nReady to set up your roster?",
   contract:
@@ -135,7 +135,7 @@ export function HeroChat() {
           Artispreneur Agent
         </span>
         <span className="ml-auto rounded-full bg-[color:var(--color-crimson)]/10 px-2.5 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-wider text-[color:var(--color-crimson)]">
-          {mode === "live-auth" ? "Your Workspace" : "Live · Bedrock"}
+          {mode === "live-auth" ? "Your Workspace" : "Live demo"}
         </span>
       </div>
 
@@ -218,8 +218,8 @@ export function HeroChat() {
         <div className="mt-1.5 flex items-center justify-between px-1">
           <p className="font-mono text-[10px] text-[color:var(--color-gray-mid)]">
             {mode === "live-auth"
-              ? "Hermes · Bedrock DeepSeek · full workspace"
-              : "AWS Bedrock DeepSeek · demo mode"}
+              ? "Signed in · full workspace"
+              : "Demo mode · try a prompt"}
           </p>
           {mode === "live-demo" && (
             <a

@@ -9,7 +9,7 @@ import { Reveal } from "@/components/marketing/Reveal";
 export const metadata: Metadata = {
   title: "Pricing — Agent by Artispreneur",
   description:
-    "Starter free forever. Workspace $79/mo for the full Hermes team. Agency & Label custom.",
+    "Starter free forever. Workspace $79/mo for the full specialist team. Agency & Label for rosters.",
 };
 
 export default function PricingPage() {
@@ -17,8 +17,8 @@ export default function PricingPage() {
     <MarketingShell>
       <PageHero
         eyebrow="Pricing"
-        title="Start free. Add agents as you grow."
-        body="No credit card to begin. PAL onboarding provisions your workspace. Upgrade when you need the full specialist roster and Skills Library power."
+        title="Start free. Scale with the roster."
+        body="No card to open a workspace. Upgrade when you want the full specialist team and Skills power — for one artist or a whole catalog."
       >
         <a
           href="/api/auth/login?signup=1&return=/onboarding"
@@ -27,7 +27,7 @@ export default function PricingPage() {
           Start for Free
         </a>
         <Link href="/features" className="btn btn--outline btn--lg">
-          Compare features
+          See what you get
         </Link>
       </PageHero>
 
@@ -35,13 +35,13 @@ export default function PricingPage() {
         <div className="container-page">
           <PricingGrid />
           <Reveal className="mx-auto mt-12 max-w-2xl text-center text-sm text-[color:var(--color-gray-mid)]">
-            Skills Marketplace packs are free during launch. Paid Stripe checkout ready when you flip{" "}
-            <code className="font-mono text-[12px]">SKILLS_FORCE_FREE=0</code>.
+            Skills Marketplace packs are free during launch. Add what you need — EPK, outreach,
+            release, deals — and put them to work the same day.
           </Reveal>
         </div>
       </section>
 
-      <FinalCta title="Pick a plan. Keep the approvals." />
+      <FinalCta title="Pick a plan. Keep the green light." />
     </MarketingShell>
   );
 }

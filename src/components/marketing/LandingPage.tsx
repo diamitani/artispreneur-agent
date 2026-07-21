@@ -77,7 +77,7 @@ function AgentsSection() {
           </p>
         </Reveal>
 
-        {/* Hermes master agent banner */}
+        {/* Master agent banner */}
         <Reveal delay={0.05} className="mb-5 mt-10">
           <div className="relative overflow-hidden rounded-[14px] border border-[color:var(--color-gold)] bg-[color:var(--color-card)] px-7 py-6">
             <div
@@ -93,17 +93,17 @@ function AgentsSection() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-heading text-xl text-[color:var(--color-text-primary)]">Hermes · Master Agent</h3>
-                    <p className="font-mono text-[10px] text-[color:var(--color-gold)]">EVERY WORKSPACE · AWS BEDROCK DEEPSEEK</p>
+                    <h3 className="font-heading text-xl text-[color:var(--color-text-primary)]">Your Master Agent</h3>
+                    <p className="font-mono text-[10px] text-[color:var(--color-gold)]">EVERY WORKSPACE · APPROVAL-FIRST</p>
                   </div>
                 </div>
                 <p className="text-sm leading-relaxed text-[color:var(--color-text-muted)]">
-                  Manager-grade chief of staff. Reads your soul.md, routes tasks to the right specialist,
-                  drafts plans, and keeps every agent aligned to your goals and boundaries. The only agent that
-                  talks to all the others.
+                  Manager-grade chief of staff. Works from your brief, routes the right specialist,
+                  drafts the package, and never ships without your sign-off — the desk that talks to
+                  the whole team.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {["Route work to specialists", "Draft multi-step plans", "Maintain soul.md context", "Approval queue manager", "Skills library broker"].map((cap) => (
+                  {["Route work to specialists", "Draft multi-step plans", "Keep your brief current", "Approval queue", "Skills playbooks"].map((cap) => (
                     <span key={cap} className="rounded-full border border-[color:var(--color-border)] px-2.5 py-0.5 font-mono text-[10px] text-[color:var(--color-text-dim)]">
                       {cap}
                     </span>
@@ -168,7 +168,7 @@ function DashboardPreviewSection() {
           </h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-[color:var(--color-text-muted)]">
             The dashboard surfaces your roadmap, agent outputs, and approval queue — while
-            Hermes runs tasks in the background.
+            Your Agent runs tasks in the background.
           </p>
           <a
             href="/api/auth/login?signup=1&return=/onboarding"
@@ -203,7 +203,7 @@ function DashboardPreviewSection() {
                 <nav className="flex-1 space-y-0.5 px-2 py-3">
                   {[
                     { label: "Home", icon: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z", active: true },
-                    { label: "Hermes Agent", icon: "M13 2L3 14h9l-1 8 10-12h-9l1-8z", active: false },
+                    { label: "Master Agent", icon: "M13 2L3 14h9l-1 8 10-12h-9l1-8z", active: false },
                     { label: "Business Center", icon: "M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z", active: false },
                     { label: "Brand Center", icon: "M12 2a10 10 0 100 20c1.1 0 2-.9 2-2v-.5c0-.3.2-.5.5-.5H17a3 3 0 000-6h-1.4A10 10 0 0012 2z", active: false },
                     { label: "Booking & CRM", icon: "M22 2L11 13 M22 2l-7 20-4-9-9-4z", active: false },
@@ -240,7 +240,7 @@ function DashboardPreviewSection() {
                   <p className="text-[11px] text-[color:var(--color-text-dim)] mt-0.5">Art Means Business. 4 tasks awaiting action.</p>
                   <div className="mt-3 flex gap-2">
                     <span className="rounded-lg bg-[color:var(--color-gold)] px-3 py-1 font-mono text-[9px] font-bold text-[color:var(--color-black)]">Continue Onboarding</span>
-                    <span className="rounded-lg border border-[color:var(--color-border)] px-3 py-1 font-mono text-[9px] text-[color:var(--color-text-dim)]">Open Hermes</span>
+                    <span className="rounded-lg border border-[color:var(--color-border)] px-3 py-1 font-mono text-[9px] text-[color:var(--color-text-dim)]">Open workspace</span>
                   </div>
                 </div>
 
@@ -511,7 +511,7 @@ function SkillsTeaser() {
               Digital skills. Instant install.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-text-muted)]">
-              Playbook packs that drop into Hermes and activate on your next message — EPK,
+              Playbook packs you add to your workspace and put to work on the next ask — EPK,
               release strategy, outreach, rights management.
             </p>
           </div>
@@ -608,7 +608,7 @@ function AcademySection() {
               { tag: "LESSON", color: "text-[color:var(--color-text-dim)]", text: "How to register with a PRO" },
               { tag: "TASK", color: "text-[color:var(--color-gold)]", text: "Draft PRO registration checklist" },
               { tag: "TASK", color: "text-[color:var(--color-gold)]", text: "Prepare repertoire spreadsheet" },
-              { tag: "DONE", color: "text-[color:var(--color-success)]", text: "soul.md updated · Finance notified" },
+              { tag: "DONE", color: "text-[color:var(--color-success)]", text: "profile updated · Finance on deck" },
             ].map((row) => (
               <div
                 key={row.text}

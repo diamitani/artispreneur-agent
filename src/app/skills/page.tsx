@@ -53,8 +53,8 @@ export default async function SkillsMarketplacePage({
                 Digital skills for your Agent workspace.
               </h1>
               <p className="mt-5 max-w-md text-base leading-relaxed text-white/55">
-                Install playbooks and prompt packs like a download store. Free during launch —
-                Stripe ready when you go paid.
+                Playbooks for EPKs, deals, releases, and outreach — free during launch. Add them
+                to your workspace and put them to work the same day.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/skills/library" className="btn btn--gold btn--md">
@@ -69,9 +69,9 @@ export default async function SkillsMarketplacePage({
               <p className="font-mono text-[10px] tracking-wider text-[color:var(--color-gold)]">
                 SHELF · {SKILLS_CATALOG.length} PACKS
               </p>
-              <p className="font-heading mt-3 text-2xl text-white">Instant install</p>
+              <p className="font-heading mt-3 text-2xl text-white">Ready to work</p>
               <p className="mt-2 text-sm leading-relaxed text-white/50">
-                Each skill drops a SKILL.md pack into your Diamitani → Artispreneur → Agent vault.
+                Each pack lands in your workspace so your Agent can use it when you ask.
               </p>
             </div>
           </div>

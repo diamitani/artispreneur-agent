@@ -1,7 +1,7 @@
-/** SaaS marketing content — PAL site-spec + product source of truth */
+/** SaaS marketing content — industry voice for artists, labels, agencies, operators */
 
 export const NAV_LINKS = [
-  { href: "/features", label: "Features" },
+  { href: "/features", label: "Product" },
   { href: "/skills", label: "Skills" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
@@ -11,113 +11,113 @@ export const NAV_LINKS = [
 export const PROBLEM_PAINS = [
   {
     label: "01",
-    title: "Ops bury the music",
-    body: "EPKs, outreach, splits, and release calendars live in twelve tabs — none of them talk to each other.",
+    title: "The business buries the music",
+    body: "EPKs, venue pitches, split sheets, and street-date calendars live in twelve tabs — and none of them talk to each other.",
   },
   {
     label: "02",
-    title: "Generic AI forgets you",
-    body: "Chatbots don't know your genre, boundaries, or release date. Every answer starts from zero.",
+    title: "Generic tools don't know your lane",
+    body: "They don't know your genre, your boundaries, or when the record drops. Every answer starts from zero.",
   },
   {
     label: "03",
     title: "One wrong send costs trust",
-    body: "Pitch emails and deal language need a human gate. Autonomy without approval is a liability.",
+    body: "Pitch emails and deal language need your eyes. Nothing leaves the building until you say so.",
   },
 ] as const;
 
 export const SOLUTION_PILLARS = [
   {
-    tag: "PAL",
-    title: "Compile your intent",
-    body: "Short onboarding becomes a Master Soul, roster, and NPAO plan — not a generic prompt.",
+    tag: "INTAKE",
+    title: "Tell us who you are",
+    body: "A short sit-down on your goals, genre, release plans, and hard lines. That becomes your operating profile — so the work sounds like you.",
   },
   {
-    tag: "HERMES",
+    tag: "TEAM",
     title: "Run the business day",
-    body: "Chat with your chief of staff on Bedrock DeepSeek. Specialists draft; you approve.",
+    body: "Talk to your Agent like a manager. Specialists draft EPKs, outreach, splits, and release plans. You approve before anything ships.",
   },
   {
     tag: "SKILLS",
-    title: "Install real playbooks",
-    body: "Marketplace packs drop into your vault and activate in Hermes — EPK, release, outreach, rights.",
+    title: "Add the playbooks you need",
+    body: "Grab skill packs for press kits, deal review, 42-day releases, venue outreach, and more — then put them to work in your workspace.",
   },
 ] as const;
 
 export const FEATURE_BLOCKS = [
   {
     id: "hermes",
-    eyebrow: "Hermes Agent",
+    eyebrow: "Your Agent",
     title: "A manager-grade chief of staff",
-    body: "Ask in plain language. Hermes routes to the right specialist, drafts the artifact, and waits for your approval before anything ships.",
+    body: "Ask in plain language — book rooms, finish the EPK, stage the release. Your Agent routes the work, drafts the package, and waits for your approval before anything goes out.",
     points: [
-      "Bedrock DeepSeek on Artispreneur infra",
-      "Soul + roster + Skills in every turn",
-      "Workspace apa_* keys + usage ledger",
+      "Talk like you talk to a manager",
+      "Specialists for press, deals, release, money",
+      "Nothing sends without your say-so",
     ],
   },
   {
     id: "pal",
-    eyebrow: "PAL / ROSTR",
-    title: "Onboarding that becomes an OS",
-    body: "PAL compiles your answers into soul.md, artist profile, specialist roster, and a first NPAO plan — the runtime brain for Hermes.",
+    eyebrow: "Your profile",
+    title: "Setup that actually sticks",
+    body: "Onboarding isn't a throwaway form. Your goals, brand voice, and boundaries become the brief every specialist works from — so you're not re-explaining yourself every session.",
     points: [
-      "Soft-gate Mission Control",
-      "7 specialist agents day one",
-      "Recompile when goals change",
+      "Artist profile + priorities locked in",
+      "Full specialist team from day one",
+      "Update the brief when the strategy changes",
     ],
   },
   {
     id: "skills",
-    eyebrow: "Skills Library",
-    title: "Capability packs you can install",
-    body: "Browse like a store. Claim free packs at launch. Install into Hermes so playbooks load on every chat.",
+    eyebrow: "Skills Marketplace",
+    title: "Playbooks you can plug in",
+    body: "Browse like a store. Add packs for EPKs, contract red flags, release calendars, venue outreach, royalties, and splits — free during launch.",
     points: [
-      "EPK, contracts, release, outreach, finance",
-      "Stripe + HubSpot ready for paid",
-      "AWS hub vault under your instance",
+      "EPK, deals, release, outreach, finance",
+      "Install once, use every session",
+      "Built for how the industry actually works",
     ],
   },
   {
     id: "aws",
-    eyebrow: "AWS Instance",
-    title: "Multi-tenant by design",
-    body: "Diamitani → Artispreneur → Agent → your Cognito user → project workspace. Hub on S3, control plane on DynamoDB USER#.",
+    eyebrow: "Your workspace",
+    title: "Private. Scoped. Yours.",
+    body: "One workspace per artist — or a roster of them for agencies and labels. Files, drafts, and memory stay in your house. Staff only see what you assign.",
     points: [
-      "Cognito OAuth (not Mantle)",
-      "Hierarchical Rostr Hub paths",
-      "Approval-first audit posture",
+      "Artist, agency, and label modes",
+      "Approval queue with a clear trail",
+      "Built for teams that move catalogs and careers",
     ],
   },
 ] as const;
 
 export const SOCIAL_PROOF = [
-  { value: "7", label: "Specialist agents" },
-  { value: "PAL", label: "Compiled Soul runtime" },
+  { value: "7", label: "Specialists on roster" },
+  { value: "You", label: "Approve every send" },
   { value: "$0", label: "Starter forever" },
-  { value: "0", label: "Sends without approval" },
+  { value: "EPK+", label: "Skills ready to install" },
 ] as const;
 
 export const HOW_STEPS = [
   {
     num: "01 / SIGN UP",
-    title: "Create your account",
-    desc: "One account, one private workspace. No credit card to start.",
+    title: "Open your workspace",
+    desc: "One account. One private house for the artist or the roster. No card to start.",
   },
   {
-    num: "02 / PAL INTAKE",
-    title: "Answer a short questionnaire",
-    desc: "Your goals, genre, release plans, and boundaries — compiled into your operating profile.",
+    num: "02 / BRIEF",
+    title: "Tell us the story",
+    desc: "Goals, genre, release plans, and boundaries — so the team works from your brief, not a generic prompt.",
   },
   {
-    num: "03 / SOUL.MD",
-    title: "Your workspace is provisioned",
-    desc: "soul.md, artist profile, a first-30-days plan, and your agent team — generated in minutes.",
+    num: "03 / SETUP",
+    title: "Walk into a ready room",
+    desc: "Operating profile, first 30-day plan, and your specialist team — standing by in minutes.",
   },
   {
-    num: "04 / BUILD",
-    title: "Work with your team",
-    desc: "Ask for anything. Specialists draft; you approve. Every action is logged.",
+    num: "04 / RUN",
+    title: "Work the business",
+    desc: "Ask for the EPK, the pitch list, the split sheet. Specialists draft. You approve. Every move is logged.",
   },
 ];
 
@@ -131,77 +131,77 @@ export const AGENT_CARDS = [
   {
     name: "Contract Agent",
     gate: "PRO",
-    desc: "Guided deal questionnaire → reviewed contract draft, plain-language clause explanations, red-flag checklist.",
+    desc: "Guided deal questionnaire → reviewed draft, plain-language clauses, red-flag checklist before you sign.",
     icon: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8",
   },
   {
     name: "EPK Builder",
     gate: "PRO",
-    desc: "Bio variants, one-sheet, press release, asset completeness scoring, exportable web + PDF EPK.",
+    desc: "Bio variants, one-sheet, press release, asset checklist — press-ready kit for the room and the blog.",
     icon: "M12 2a10 10 0 100 20c1.1 0 2-.9 2-2v-.5c0-.3.2-.5.5-.5H17a3 3 0 000-6h-1.4A10 10 0 0012 2z",
   },
   {
     name: "Directory Outreach & CRM",
     gate: "PRO",
-    desc: "Matched blogs, playlists, radio & venues. Personalized pitches, follow-ups, and a real CRM — approval-gated.",
+    desc: "Matched blogs, playlists, radio & venues. Personalized pitches and follow-ups — nothing sends until you approve.",
     icon: "M22 2L11 13 M22 2l-7 20-4-9-9-4z",
   },
   {
     name: "Academy Tutor",
     gate: "FREE",
-    desc: "Interactive courses that turn into execution: lessons become tasks assigned to the right agent.",
+    desc: "Courses that turn into execution: lessons become tasks on the right specialist's desk.",
     icon: "M22 10v6M2 10l10-5 10 5-10 5zM6 12v5c3 3 9 3 12 0v-5",
   },
   {
     name: "Cataba Publishing & Catalog",
     gate: "PRO",
-    desc: "Master catalog, split sheets, ISRC/UPC tracking, PRO registration checklists, release-readiness reports.",
+    desc: "Master catalog, split sheets, ISRC/UPC tracking, PRO registration checklists, release-readiness.",
     icon: "M9 18V5l12-2v13 M6 21a3 3 0 100-6 3 3 0 000 6z M18 19a3 3 0 100-6 3 3 0 000 6z",
   },
   {
     name: "Finance Manager",
     gate: "PRO",
-    desc: "Budgets, invoices, statement organization, and revenue-channel tracking across DSP, sync, and shows.",
+    desc: "Budgets, invoices, statement staging, and money across DSP, sync, and shows — before it gets fuzzy.",
     icon: "M12 1v22 M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
   },
 ];
 
 export const TRUST_POINTS = [
-  "Drafting, research, and planning run autonomously — sending never does.",
-  "Every approval creates an immutable audit record: who, what, when, where.",
-  "Your files, memory, and directory data are scoped to your workspace only.",
+  "Research and drafts move on their own — sending never does.",
+  "Every approval leaves a clear trail: who signed off, what went out, when.",
+  "Your files, notes, and directory stays stay in your workspace — not a shared soup.",
 ];
 
 export const MODE_CARDS = [
   {
     tag: "ARTIST",
-    name: "My Artispreneur Agent",
-    desc: "One private workspace. A Master Agent that acts like a manager-grade chief of staff, plus the full specialist roster.",
-    foot: "1 workspace · pooled compute",
+    name: "Independent artist",
+    desc: "One private workspace. A chief-of-staff Agent plus the specialists — press, deals, release, money — working your brief.",
+    foot: "1 artist workspace",
   },
   {
     tag: "AGENCY",
-    name: "Agency Director",
-    desc: "A portfolio command center. Staff roles, client artist workspaces, shared playbooks, client-approval routes, weekly operating briefs.",
-    foot: "N client workspaces · priority queues",
+    name: "Agency / management",
+    desc: "Run a client roster from one command center. Staff roles, client workspaces, shared playbooks, and approvals that respect the artist.",
+    foot: "Client workspaces · team seats",
   },
   {
     tag: "LABEL",
-    name: "Roster Director",
-    desc: "Roster release calendar, readiness scorecards, budgets, catalog & rights vault — while every artist keeps their own voice and boundaries.",
-    foot: "roster workspaces · reserved capacity",
+    name: "Label / operator",
+    desc: "Release calendar, readiness scorecards, budgets, catalog and rights — while each artist keeps their own voice and boundaries.",
+    foot: "Roster workspaces · ops capacity",
   },
 ];
 
 export const PRICE_TOP = [
   {
     name: "Starter",
-    sub: "Academy + Tutor Agent, directory browsing, your first workspace.",
+    sub: "Academy, Tutor Agent, directory browsing, and your first workspace — on us.",
     price: "$0",
     per: "forever",
     feats: [
       "Academy courses + Tutor Agent",
-      "Master Agent (light model)",
+      "Light Agent for day-to-day asks",
       "Directory browsing",
       "Catalog upload on Cataba",
     ],
@@ -211,15 +211,15 @@ export const PRICE_TOP = [
   },
   {
     name: "Workspace",
-    sub: "The full AI business team. Every agent, every skill, one command center.",
+    sub: "The full business team. Every specialist, every skill, one command center.",
     price: "$79",
     per: "/month",
     feats: [
-      "All 7 specialist agents + Master Agent",
-      "Approval queue + audit log",
-      "Full Composio integrations (Gmail, Drive, Sheets)",
-      "Priority jobs + larger models",
-      "BYOK supported",
+      "All 7 specialists + Master Agent",
+      "Approval queue + activity trail",
+      "Gmail, Drive, Sheets connections",
+      "Priority jobs when the calendar is tight",
+      "Bring your own model keys (optional)",
     ],
     cta: "Get the Workspace",
     featured: true,
@@ -227,14 +227,14 @@ export const PRICE_TOP = [
   },
   {
     name: "Agency & Label",
-    sub: "Organization hub, staff roles, client workspaces, and the Director agent.",
+    sub: "Roster ops — staff roles, client houses, Director Agent, reporting.",
     price: "Custom",
     per: "per roster",
     feats: [
       "Agency Director / Roster Director",
       "Client artist workspaces",
-      "Shared playbooks + reporting",
-      "SSO, audit export, dedicated compute options",
+      "Shared playbooks + weekly briefs",
+      "SSO, exportable audit, dedicated capacity",
     ],
     cta: "Talk to us",
     featured: false,
@@ -247,13 +247,13 @@ export const PRICE_BOTTOM = [
     name: "Contract Agent + EPK Builder",
     price: "$29",
     per: "/mo",
-    sub: "The Pro Toolkit. Guided contracts, red-flag checklists, exportable web + PDF EPKs.",
+    sub: "Deal review checklists and exportable press kits — the toolkit most artists need first.",
   },
   {
     name: "Directory & Outreach",
     price: "$24",
     per: "/mo",
-    sub: "Outreach Agent + CRM. Directory download available as a $20 one-time export.",
+    sub: "Pitch lists, follow-ups, and a real CRM. Directory export available as a one-time download.",
   },
   {
     name: "Cataba Publishing Agent",
@@ -274,35 +274,35 @@ export const COURSE_CHIPS = [
 
 export const FAQS = [
   {
-    q: "Can the agents send emails or publish without me?",
-    a: "No. Agents research, plan, and draft autonomously — but sending messages, publishing, spending money, and signing documents always require your explicit approval. Every approval is logged in an immutable audit record.",
+    q: "Can the Agent send emails or publish without me?",
+    a: "No. It can research, plan, and draft all day — but pitches, posts, spends, and signatures wait for your explicit approval. Every approval is logged.",
   },
   {
-    q: "What is soul.md?",
-    a: "It's your operating profile — identity, goals, brand voice, boundaries, and current priorities — generated from your PAL onboarding answers. Hermes and every specialist read it before working for you, so nothing you get back is generic. You can recompile anytime.",
+    q: "What is my operating profile?",
+    a: "It's the brief your team works from — who you are, what you're chasing, how you sound, and what you won't do. Built from onboarding so you're not re-explaining yourself every time. You can update it when the strategy changes.",
   },
   {
-    q: "What is Hermes?",
-    a: "Hermes is the Master Agent runtime inside Agent by Artispreneur. It runs on Amazon Bedrock (DeepSeek), loads your PAL-compiled Soul, specialist roster, and installed Skills Library packs, then drafts work for your approval.",
+    q: "Who is this for?",
+    a: "Independent artists running their own careers. Managers and agencies with a client roster. Label and catalog operators who need release, rights, and outreach moving without losing artist voice.",
   },
   {
-    q: "How do Skills work?",
-    a: "Skills are digital playbooks in the marketplace. Claim or purchase a pack, install it into your library, and Hermes injects the SKILL.md protocol into chat. Free during launch.",
+    q: "What are Skills?",
+    a: "Skill packs are playbooks you add to your workspace — EPK builder, contract red flags, 42-day release plan, venue outreach, royalty staging, split sheets, and more. Free during launch. Install once; your Agent uses them when you ask.",
   },
   {
-    q: "Is my workspace on AWS?",
-    a: "Yes. Identity is Cognito. Your hub (Soul, skills, usage) lives under the Diamitani → Artispreneur → Agent hierarchy on the instance hub (S3 in production, local fs in dev). Control plane records use DynamoDB USER# keys.",
+    q: "Is my work private?",
+    a: "Yes. Your files, drafts, and notes stay in your workspace. On agency or label plans, staff only see the artist houses you assign — and artists keep their own boundaries.",
   },
   {
     q: "Is this legal or tax advice?",
-    a: "No. The Legal Business Setup and Contract agents provide education, templates, and checklists — clearly labeled as informational. For signatures and filings we recommend qualified professionals, and the agents will tell you when to bring one in.",
+    a: "No. Legal and finance specialists give education, templates, and checklists — clearly labeled. When it's time to sign or file, we tell you to bring in a qualified professional.",
   },
   {
-    q: "Who can see my files and data?",
-    a: "Only you. Every file, memory, and retrieval is scoped to your workspace. In Agency and Label modes, staff see only the artist workspaces explicitly assigned to them — and artists always keep their own boundary.",
+    q: "Can agencies and labels run multiple artists?",
+    a: "Yes. Agency and Label modes give you a command center, client or roster workspaces, shared playbooks, and approval routes that still respect each artist's voice.",
   },
   {
-    q: "Can I bring my own model keys?",
-    a: "Yes. Paid plans support BYOK through encrypted secrets storage. Your usage is marked accordingly, but workspace safety rules, action limits, and audit logging still apply. Platform Bedrock credentials are never shared with customers.",
+    q: "Do I need a credit card to start?",
+    a: "No. Starter is free forever. Upgrade to Workspace when you want the full specialist team and Skills power.",
   },
 ];

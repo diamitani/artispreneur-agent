@@ -50,12 +50,12 @@ export default function AboutPage() {
               className="font-heading text-[color:var(--color-black)]"
               style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.1rem)" }}
             >
-              Independent artists deserve manager-grade ops — without giving up ownership.
+              Independent careers deserve manager-grade ops — without giving up ownership.
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-gray-mid)] md:text-base">
-              Agent by Artispreneur is the Hermes workspace under the Artispreneur product family.
-              It compiles your intent with PAL/ROSTR, runs specialists approval-first, and stores
-              your Soul and Skills on the AWS instance hierarchy owned by Diamitani Industries.
+              Agent by Artispreneur is built for the people who actually move careers: artists
+              running their own shop, managers and agencies with a client book, and labels and
+              operators shipping catalogs. Specialists draft. You approve. The art stays yours.
             </p>
           </Reveal>
         </div>
@@ -87,9 +87,9 @@ export default function AboutPage() {
       <section className="section bg-white">
         <div className="container-page">
           <Reveal className="mb-8 max-w-lg">
-            <p className="type-overline mb-2.5">Ecosystem</p>
+            <p className="type-overline mb-2.5">The family</p>
             <h2 className="font-heading text-2xl text-[color:var(--color-black)] md:text-3xl">
-              One family. Six platforms.
+              One brand. Six platforms.
             </h2>
           </Reveal>
           <RevealStagger className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -7,9 +7,9 @@ import { FinalCta } from "@/components/marketing/FinalCta";
 import { Reveal, RevealItem, RevealStagger } from "@/components/marketing/Reveal";
 
 export const metadata: Metadata = {
-  title: "Features — Agent by Artispreneur",
+  title: "Product — Agent by Artispreneur",
   description:
-    "Hermes Agent, PAL/ROSTR Soul compilation, Skills Library, and AWS multi-tenant instance — the full music-business OS.",
+    "Manager-grade Agent for independent artists, agencies, and labels. EPKs, deals, releases, outreach — drafts wait for your approval.",
 };
 
 export default function FeaturesPage() {
@@ -18,8 +18,8 @@ export default function FeaturesPage() {
       <PageHero
         dark
         eyebrow="Product"
-        title="The operating system for the business of music."
-        body="Hermes runs the day. PAL compiles your Soul. Skills install playbooks. Everything sits on your AWS instance under Diamitani → Artispreneur → Agent."
+        title="The business side of music — staffed."
+        body="For independent artists, managers, agencies, and label operators. Your Agent drafts the EPK, the pitch list, the release plan, and the split sheet. You greenlight before anything ships."
       >
         <a
           href="/api/auth/login?signup=1&return=/onboarding"
@@ -75,7 +75,9 @@ export default function FeaturesPage() {
                 >
                   <p
                     className={`font-mono text-[11px] font-semibold tracking-[0.12em] ${
-                      i % 2 === 0 ? "text-[color:var(--color-gold)]" : "text-[color:var(--color-crimson)]"
+                      i % 2 === 0
+                        ? "text-[color:var(--color-gold)]"
+                        : "text-[color:var(--color-crimson)]"
                     }`}
                   >
                     {block.eyebrow.toUpperCase()}
@@ -92,7 +94,7 @@ export default function FeaturesPage() {
                       i % 2 === 0 ? "text-white/50" : "text-[color:var(--color-gray-mid)]"
                     }`}
                   >
-                    Live in Mission Control after PAL onboarding.
+                    Live in your workspace after a short setup brief.
                   </p>
                 </div>
               </div>
@@ -104,19 +106,19 @@ export default function FeaturesPage() {
       <section className="section bg-[color:var(--color-bg-surface)]">
         <div className="container-page">
           <Reveal className="mx-auto mb-10 max-w-lg text-center">
-            <p className="type-overline mb-2.5">Stack</p>
+            <p className="type-overline mb-2.5">Built for the industry</p>
             <h2 className="font-heading text-2xl text-[color:var(--color-black)] md:text-3xl">
-              Built for production, not demos.
+              What operators actually need.
             </h2>
           </Reveal>
           <RevealStagger className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-2">
             {[
-              "Next.js 15 · React 19",
-              "AWS Cognito OAuth",
-              "Amazon Bedrock DeepSeek",
-              "S3 hub + DynamoDB USER#",
-              "Stripe Skills checkout",
-              "HubSpot event tracking",
+              "EPKs & press kits",
+              "Venue & playlist outreach",
+              "Deal red-flag review",
+              "42-day release calendars",
+              "Split sheets & catalog prep",
+              "Royalty staging & budgets",
             ].map((item) => (
               <RevealItem key={item}>
                 <div className="rounded-[10px] border border-[color:var(--color-border)] bg-white px-5 py-4 text-sm font-medium text-[color:var(--color-black)]">
@@ -129,8 +131,8 @@ export default function FeaturesPage() {
       </section>
 
       <FinalCta
-        title="Put Hermes on your roster."
-        body="Compile your Soul, install skills, and run the business side without losing the art."
+        title="Put a team on your roster."
+        body="Independent artist, agency, or label — open a workspace and run the business side like you mean it."
       />
     </MarketingShell>
   );

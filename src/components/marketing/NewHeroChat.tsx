@@ -34,7 +34,7 @@ export function NewHeroChat() {
     setMessages((prev) => [
       ...prev,
       { role: "user", text: input },
-      { role: "agent", text: "I'm working on that... In production, I'd be calling Bedrock DeepSeek to help you." },
+      { role: "agent", text: "On it — drafting the package now. Nothing ships until you approve." },
     ]);
     setInput("");
   };
