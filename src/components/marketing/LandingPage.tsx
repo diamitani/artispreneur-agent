@@ -5,6 +5,7 @@ import {
   HOW_STEPS,
   MODE_CARDS,
   PROBLEM_PAINS,
+  ROI_COMPARISON,
   SOCIAL_PROOF,
   TRUST_POINTS,
 } from "@/lib/marketing-data";
@@ -21,15 +22,16 @@ export function LandingPage() {
     <MarketingShell>
       <NewHeroChat />
       <ProofStrip />
+      <HowSection />
       <AgentsSection />
+      <RoiComparisonSection />
       <DashboardPreviewSection />
+      <AcademySection />
       <ProblemSection />
       <ApprovalSection />
       <ModesSection />
-      <HowSection />
       <SkillsTeaser />
       <PricingTeaser />
-      <AcademySection />
       <FaqTeaser />
       <FinalCta />
     </MarketingShell>
@@ -146,6 +148,90 @@ function AgentsSection() {
             </RevealItem>
           ))}
         </RevealStagger>
+      </div>
+    </section>
+  );
+}
+
+/* ─── ROI Comparison ───────────────────────────────────────────────────────── */
+function RoiComparisonSection() {
+  return (
+    <section className="section bg-[color:var(--color-bg-page)]">
+      <div className="container-page">
+        <Reveal className="mb-12 max-w-2xl">
+          <p className="type-overline mb-2.5">The Math</p>
+          <h2
+            className="font-heading text-[color:var(--color-text-primary)]"
+            style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)" }}
+          >
+            What artists pay
+            <br />
+            <span className="text-[color:var(--color-gold)]">without an agent team.</span>
+          </h2>
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-[color:var(--color-text-muted)]">
+            The industry standard: hire a manager, lawyer, accountant, and publicist separately.
+            Or get all of it in one workspace for $79/month.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.05}>
+          <div className="overflow-hidden rounded-[14px] border border-[color:var(--color-border)] bg-[color:var(--color-card)]">
+            {/* Header */}
+            <div className="grid grid-cols-3 gap-4 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-6 py-4 md:grid-cols-4">
+              <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-text-dim)]">
+                Service
+              </div>
+              <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-text-dim)]">
+                Industry Rate
+              </div>
+              <div className="hidden font-mono text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-gold)] md:block">
+                With Agent
+              </div>
+              <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-[color:var(--color-success)]">
+                You Save
+              </div>
+            </div>
+
+            {/* Rows */}
+            {ROI_COMPARISON.map((row, i) => (
+              <div
+                key={row.task}
+                className={`grid grid-cols-3 gap-4 px-6 py-4 md:grid-cols-4 ${
+                  i < ROI_COMPARISON.length - 1 ? "border-b border-[color:var(--color-border)]" : ""
+                }`}
+              >
+                <div className="text-sm font-medium text-[color:var(--color-text-primary)]">
+                  {row.task}
+                </div>
+                <div className="text-sm text-[color:var(--color-text-muted)] line-through opacity-70">
+                  {row.without}
+                </div>
+                <div className="hidden text-sm font-semibold text-[color:var(--color-gold)] md:block">
+                  {row.withAgent}
+                </div>
+                <div className="text-sm font-semibold text-[color:var(--color-success)]">
+                  {row.savings}
+                </div>
+              </div>
+            ))}
+
+            {/* Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[color:var(--color-gold)]/30 bg-[color:var(--color-gold)]/5 px-6 py-5">
+              <div>
+                <p className="font-heading text-xl text-[color:var(--color-text-primary)]">
+                  Total potential savings:{" "}
+                  <span className="text-[color:var(--color-gold)]">$40,000+/year</span>
+                </p>
+                <p className="mt-1 text-sm text-[color:var(--color-text-muted)]">
+                  Workspace plan: $79/month ($948/year)
+                </p>
+              </div>
+              <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--md">
+                Start Saving Now
+              </a>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

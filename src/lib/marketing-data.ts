@@ -1,5 +1,12 @@
 /** SaaS marketing content — industry voice for artists, labels, agencies, operators */
 
+/* ─── Hero Stats (platform capabilities, not fake metrics) ─────────────────── */
+export const HERO_STATS = [
+  { value: "7", label: "Specialist Agents" },
+  { value: "16", label: "Academy Courses" },
+  { value: "$0", label: "To Start" },
+] as const;
+
 export const NAV_LINKS = [
   { href: "/features", label: "Product" },
   { href: "/skills", label: "Skills" },
@@ -92,10 +99,10 @@ export const FEATURE_BLOCKS = [
 ] as const;
 
 export const SOCIAL_PROOF = [
-  { value: "7", label: "Specialists on roster" },
-  { value: "You", label: "Approve every send" },
-  { value: "$0", label: "Starter forever" },
-  { value: "EPK+", label: "Skills ready to install" },
+  { value: "7", label: "Specialist Agents" },
+  { value: "16", label: "Academy Courses" },
+  { value: "51", label: "Business Tools" },
+  { value: "$0", label: "To Start" },
 ] as const;
 
 export const HOW_STEPS = [
@@ -271,6 +278,48 @@ export const COURSE_CHIPS = [
   "Music Streaming Guide",
   "PR Email Campaigns",
 ];
+
+/** ROI comparison — what artists pay without vs with Artispreneur */
+export const ROI_COMPARISON = [
+  {
+    task: "Artist manager",
+    without: "$2,000-5,000/mo",
+    withAgent: "Included",
+    savings: "$24,000-60,000/yr",
+  },
+  {
+    task: "Entertainment lawyer",
+    without: "$300-500/hr",
+    withAgent: "Included",
+    savings: "$3,000-10,000/yr",
+  },
+  {
+    task: "Accountant/bookkeeper",
+    without: "$200-500/mo",
+    withAgent: "Included",
+    savings: "$2,400-6,000/yr",
+  },
+  {
+    task: "PR & playlist pitching",
+    without: "$1,000-3,000/mo",
+    withAgent: "Included",
+    savings: "$12,000-36,000/yr",
+  },
+  {
+    task: "EPK & press materials",
+    without: "$500-2,000 one-time",
+    withAgent: "Included",
+    savings: "$500-2,000",
+  },
+] as const;
+
+/** Integrations & tech stack for trust signals */
+export const INTEGRATIONS = [
+  { name: "Amazon Bedrock", category: "AI" },
+  { name: "AWS Cognito", category: "Auth" },
+  { name: "Stripe", category: "Payments" },
+  { name: "BMI/ASCAP/SESAC", category: "PROs" },
+] as const;
 
 export const FAQS = [
   {

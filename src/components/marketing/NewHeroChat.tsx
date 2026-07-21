@@ -4,17 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { brand } from "@/lib/brand";
+import { HERO_STATS } from "@/lib/marketing-data";
 
 const ease = [0.16, 1, 0.3, 1] as const;
-
-const AGENT_CAPABILITIES = [
-  "Registering songs with your PRO",
-  "Distribution strategy & planning",
-  "Music licensing opportunities",
-  "Setting up your LLC or business entity",
-  "Business taxes & accounting",
-  "Building & protecting your brand",
-];
 
 export function NewHeroChat() {
   const reduce = useReducedMotion();
@@ -84,23 +76,25 @@ export function NewHeroChat() {
 
             <motion.h1
               className="font-heading text-white"
-              style={{ fontSize: "clamp(2.5rem, 7vw, 3.5rem)", lineHeight: 1.1 }}
+              style={{ fontSize: "clamp(2.25rem, 6vw, 3.25rem)", lineHeight: 1.1 }}
               initial={reduce ? false : { opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease }}
             >
-              Your Music Business
+              You make the music.
               <br />
-              <span className="text-[color:var(--color-gold)]">Operating System</span>
+              <span className="text-[color:var(--color-gold)]">We handle the rest.</span>
             </motion.h1>
 
             <motion.p
-              className="mt-6 max-w-lg text-[clamp(0.95rem,2vw,1.125rem)] leading-relaxed text-white/70"
+              className="mt-6 max-w-xl text-[clamp(0.95rem,2vw,1.125rem)] leading-relaxed text-white/70"
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.2, ease }}
             >
-              AI agents handle your PROs, distribution, licensing, contracts, accounting, and brand — so you focus on making music. Set up your business, stay organized, and get expert guidance without the legal bill.
+              Register songs. Book shows. Draft contracts. Manage releases.{" "}
+              <span className="text-white font-medium">Just ask your AI business team</span> — they
+              draft everything, you approve before it ships.
             </motion.p>
 
             <motion.div
@@ -110,31 +104,46 @@ export function NewHeroChat() {
               transition={{ duration: 0.6, delay: 0.28, ease }}
             >
               <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--lg">
-                Get Started Free
+                Start for Free
               </a>
-              <a href="#agents" className="btn btn--outline-on-dark btn--lg">
-                See the Agents
+              <a href="#how" className="btn btn--outline-on-dark btn--lg">
+                See How It Works
               </a>
             </motion.div>
 
             <motion.div
-              className="mt-10 flex gap-10"
+              className="mt-10 flex flex-wrap gap-6 md:gap-10"
               initial={reduce ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.35 }}
             >
-              <div>
-                <p className="font-heading text-[28px] text-white">6</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">AI Agents</p>
-              </div>
-              <div>
-                <p className="font-heading text-[28px] text-white">16</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">Courses</p>
-              </div>
-              <div>
-                <p className="font-heading text-[28px] text-white">$0</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">To Start</p>
-              </div>
+              {HERO_STATS.map((stat, i) => (
+                <div key={stat.label}>
+                  <p className={`font-heading text-[28px] ${i === 0 ? "text-[color:var(--color-gold)]" : "text-white"}`}>
+                    {stat.value}
+                  </p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40">{stat.label}</p>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* B2B callout */}
+            <motion.div
+              className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.42 }}
+            >
+              <span className="text-[13px] text-white/60">
+                Running a roster?
+              </span>
+              <a href="/for-agencies" className="text-[13px] font-semibold text-[color:var(--color-gold)] hover:text-[color:var(--color-gold-light)]">
+                Agency plans
+              </a>
+              <span className="text-white/20">|</span>
+              <a href="/for-labels" className="text-[13px] font-semibold text-[color:var(--color-gold)] hover:text-[color:var(--color-gold-light)]">
+                Label plans
+              </a>
             </motion.div>
           </motion.div>
 

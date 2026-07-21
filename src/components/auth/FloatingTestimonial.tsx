@@ -25,7 +25,7 @@ const testimonials = [
   },
 ];
 
-const springTransition = { type: "spring", stiffness: 100, damping: 20 };
+const springTransition = { type: "spring", stiffness: 100, damping: 20 } as const;
 
 export function FloatingTestimonial() {
   const [current, setCurrent] = useState(0);

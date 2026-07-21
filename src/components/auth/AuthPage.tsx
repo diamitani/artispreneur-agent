@@ -12,7 +12,7 @@ type AuthPageProps = {
   mode: "signin" | "signup";
 };
 
-const springTransition = { type: "spring", stiffness: 100, damping: 20 };
+const springTransition = { type: "spring", stiffness: 100, damping: 20 } as const;
 
 export function AuthPage({ mode }: AuthPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);

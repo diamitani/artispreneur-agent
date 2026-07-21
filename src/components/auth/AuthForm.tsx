@@ -9,7 +9,7 @@ type AuthFormProps = {
   isSubmitting: boolean;
 };
 
-const springTransition = { type: "spring", stiffness: 100, damping: 20 };
+const springTransition = { type: "spring", stiffness: 100, damping: 20 } as const;
 
 export function AuthForm({ mode, onSubmit, isSubmitting }: AuthFormProps) {
   const isSignUp = mode === "signup";
