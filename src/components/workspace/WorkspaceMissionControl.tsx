@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { PalCompilationResult } from "@/lib/rostr/pal-compiler";
 import { brand } from "@/lib/brand";
 import { MasterAgentChat } from "./MasterAgentChat";
+import { AgentSelector } from "./AgentSelector";
 
 type HermesSnap = {
   soul_loaded: boolean;
@@ -112,6 +113,7 @@ export function WorkspaceMissionControl({ artistId }: { artistId?: string }) {
             <Link href="/onboarding" className="text-xs font-semibold text-[color:var(--color-text-muted)] hover:text-[color:var(--color-text-primary)]">
               Recompile Soul
             </Link>
+            <AgentSelector className="mr-2" />
             <a href="/api/auth/logout" className="text-xs text-[color:var(--color-text-dim)] hover:text-[color:var(--color-gold)]">
               Sign out
             </a>
