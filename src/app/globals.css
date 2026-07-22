@@ -405,3 +405,10 @@ a {
   vertical-align: middle;
   animation: blink 1.1s infinite;
 }
+
+/* Landing v0 chat demo — targets a raw HTML string rendered via
+   dangerouslySetInnerHTML, so it must stay a real global class. */
+.lv0-chat-cta {
+  color: #f5c100;
+  font-weight: 700;
+}
