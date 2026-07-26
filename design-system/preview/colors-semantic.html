@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Colors" name="Semantic Colors" subtitle="Text, status and semantic color tokens" viewport="700x100" -->
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: #fff; font-family: var(--font-sans); padding: 20px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .item { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 130px; }
+  .dot { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; border: 1px solid #eee; }
+  .label { font-size: 11px; }
+  .name { font-weight: 600; color: #111; display: block; }
+  .role { color: #777; }
+</style>
+</head><body>
+<div class="row">
+  <div class="item"><div class="dot" style="background:#CC0000; border-color:#CC0000;"></div><div class="label"><span class="name">Text Brand</span><span class="role">Brand headlines</span></div></div>
+  <div class="item"><div class="dot" style="background:#111111; border-color:#111;"></div><div class="label"><span class="name">Text Primary</span><span class="role">Main body</span></div></div>
+  <div class="item"><div class="dot" style="background:#444444;"></div><div class="label"><span class="name">Text Secondary</span><span class="role">Supporting</span></div></div>
+  <div class="item"><div class="dot" style="background:#777777;"></div><div class="label"><span class="name">Text Muted</span><span class="role">Captions, hints</span></div></div>
+  <div class="item"><div class="dot" style="background:#FFFFFF; border-color:#ddd;"></div><div class="label"><span class="name">Text Inverse</span><span class="role">On dark BG</span></div></div>
+  <div class="item"><div class="dot" style="background:#1A7F4B; border-color:#1A7F4B;"></div><div class="label"><span class="name">Success</span><span class="role">Confirmations</span></div></div>
+  <div class="item"><div class="dot" style="background:#D97706; border-color:#D97706;"></div><div class="label"><span class="name">Warning</span><span class="role">Alerts</span></div></div>
+  <div class="item"><div class="dot" style="background:#CC0000; border-color:#CC0000;"></div><div class="label"><span class="name">Error</span><span class="role">Validation</span></div></div>
+</div>
+</body></html>

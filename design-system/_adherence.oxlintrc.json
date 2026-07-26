@@ -1,0 +1,229 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "assets/**",
+              "ui_kits/dashboard/**",
+              "ui_kits/marketing/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Libre Baskerville|Inter))/i]",
+        "message": "Font not provided by the design system. Available: Libre Baskerville, Inter."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {},
+    "tokens": [
+      "--color-bg-brand",
+      "--color-bg-dark",
+      "--color-bg-page",
+      "--color-bg-surface",
+      "--color-black",
+      "--color-border",
+      "--color-border-dark",
+      "--color-charcoal",
+      "--color-crimson",
+      "--color-crimson-dark",
+      "--color-crimson-light",
+      "--color-error",
+      "--color-focus",
+      "--color-gold",
+      "--color-gold-dark",
+      "--color-gold-light",
+      "--color-gray-border",
+      "--color-gray-dark",
+      "--color-gray-light",
+      "--color-gray-mid",
+      "--color-gray-subtle",
+      "--color-success",
+      "--color-text-accent",
+      "--color-text-brand",
+      "--color-text-inverse",
+      "--color-text-muted",
+      "--color-text-primary",
+      "--color-text-secondary",
+      "--color-warning",
+      "--color-white",
+      "--font-mono",
+      "--font-sans",
+      "--font-serif",
+      "--leading-loose",
+      "--leading-normal",
+      "--leading-snug",
+      "--leading-tight",
+      "--radius-full",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-sm",
+      "--radius-xl",
+      "--shadow-lg",
+      "--shadow-md",
+      "--shadow-sm",
+      "--shadow-xl",
+      "--space-1",
+      "--space-12",
+      "--space-16",
+      "--space-2",
+      "--space-24",
+      "--space-3",
+      "--space-4",
+      "--space-6",
+      "--space-8",
+      "--text-2xl",
+      "--text-3xl",
+      "--text-4xl",
+      "--text-5xl",
+      "--text-base",
+      "--text-lg",
+      "--text-md",
+      "--text-sm",
+      "--text-xl",
+      "--text-xs",
+      "--tracking-normal",
+      "--tracking-tight",
+      "--tracking-wide",
+      "--tracking-wider",
+      "--tracking-widest",
+      "--transition-base",
+      "--transition-fast",
+      "--transition-slow",
+      "--weight-bold",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold",
+      "--z-base",
+      "--z-modal",
+      "--z-overlay",
+      "--z-raised",
+      "--z-toast"
+    ],
+    "tokenKinds": {
+      "--color-crimson": "color",
+      "--color-crimson-dark": "color",
+      "--color-crimson-light": "color",
+      "--color-gold": "color",
+      "--color-gold-dark": "color",
+      "--color-gold-light": "color",
+      "--color-black": "color",
+      "--color-charcoal": "color",
+      "--color-gray-dark": "color",
+      "--color-gray-mid": "color",
+      "--color-gray-subtle": "color",
+      "--color-gray-light": "color",
+      "--color-gray-border": "color",
+      "--color-white": "color",
+      "--color-bg-page": "color",
+      "--color-bg-surface": "color",
+      "--color-bg-dark": "color",
+      "--color-bg-brand": "color",
+      "--color-text-primary": "font",
+      "--color-text-secondary": "font",
+      "--color-text-muted": "font",
+      "--color-text-inverse": "font",
+      "--color-text-brand": "font",
+      "--color-text-accent": "font",
+      "--color-border": "color",
+      "--color-border-dark": "color",
+      "--color-focus": "color",
+      "--color-success": "color",
+      "--color-warning": "color",
+      "--color-error": "color",
+      "--font-serif": "font",
+      "--font-sans": "font",
+      "--font-mono": "font",
+      "--text-xs": "font",
+      "--text-sm": "font",
+      "--text-base": "font",
+      "--text-md": "font",
+      "--text-lg": "font",
+      "--text-xl": "font",
+      "--text-2xl": "font",
+      "--text-3xl": "font",
+      "--text-4xl": "font",
+      "--text-5xl": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--leading-tight": "font",
+      "--leading-snug": "font",
+      "--leading-normal": "font",
+      "--leading-loose": "font",
+      "--tracking-tight": "font",
+      "--tracking-normal": "font",
+      "--tracking-wide": "font",
+      "--tracking-wider": "font",
+      "--tracking-widest": "font",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-6": "spacing",
+      "--space-8": "spacing",
+      "--space-12": "spacing",
+      "--space-16": "spacing",
+      "--space-24": "spacing",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-full": "radius",
+      "--shadow-sm": "shadow",
+      "--shadow-md": "shadow",
+      "--shadow-lg": "shadow",
+      "--shadow-xl": "shadow",
+      "--transition-fast": "other",
+      "--transition-base": "other",
+      "--transition-slow": "other",
+      "--z-base": "other",
+      "--z-raised": "other",
+      "--z-overlay": "other",
+      "--z-modal": "other",
+      "--z-toast": "other"
+    },
+    "fontFamilies": [
+      "Inter",
+      "Libre Baskerville"
+    ]
+  }
+}

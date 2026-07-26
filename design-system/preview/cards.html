@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Components" name="Cards" subtitle="Light, dark, brand and outlined card variants" viewport="700x160" -->
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; background: #F5F5F5; padding: 20px; font-family: 'Inter', sans-serif; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); flex: 1; min-width: 160px; }
+  .card-dark { background: #111; color: #fff; }
+  .card-brand { background: #CC0000; color: #fff; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .tag-gold { background: #FEE55E; color: #7A5C00; }
+  .tag-red { background: #CC0000; color: #fff; }
+  .tag-green { background: #D1FAE5; color: #065F46; }
+  h4 { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+  p { font-size: 13px; color: #777; margin: 0; line-height: 1.5; }
+  .card-dark p, .card-brand p { color: rgba(255,255,255,0.7); }
+  .card-dark h4, .card-brand h4 { color: #fff; }
+</style>
+</head><body>
+<div class="row">
+  <div class="card">
+    <div class="tag tag-gold">Business</div>
+    <h4>Register Your EIN</h4>
+    <p>Start your business legally. Get your Employer Identification Number in minutes.</p>
+  </div>
+  <div class="card card-dark">
+    <div class="tag tag-gold">Featured</div>
+    <h4>Artist Roadmap</h4>
+    <p>A customized step-by-step plan for your music business journey.</p>
+  </div>
+  <div class="card card-brand">
+    <div class="tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pro</div>
+    <h4>Music Catalogue</h4>
+    <p>Manage every track, claim royalties, and register copyrights in one place.</p>
+  </div>
+  <div class="card" style="border: 1px solid #EEEEEE; box-shadow: none;">
+    <div class="tag tag-green">Complete</div>
+    <h4>Business Bank Account</h4>
+    <p>Connected to Mercury. Ready to receive payments professionally.</p>
+  </div>
+</div>
+</body></html>
