@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Brand Core */
+  --color-crimson: #CC0000;
+  --color-crimson-light: #E63333;
+  --color-crimson-dark: #990000;
+  --color-gold: #FED001;
+  --color-gold-light: #FFE04D;
+  --color-gold-dark: #D4AD00;
+
+  /* Neutrals */
+  --color-black: #111111;
+  --color-charcoal: #1a1a1a;
+  --color-gray-900: #222222;
+  --color-gray-800: #2d2d2d;
+  --color-gray-700: #404040;
+  --color-gray-600: #525252;
+  --color-gray-500: #6b6b6b;
+  --color-gray-400: #8a8a8a;
+  --color-gray-300: #b0b0b0;
+  --color-gray-200: #d4d4d4;
+  --color-gray-100: #ededed;
+  --color-gray-50: #f7f7f7;
+  --color-white: #ffffff;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+
+  /* Typography */
+  --font-display: "Libre Baskerville", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-black);
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
