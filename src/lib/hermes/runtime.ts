@@ -19,6 +19,7 @@ import {
 import { getSkillById } from "@/lib/skills/catalog";
 import type { SpecialistId } from "@/lib/rostr/specialists";
 import { hubReadText, hubBackendLabel } from "@/lib/hub/store";
+import { listAgents } from "@/lib/rostr/agent-registry";
 import {
   getAwsHermesAgent,
   getAwsInstanceProject,
@@ -186,6 +187,20 @@ export async function buildHermesSystemPrompt(
         ...plan.slice(0, 8).map((t) => `- [${t.npao}] ${t.title} → ${t.agent} (${t.phase})`),
       );
     }
+  }
+
+  // Custom agents the artist has built and activated in this workspace.
+  const customAgents = await listAgents(
+    agentProjectScope(userId, projectId),
+    "active",
+  ).catch(() => []);
+  if (customAgents.length) {
+    parts.push(
+      "",
+      `## Custom agents (${customAgents.length} active)`,
+      "These were built by this artist for recurring work. Route matching requests to them by name and follow their instructions:",
+      ...customAgents.map((a) => `- **${a.name}** (\`${a.id}\`) — ${a.purpose}`),
+    );
   }
 
   const activeBodies = skillBodies.slice(0, MAX_TOTAL_SKILLS);

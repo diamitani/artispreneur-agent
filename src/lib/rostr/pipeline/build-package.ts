@@ -1,0 +1,234 @@
+/**
+ * Build package — the artifact set PAL hands to UserOps for provisioning.
+ *
+ * Per the AWS Backend Infrastructure spec (step 3), a compile outputs:
+ *   1. PRD
+ *   2. Soul.MD
+ *   3. Tool Scripts  (MCPs, Functions, Skills, Sub Agents)
+ *   4. Build Prompts (Skills, Functions/Tools, System Instructions, Misc)
+ */
+
+import type {
+  BuildPackage,
+  IaStageOutput,
+  JtbdStageOutput,
+  NpaoStageOutput,
+  PalStageOutput,
+  RagDalStageOutput,
+  ToolScript,
+  WorkspaceContext,
+} from "./types";
+
+/** MCP servers and functions each tool binding implies. */
+const TOOL_BINDINGS: Record<string, ToolScript[]> = {
+  directory_search: [
+    {
+      name: "artispreneur-directory",
+      kind: "mcp",
+      description: "MCP server exposing the curated blog, playlist, radio, and venue directories.",
+      spec: {
+        transport: "https",
+        scope: "workspace",
+        approval_gated: false,
+        operations: ["search_outlets", "get_outlet", "list_genres"],
+      },
+    },
+    {
+      name: "search_outlets",
+      kind: "function",
+      description: "Match directory outlets to genre, market, and campaign type.",
+      spec: {
+        input: { genre: "string", market: "string?", kind: "blog|playlist|radio|venue", limit: "number?" },
+        output: { outlets: "Outlet[]", total: "number" },
+        approval_gated: false,
+      },
+    },
+  ],
+  email_draft: [
+    {
+      name: "draft_outreach",
+      kind: "function",
+      description: "Draft a personalized pitch into the approval queue. Never sends.",
+      spec: {
+        input: { outlet_id: "string", angle: "string", assets: "string[]" },
+        output: { draft_id: "string", subject: "string", body: "string" },
+        approval_gated: true,
+      },
+    },
+  ],
+  epk_builder: [
+    {
+      name: "epk-builder",
+      kind: "skill",
+      description: "Assemble bios, one-sheet, and asset completeness score into an EPK.",
+      spec: { produces: ["bio_50", "bio_100", "bio_250", "one_sheet", "gap_report"] },
+    },
+  ],
+  release_planner: [
+    {
+      name: "release-planner",
+      kind: "skill",
+      description: "Back-plan a dated release calendar with metadata QC and DSP checklists.",
+      spec: { produces: ["timeline", "metadata_qc", "dsp_checklist", "pitch_fields"] },
+    },
+  ],
+  contract_builder: [
+    {
+      name: "contract-builder",
+      kind: "skill",
+      description: "Guided split sheets and agreements with plain-language clause notes.",
+      spec: { produces: ["split_sheet", "agreement_draft", "red_flag_report"], approval_gated: true },
+    },
+  ],
+  budget_planner: [
+    {
+      name: "budget_planner",
+      kind: "function",
+      description: "Build a campaign or quarterly budget from revenue channels.",
+      spec: {
+        input: { window: "string", channels: "string[]", ceiling_usd: "number?" },
+        output: { budget: "LineItem[]", total_usd: "number" },
+        approval_gated: false,
+      },
+    },
+  ],
+  content_planner: [
+    {
+      name: "content-planner",
+      kind: "skill",
+      description: "Content calendar, hooks, and per-piece asset requirements.",
+      spec: { produces: ["calendar", "hook_scripts", "asset_list"] },
+    },
+  ],
+  knowledge_vault: [
+    {
+      name: "vault-retrieval",
+      kind: "mcp",
+      description: "Permission-scoped retrieval over the artist's files and approved libraries.",
+      spec: {
+        transport: "https",
+        scope: "workspace",
+        approval_gated: false,
+        operations: ["search", "read", "cite"],
+        isolation: "workspace_id enforced server-side",
+      },
+    },
+  ],
+};
+
+/** Sub-agents derived from the active specialist roster. */
+function subAgents(ctx: WorkspaceContext): ToolScript[] {
+  return ctx.active_specialists.map((s) => ({
+    name: s.id,
+    kind: "sub_agent" as const,
+    description: `${s.name} — ${s.role}.`,
+    spec: {
+      runtime: "hermes",
+      reports_to: "master",
+      context_required: ["00-config/master-soul.md", "00-config/permissions.yaml"],
+      approval_gated_actions: ["send", "publish", "spend", "sign", "file"],
+    },
+  }));
+}
+
+function buildToolScripts(pal: PalStageOutput, ctx: WorkspaceContext): ToolScript[] {
+  const scripts: ToolScript[] = [];
+  const seen = new Set<string>();
+  for (const tool of pal.intent.tools) {
+    for (const script of TOOL_BINDINGS[tool] ?? []) {
+      if (seen.has(script.name)) continue;
+      seen.add(script.name);
+      scripts.push(script);
+    }
+  }
+  for (const agent of subAgents(ctx)) {
+    if (seen.has(agent.name)) continue;
+    seen.add(agent.name);
+    scripts.push(agent);
+  }
+  return scripts;
+}
+
+function buildPrd(
+  pal: PalStageOutput,
+  ragDal: RagDalStageOutput,
+  jtbd: JtbdStageOutput,
+  npao: NpaoStageOutput,
+  ia: IaStageOutput,
+  ctx: WorkspaceContext,
+): string {
+  return `# PRD — ${pal.intent.goal}
+
+> Generated by ROSTR for **${ctx.artist_name}** · use case: ${pal.intent.use_case}
+
+## Problem
+
+${ctx.artist_name} needs: ${pal.intent.goal}
+
+Current stage: ${ctx.career_stage}. 90-day goal: ${ctx.goal_90d}.
+
+## Users
+
+Primary: ${ctx.artist_name} (${ctx.genres.join(", ") || "genre unspecified"}), working in ${ctx.mode} mode.
+
+## Requirements
+
+### Must do
+${jtbd.product_jobs.filter((j) => !j.requires_approval).map((j) => `- ${j.job}`).join("\n") || "- None"}
+
+### Must gate on approval
+${jtbd.product_jobs.filter((j) => j.requires_approval).map((j) => `- ${j.job}`).join("\n") || "- None"}
+
+### Must exist first
+${jtbd.build_jobs.map((j) => `- ${j.job}`).join("\n")}
+
+## Architecture
+
+- Surfaces: ${ia.architecture.surfaces.join(", ")}
+- Agents: ${ia.architecture.agents.join(", ")}
+- Tools: ${ia.architecture.tools.join(", ") || "none"}
+- Integrations: ${ia.architecture.integrations.join(", ")}
+
+## Constraints
+
+${pal.intent.constraints.map((c) => `- ${c}`).join("\n")}
+
+## Definition of done
+
+${npao.steps.map((s) => `${s.order}. ${s.title}${s.requires_approval ? " *(approved by artist)*" : ""}`).join("\n")}
+
+## Out of scope
+
+- Autonomous sending, publishing, spending, signing, or filing
+- Any action touching another artist's workspace
+- Legal or tax advice presented as anything other than educational
+
+## Open questions
+
+${pal.intent.open_questions.map((q) => `- ${q}`).join("\n") || "- None"}
+
+## Sources
+
+${ragDal.research.map((r) => `- ${r.title} (${r.source})`).join("\n") || "- None"}
+`;
+}
+
+/** Assemble the full build package. */
+export function buildPackage(input: {
+  pal: PalStageOutput;
+  ragDal: RagDalStageOutput;
+  jtbd: JtbdStageOutput;
+  npao: NpaoStageOutput;
+  ia: IaStageOutput;
+  ctx: WorkspaceContext;
+  /** Existing Soul.md; when absent the IA system instructions seed it. */
+  soulMd: string | null;
+}): BuildPackage {
+  const { pal, ragDal, jtbd, npao, ia, ctx, soulMd } = input;
+  return {
+    prd: buildPrd(pal, ragDal, jtbd, npao, ia, ctx),
+    soul_md: soulMd?.trim() || ia.master_system_instructions,
+    tool_scripts: buildToolScripts(pal, ctx),
+    build_prompts: pal.build_prompts,
+  };
+}
