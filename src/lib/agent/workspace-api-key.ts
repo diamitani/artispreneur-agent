@@ -152,9 +152,12 @@ export async function revokeWorkspaceApiKey(userId: string, projectId: string, k
   const keys = await readKeyList(userId, projectId);
   const idx = keys.findIndex((k) => k.key_id === keyId);
   if (idx < 0) return false;
-  keys[idx] = { ...keys[idx], revoked_at: new Date().toISOString() };
+  const target = keys[idx];
+  if (!target) return false;
+  const revoked = { ...target, revoked_at: new Date().toISOString() };
+  keys[idx] = revoked;
   await writeKeyList(userId, projectId, keys);
-  await indexKey(keys[idx]);
+  await indexKey(revoked);
   return true;
 }
 
@@ -177,7 +180,8 @@ export async function resolveWorkspaceApiKey(
   const keys = await readKeyList(idx.user_id, idx.project_id);
   const i = keys.findIndex((k) => k.key_hash === key_hash);
   if (i >= 0) {
-    keys[i] = { ...keys[i], last_used_at: new Date().toISOString() };
+    const existing = keys[i];
+    if (existing) keys[i] = { ...existing, last_used_at: new Date().toISOString() };
     await writeKeyList(idx.user_id, idx.project_id, keys);
   }
 

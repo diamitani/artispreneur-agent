@@ -40,18 +40,18 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href="/api/auth/login?return=/workspace"
+          <Link
+            href="/signin"
             className="btn btn--ghost btn--sm hidden sm:inline-flex"
           >
             Sign in
-          </a>
-          <a
-            href="/api/auth/login?signup=1&return=/onboarding"
+          </Link>
+          <Link
+            href="/signup"
             className="btn btn--primary btn--sm"
           >
             Get Started Free
-          </a>
+          </Link>
           <button
             type="button"
             className="ml-1 inline-flex h-9 w-9 items-center justify-center rounded border border-[color:var(--color-border)] lg:hidden"
@@ -79,12 +79,12 @@ export function Nav() {
                 {l.label}
               </Link>
             ))}
-            <a
-              href="/api/auth/login?return=/workspace"
+            <Link
+              href="/signin"
               className="rounded px-2 py-2.5 text-sm font-medium text-[color:var(--color-gray-dark)] sm:hidden"
             >
               Sign in
-            </a>
+            </Link>
           </nav>
         </div>
       )}

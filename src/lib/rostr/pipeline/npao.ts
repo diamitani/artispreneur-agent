@@ -64,7 +64,7 @@ function ownerFor(job: Job, ctx: WorkspaceContext): string {
   const roster = ctx.active_specialists;
   if (!roster.length) return "Master Agent";
   // Route product work to the first specialist; the Master Agent still drafts.
-  return roster[0].name;
+  return roster[0]?.name ?? "Master Agent";
 }
 
 /** Run the NPAO stage. */

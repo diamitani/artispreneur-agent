@@ -157,7 +157,12 @@ export async function provisionWorkspace(input: {
 /** Compact summary for Mission Control. */
 export function provisionSummary(state: ProvisionState | null) {
   if (!state) {
-    return { status: "pending" as const, done: 0, total: PROVISION_STEPS.length, next: PROVISION_STEPS[0].label };
+    return {
+      status: "pending" as const,
+      done: 0,
+      total: PROVISION_STEPS.length,
+      next: PROVISION_STEPS[0]?.label ?? null,
+    };
   }
   const done = state.steps.filter((s) => s.status === "done" || s.status === "skipped").length;
   const next = state.steps.find((s) => s.status !== "done" && s.status !== "skipped");

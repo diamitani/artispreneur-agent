@@ -1,17 +1,21 @@
 {
-  "name": "artispreneur-agent-workspace",
-  "version": "2.0.0",
+  "name": "artispreneur-agent",
+  "version": "3.0.0",
   "private": true,
-  "description": "Artispreneur Agent Workspace v2 — a rights-first, ROSTR-driven operating system for independent music artists",
+  "description": "Artispreneur Agent \u2014 AI operating system for independent musicians, agencies, and labels",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^5.0.24",
     "@ai-sdk/react": "^4.0.34",
+    "@assistant-ui/react": "^0.14.27",
+    "@assistant-ui/react-ai-sdk": "^1.3.41",
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.1095.0",
     "@aws-sdk/client-bedrock-agentcore": "^3.1095.0",
     "@aws-sdk/client-bedrock-agentcore-control": "^3.1095.0",
     "@aws-sdk/client-dynamodb": "^3.1090.0",
@@ -23,6 +27,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "jose": "^6.2.3",
+    "lucide-react": "^1.16.0",
     "next": "^15.5.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -33,9 +38,9 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@tailwindcss/postcss": "^4.1.12",
-    "@types/node": "^20.19.11",
-    "@types/react": "^19.1.12",
-    "@types/react-dom": "^19.1.9",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "eslint": "^9.34.0",
     "eslint-config-next": "^15.5.2",
     "tailwindcss": "^4.1.12",

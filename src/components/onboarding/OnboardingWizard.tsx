@@ -114,7 +114,7 @@ export function OnboardingWizard() {
   const progress = ((stepIdx + (result ? 1 : 0)) / (ONBOARDING_STEPS.length + 1)) * 100;
 
   const missingRequired = useMemo(() => {
-    return step.fields
+    return (step?.fields ?? [])
       .filter((f) => f.required)
       .filter((f) => {
         const v = answers[f.id];
@@ -215,7 +215,7 @@ export function OnboardingWizard() {
           <button
             type="button"
             onClick={() =>
-              router.push(`/workspace?artist=${result.workspace_config.artist_id}`)
+              router.push(`/dashboard`)
             }
             className="mt-8 w-full rounded-xl bg-[color:var(--red)] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a81f24]"
           >
@@ -234,12 +234,12 @@ export function OnboardingWizard() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--gold)]">
-              Step {stepIdx + 1} of {ONBOARDING_STEPS.length} · NPAO {step.npao}
+              Step {stepIdx + 1} of {ONBOARDING_STEPS.length} · NPAO {step?.npao}
             </p>
             <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[color:var(--ink)]">
-              {step.title}
+              {step?.title}
             </h1>
-            <p className="mt-1 text-sm leading-relaxed text-[color:var(--muted)]">{step.subtitle}</p>
+            <p className="mt-1 text-sm leading-relaxed text-[color:var(--muted)]">{step?.subtitle}</p>
           </div>
           <button
             type="button"
@@ -252,7 +252,7 @@ export function OnboardingWizard() {
         </div>
 
         <div className="mt-6 space-y-5">
-          {step.fields.map((field) => (
+          {(step?.fields ?? []).map((field) => (
             <label key={field.id} className="block">
               <span className="text-sm font-medium text-[color:var(--ink)]">
                 {field.label}

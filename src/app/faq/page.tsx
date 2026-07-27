@@ -8,7 +8,7 @@ import { FinalCta } from "@/components/marketing/FinalCta";
 export const metadata: Metadata = {
   title: "FAQ — Agent by Artispreneur",
   description:
-    "Approvals, soul.md, Hermes, Skills Library, AWS instance tenancy, and BYOK — answered straight.",
+    "Approvals, privacy, Skills, agency and label modes — answered for artists, managers, and operators.",
 };
 
 export default function FaqPage() {
@@ -16,8 +16,8 @@ export default function FaqPage() {
     <MarketingShell>
       <PageHero
         eyebrow="FAQ"
-        title="Questions, answered."
-        body="Approval-first by default. Educational on legal and tax. Your workspace stays yours."
+        title="Straight answers."
+        body="Nothing ships without you. Education on deals and money — not a substitute for counsel. Your workspace stays yours."
       >
         <a
           href="/api/auth/login?signup=1&return=/onboarding"
@@ -36,7 +36,7 @@ export default function FaqPage() {
         </div>
       </section>
 
-      <FinalCta title="Still curious? Start the workspace." />
+      <FinalCta title="Still curious? Open a workspace." />
     </MarketingShell>
   );
 }

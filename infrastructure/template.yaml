@@ -1,0 +1,220 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Artispreneur Agent v3 — Infrastructure (S3, DynamoDB, Cognito, IAM)
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Deployment environment
+
+  AppDomain:
+    Type: String
+    Description: Application domain (e.g., app.artispreneur.ai)
+
+  BedrockModelId:
+    Type: String
+    Default: us.anthropic.claude-sonnet-4-20250514
+    Description: Bedrock model ID for the agent runtime
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # S3 — Hub Storage
+  # ---------------------------------------------------------------------------
+  HubBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "artispreneur-hub-${Environment}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ["*"]
+            AllowedMethods: [GET, PUT, POST]
+            AllowedOrigins:
+              - !Sub "https://${AppDomain}"
+            MaxAge: 3600
+
+  # ---------------------------------------------------------------------------
+  # DynamoDB — Single Table
+  # ---------------------------------------------------------------------------
+  MainTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "artispreneur-${Environment}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: gsi1pk
+          AttributeType: S
+        - AttributeName: gsi1sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: gsi1
+          KeySchema:
+            - AttributeName: gsi1pk
+              KeyType: HASH
+            - AttributeName: gsi1sk
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Service
+          Value: artispreneur-agent
+
+  # ---------------------------------------------------------------------------
+  # Cognito — User Pool
+  # ---------------------------------------------------------------------------
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "artispreneur-${Environment}"
+      AutoVerifiedAttributes: [email]
+      UsernameAttributes: [email]
+      MfaConfiguration: "OFF"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+        - Name: name
+          Required: false
+          Mutable: true
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "artispreneur-${Environment}"
+      UserPoolId: !Ref UserPool
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "artispreneur-web-${Environment}"
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+      SupportedIdentityProviders: [COGNITO]
+      AllowedOAuthFlows: [code]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: [openid, email, profile]
+      CallbackURLs:
+        - !Sub "https://${AppDomain}/api/auth/callback"
+        - "http://localhost:3000/api/auth/callback"
+      LogoutURLs:
+        - !Sub "https://${AppDomain}"
+        - "http://localhost:3000"
+      PreventUserExistenceErrors: ENABLED
+
+  # ---------------------------------------------------------------------------
+  # IAM — App Role (for Vercel / ECS / Lambda runtime)
+  # ---------------------------------------------------------------------------
+  AppRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "artispreneur-app-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}"
+                  - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/*"
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:HeadObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt HubBucket.Arn
+                  - !Sub "${HubBucket.Arn}/*"
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                Resource:
+                  - !GetAtt MainTable.Arn
+                  - !Sub "${MainTable.Arn}/index/*"
+
+Outputs:
+  HubBucketName:
+    Value: !Ref HubBucket
+    Description: S3 bucket for hub file storage
+
+  DynamoDBTableName:
+    Value: !Ref MainTable
+    Description: DynamoDB table name
+
+  UserPoolId:
+    Value: !Ref UserPool
+    Description: Cognito User Pool ID
+
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
+    Description: Cognito User Pool Client ID
+
+  UserPoolDomainUrl:
+    Value: !Sub "https://artispreneur-${Environment}.auth.${AWS::Region}.amazoncognito.com"
+    Description: Cognito Hosted UI domain
+
+  AppRoleArn:
+    Value: !GetAtt AppRole.Arn
+    Description: IAM role ARN for the application runtime

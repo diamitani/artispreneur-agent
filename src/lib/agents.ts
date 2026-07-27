@@ -152,5 +152,6 @@ export const AGENTS: Agent[] = [
 ];
 
 export function getAgent(id: AgentId) {
-  return AGENTS.find((a) => a.id === id) ?? AGENTS[0];
+  // AGENTS is a non-empty literal, so the fallback always resolves.
+  return AGENTS.find((a) => a.id === id) ?? (AGENTS[0] as (typeof AGENTS)[number]);
 }

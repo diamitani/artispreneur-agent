@@ -1,4 +1,4 @@
-import { streamText, type UIMessage, convertToModelMessages } from "ai";
+import { streamText, type UIMessage, type ToolSet, convertToModelMessages } from "ai";
 import {
   createBedrockProvider,
   getAgentModelId,
@@ -18,6 +18,7 @@ import {
   runtimeSessionId,
   type MemoryTurn,
 } from "@/lib/agentcore";
+import { getComposioTools } from "@/lib/composio";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -26,7 +27,7 @@ export const maxDuration = 60;
 function extractLatestUserText(messages: UIMessage[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
-    if (message.role !== "user") continue;
+    if (!message || message.role !== "user") continue;
     const text = (message.parts ?? [])
       .filter((p): p is { type: "text"; text: string } => p.type === "text")
       .map((p) => p.text)
@@ -115,10 +116,15 @@ export async function POST(req: Request) {
         .join("\n")}`
     : system;
 
+  // Composio integrations (Gmail, Drive, Sheets, Calendar, Slack) when configured.
+  const rawTools = getComposioTools({ entityId: projectId });
+  const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
+
   const result = streamText({
     model: bedrock(modelId),
     system: systemWithMemory,
     messages: await convertToModelMessages(body.messages),
+    tools,
     temperature: 0.6,
     maxOutputTokens: 4096,
     onFinish: async ({ usage, text }) => {

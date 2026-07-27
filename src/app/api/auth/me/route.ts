@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
-import { getSessionUser, isCognitoConfigured, isAuthDevBypass } from "@/lib/auth";
-import { HIERARCHY_LABELS } from "@/lib/tenancy/hierarchy";
+import { getSession } from "@/lib/auth/session";
 
-export async function GET() {
-  const user = await getSessionUser();
-  return NextResponse.json({
-    ok: true,
-    authenticated: Boolean(user),
-    cognitoConfigured: isCognitoConfigured(),
-    authDevBypass: isAuthDevBypass(),
-    hierarchy: HIERARCHY_LABELS,
-    user,
-  });
+/**
+ * GET /api/auth/me
+ *
+ * Returns the current user session data as JSON, or 401 if not authenticated.
+ */
+export async function GET(): Promise<NextResponse> {
+  const session = await getSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
+  return NextResponse.json(session);
 }

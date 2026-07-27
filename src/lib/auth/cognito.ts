@@ -1,129 +1,226 @@
 /**
- * Cognito Hosted UI OAuth (PKCE) + JWKS ID-token verification.
- * Pattern aligned with Diamitani FCRAgent / artispreneur-aws backends.
+ * Cognito PKCE helpers for OAuth 2.0 Authorization Code flow.
+ * Uses Web Crypto API (Edge-compatible) and `jose` for JWKS verification.
  */
 
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
-import { getCognitoConfig } from "./config";
 
-export type CognitoClaims = {
-  sub: string;
-  email: string;
-  email_verified?: boolean;
-  name?: string;
-  token_use?: string;
-} & JWTPayload;
+// ─── Environment helpers ───────────────────────────────────────────────────────
 
-const jwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
-
-function jwksFor(region: string, poolId: string) {
-  const key = `${region}:${poolId}`;
-  let jwks = jwksCache.get(key);
-  if (!jwks) {
-    jwks = createRemoteJWKSet(
-      new URL(`https://cognito-idp.${region}.amazonaws.com/${poolId}/.well-known/jwks.json`),
-    );
-    jwksCache.set(key, jwks);
-  }
-  return jwks;
+function env(key: string): string {
+  const val = process.env[key];
+  if (!val) throw new Error(`Missing environment variable: ${key}`);
+  return val;
 }
 
-export async function verifyIdToken(token: string): Promise<CognitoClaims | null> {
-  const cfg = getCognitoConfig();
-  if (!cfg) return null;
-
-  try {
-    const issuer = `https://cognito-idp.${cfg.region}.amazonaws.com/${cfg.userPoolId}`;
-    const { payload } = await jwtVerify(token, jwksFor(cfg.region, cfg.userPoolId), {
-      issuer,
-    });
-
-    if (payload.token_use === "id" && payload.aud !== cfg.clientId) return null;
-    if (payload.token_use === "access" && payload.client_id !== cfg.clientId) return null;
-
-    const sub = String(payload.sub || "");
-    const email = String(payload.email || "").toLowerCase().trim();
-    if (!sub || !email) return null;
-
-    return {
-      ...payload,
-      sub,
-      email,
-      name: typeof payload.name === "string" ? payload.name : undefined,
-      token_use: String(payload.token_use || ""),
-    };
-  } catch {
-    return null;
-  }
+function cognitoRegion(): string {
+  return process.env.COGNITO_REGION ?? process.env.AWS_REGION ?? "us-east-1";
 }
 
-export async function exchangeAuthCode(params: {
-  code: string;
-  redirectUri: string;
-  codeVerifier: string;
-}): Promise<{
+function cognitoPoolId(): string {
+  return env("COGNITO_USER_POOL_ID");
+}
+
+function cognitoClientId(): string {
+  return env("COGNITO_CLIENT_ID");
+}
+
+function cognitoDomain(): string {
+  return env("COGNITO_DOMAIN");
+}
+
+function cognitoRedirectUri(): string {
+  return env("COGNITO_REDIRECT_URI");
+}
+
+// ─── PKCE helpers (Web Crypto) ─────────────────────────────────────────────────
+
+/**
+ * Generate a cryptographically random code verifier (43-128 chars, URL-safe).
+ */
+export function generateCodeVerifier(): string {
+  const buffer = new Uint8Array(32);
+  crypto.getRandomValues(buffer);
+  return base64UrlEncode(buffer);
+}
+
+/**
+ * Derive a code challenge from a code verifier using SHA-256.
+ */
+export async function generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return base64UrlEncode(new Uint8Array(digest));
+}
+
+function base64UrlEncode(buffer: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < buffer.length; i++) {
+    binary += String.fromCharCode(buffer[i]!);
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// ─── Auth URL builder ──────────────────────────────────────────────────────────
+
+export interface BuildAuthUrlOptions {
+  signup?: boolean;
+  returnTo?: string;
+  codeChallenge: string;
+}
+
+/**
+ * Build the Cognito Hosted UI authorization URL with PKCE.
+ */
+export function buildAuthUrl(options: BuildAuthUrlOptions): string {
+  const domain = cognitoDomain();
+  const clientId = cognitoClientId();
+  const redirectUri = cognitoRedirectUri();
+
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope: "openid email profile",
+    code_challenge_method: "S256",
+    code_challenge: options.codeChallenge,
+  });
+
+  // Encode returnTo in state so we can redirect after callback
+  if (options.returnTo) {
+    params.set("state", options.returnTo);
+  }
+
+  const baseUrl = `https://${domain}`;
+  const path = options.signup ? "/signup" : "/oauth2/authorize";
+
+  return `${baseUrl}${path}?${params.toString()}`;
+}
+
+// ─── Token exchange ────────────────────────────────────────────────────────────
+
+export interface TokenSet {
   id_token: string;
   access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-} | null> {
-  const cfg = getCognitoConfig();
-  if (!cfg) return null;
+  refresh_token: string;
+}
+
+/**
+ * Exchange an authorization code for tokens using PKCE code_verifier.
+ */
+export async function exchangeCode(
+  code: string,
+  codeVerifier: string
+): Promise<TokenSet> {
+  const domain = cognitoDomain();
+  const clientId = cognitoClientId();
+  const redirectUri = cognitoRedirectUri();
 
   const body = new URLSearchParams({
     grant_type: "authorization_code",
-    client_id: cfg.clientId,
-    code: params.code,
-    redirect_uri: params.redirectUri,
-    code_verifier: params.codeVerifier,
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    code,
+    code_verifier: codeVerifier,
   });
 
-  const res = await fetch(`https://${cfg.domain}/oauth2/token`, {
+  const response = await fetch(`https://${domain}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
+    body: body.toString(),
   });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    console.error("[cognito] token exchange failed", res.status, text.slice(0, 240));
-    return null;
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Token exchange failed (${response.status}): ${text}`);
   }
 
-  return (await res.json()) as {
-    id_token: string;
-    access_token: string;
-    refresh_token?: string;
-    expires_in: number;
+  const data = await response.json();
+  return {
+    id_token: data.id_token,
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
   };
 }
 
-export function buildHostedLoginUrl(opts: {
-  redirectUri: string;
-  state: string;
-  codeChallenge: string;
-  signup?: boolean;
-}): string | null {
-  const cfg = getCognitoConfig();
-  if (!cfg) return null;
+// ─── Token refresh ─────────────────────────────────────────────────────────────
 
-  const path = opts.signup ? "signup" : "login";
-  const u = new URL(`https://${cfg.domain}/${path}`);
-  u.searchParams.set("client_id", cfg.clientId);
-  u.searchParams.set("response_type", "code");
-  u.searchParams.set("scope", "openid email profile");
-  u.searchParams.set("redirect_uri", opts.redirectUri);
-  u.searchParams.set("state", opts.state);
-  u.searchParams.set("code_challenge_method", "S256");
-  u.searchParams.set("code_challenge", opts.codeChallenge);
-  return u.toString();
+/**
+ * Refresh tokens using the refresh_token grant.
+ */
+export async function refreshTokens(
+  refreshToken: string
+): Promise<Omit<TokenSet, "refresh_token"> & { refresh_token?: string }> {
+  const domain = cognitoDomain();
+  const clientId = cognitoClientId();
+
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    client_id: clientId,
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch(`https://${domain}/oauth2/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Token refresh failed (${response.status}): ${text}`);
+  }
+
+  const data = await response.json();
+  return {
+    id_token: data.id_token,
+    access_token: data.access_token,
+    refresh_token: data.refresh_token, // may be undefined on refresh
+  };
 }
 
-export function buildLogoutUrl(logoutUri: string): string | null {
-  const cfg = getCognitoConfig();
-  if (!cfg) return null;
-  const u = new URL(`https://${cfg.domain}/logout`);
-  u.searchParams.set("client_id", cfg.clientId);
-  u.searchParams.set("logout_uri", logoutUri);
-  return u.toString();
+// ─── JWKS verification ─────────────────────────────────────────────────────────
+
+let _jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getJWKS() {
+  if (!_jwks) {
+    const region = cognitoRegion();
+    const poolId = cognitoPoolId();
+    const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`;
+    _jwks = createRemoteJWKSet(
+      new URL(`${issuer}/.well-known/jwks.json`)
+    );
+  }
+  return _jwks;
+}
+
+export interface CognitoIdTokenPayload extends JWTPayload {
+  sub: string;
+  email?: string;
+  name?: string;
+  "cognito:username"?: string;
+  email_verified?: boolean;
+  token_use?: string;
+}
+
+/**
+ * Verify a Cognito JWT (id_token or access_token) against the JWKS endpoint.
+ * Returns the decoded payload.
+ */
+export async function verifyToken(token: string): Promise<CognitoIdTokenPayload> {
+  const region = cognitoRegion();
+  const poolId = cognitoPoolId();
+  const clientId = cognitoClientId();
+  const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`;
+
+  const jwks = getJWKS();
+
+  const { payload } = await jwtVerify(token, jwks, {
+    issuer,
+    audience: clientId,
+  });
+
+  return payload as CognitoIdTokenPayload;
 }

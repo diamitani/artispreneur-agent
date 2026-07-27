@@ -110,7 +110,7 @@ export function Markdown({ content }: { content: string }) {
     const heading = /^(#{1,6})\s+(.*)$/.exec(line);
     if (heading) {
       flushList();
-      const level = heading[1].length;
+      const level = (heading[1] ?? "#").length;
       const size =
         level === 1 ? "text-lg" : level === 2 ? "text-[15px]" : "text-[13.5px]";
       blocks.push(
@@ -118,7 +118,7 @@ export function Markdown({ content }: { content: string }) {
           key={`h-${key++}`}
           className={`font-heading mt-4 mb-1.5 ${size} text-[color:var(--color-text-primary)]`}
         >
-          {renderInline(heading[2], `h-${key}`)}
+          {renderInline(heading[2] ?? "", `h-${key}`)}
         </p>,
       );
       continue;

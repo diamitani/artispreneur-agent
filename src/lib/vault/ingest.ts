@@ -57,7 +57,7 @@ const MAX_TEXT_BYTES = 2_000_000;
 
 function extensionOf(name: string): string {
   const parts = name.toLowerCase().split(".");
-  return parts.length > 1 ? parts[parts.length - 1] : "";
+  return parts.length > 1 ? (parts[parts.length - 1] ?? "") : "";
 }
 
 export function isTextFile(name: string, contentType?: string): boolean {

@@ -120,7 +120,7 @@ export default function SkillsLibraryPage() {
               Marketplace
             </Link>
             <Link href="/workspace" className="btn btn--primary btn--sm">
-              Open Hermes
+              Open workspace
             </Link>
           </div>
         </div>
@@ -128,34 +128,30 @@ export default function SkillsLibraryPage() {
 
       <main className="container-page py-10">
         <p className="type-mono-label text-[color:var(--color-crimson)]">
-          AWS INSTANCE · HERMES · PAL / ROSTR
+          YOUR WORKSPACE · SKILLS
         </p>
         <h1 className="mt-2 font-heading text-3xl text-[color:var(--color-black)]">
           Your Skills Library
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-[color:var(--color-gray-mid)]">
-          Packs are stored on your AWS instance hub. Installed packs load into
-          Hermes (Bedrock) with your PAL-compiled Soul and ROSTR roster.
+          Packs you own live here. Active packs are ready for your Agent — EPK, deals, release,
+          outreach, and more.
         </p>
 
         {hermes && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Owned" value={String(skills.length)} />
-            <Stat label="Active in Hermes" value={String(activeCount)} />
+            <Stat label="Active" value={String(activeCount)} />
             <Stat
-              label="Master Soul"
-              value={hermes.soul_loaded ? "Loaded" : "Missing"}
+              label="Artist profile"
+              value={hermes.soul_loaded ? "Ready" : "Needs setup"}
               warn={!hermes.soul_loaded}
             />
             <Stat
-              label="PAL completeness"
+              label="Setup"
               value={
                 hermes.completeness != null ? `${hermes.completeness}%` : "—"
               }
-            />
-            <Stat
-              label="Hub"
-              value={(hermes.aws_instance?.hub_backend || "fs").toUpperCase()}
             />
           </div>
         )}
@@ -173,7 +169,7 @@ export default function SkillsLibraryPage() {
           <div className="mt-12 border border-dashed border-[color:var(--color-border)] bg-white p-10 text-center">
             <p className="font-heading text-xl">Your library is empty</p>
             <p className="mt-2 text-sm text-[color:var(--color-gray-mid)]">
-              Claim free packs from the marketplace — they install into Hermes
+              Claim free packs from the marketplace — they activate in your workspace
               automatically.
             </p>
             <Link href="/skills" className="btn btn--primary btn--md mt-6">
@@ -195,11 +191,11 @@ export default function SkillsLibraryPage() {
                     <h2 className="font-heading text-lg">{s.name}</h2>
                     {active ? (
                       <span className="rounded bg-[color:var(--color-gold-light)] px-2 py-0.5 font-mono text-[10px] font-bold text-[color:var(--color-black)]">
-                        HERMES ACTIVE
+                        ACTIVE
                       </span>
                     ) : (
                       <span className="rounded bg-[color:var(--color-bg-surface)] px-2 py-0.5 font-mono text-[10px] text-[color:var(--color-gray-mid)]">
-                        OWNED · INACTIVE
+                        OWNED · OFF
                       </span>
                     )}
                   </div>
@@ -208,10 +204,8 @@ export default function SkillsLibraryPage() {
                   </p>
                   <p className="mt-2 font-mono text-[11px] text-[color:var(--color-gray-subtle)]">
                     {s.product?.agent}
-                    {s.product?.specialistId
-                      ? ` · specialist:${s.product.specialistId}`
-                      : ""}{" "}
-                    · {s.source} · v{s.product?.version} ·{" "}
+                    {s.product?.category ? ` · ${s.product.category}` : ""} · v
+                    {s.product?.version} ·{" "}
                     {new Date(s.acquired_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -225,7 +219,7 @@ export default function SkillsLibraryPage() {
                         href={`/workspace?skill=${s.slug}`}
                         className="btn btn--gold btn--sm"
                       >
-                        Use in Hermes
+                        Use with Agent
                       </Link>
                       <button
                         type="button"
@@ -233,7 +227,7 @@ export default function SkillsLibraryPage() {
                         onClick={() => setInstall(s.skill_id, false)}
                         className="btn btn--outline btn--sm"
                       >
-                        {busyId === s.skill_id ? "…" : "Deactivate"}
+                        {busyId === s.skill_id ? "…" : "Turn off"}
                       </button>
                     </>
                   ) : (
@@ -243,7 +237,7 @@ export default function SkillsLibraryPage() {
                       onClick={() => setInstall(s.skill_id, true)}
                       className="btn btn--primary btn--sm"
                     >
-                      {busyId === s.skill_id ? "…" : "Install into Hermes"}
+                      {busyId === s.skill_id ? "…" : "Activate"}
                     </button>
                   )}
                 </div>
@@ -254,11 +248,11 @@ export default function SkillsLibraryPage() {
 
         {!hermes?.soul_loaded && skills.length > 0 && (
           <p className="mt-8 text-sm text-[color:var(--color-gray-mid)]">
-            Tip: run{" "}
+            Tip: finish{" "}
             <Link href="/onboarding" className="text-[color:var(--color-crimson)] underline">
-              PAL onboarding
+              your setup brief
             </Link>{" "}
-            so Hermes has your Master Soul — skills work better with it loaded.
+            so your Agent knows your story — skills land harder with it.
           </p>
         )}
       </main>
