@@ -60,10 +60,3 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* Landing v0 chat demo — targets a raw HTML string rendered via
-   dangerouslySetInnerHTML, so it must stay a real global class. */
-.lv0-chat-cta {
-  color: #f5c100;
-  font-weight: 700;
-}

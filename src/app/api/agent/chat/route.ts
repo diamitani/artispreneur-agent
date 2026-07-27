@@ -18,7 +18,7 @@ import {
   runtimeSessionId,
   type MemoryTurn,
 } from "@/lib/agentcore";
-import { getComposioTools } from "@/lib/composio";
+import { getComposioTools, isComposioConfigured } from "@/lib/composio";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -43,7 +43,7 @@ function extractLatestUserText(messages: UIMessage[]): string {
  *
  * Auth (either):
  * 1. Cognito session cookie (browser Mission Control)
- * 2. Workspace Agent API key: Authorization: Bearer apa_… or X-Artispreneur-Agent-Key
+ * 2. Workspace Agent API key: Authorization: Bearer *** or X-Artispreneur-Agent-Key
  */
 export async function POST(req: Request) {
   if (!isBedrockConfigured()) {
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     : system;
 
   // Composio integrations (Gmail, Drive, Sheets, Calendar, Slack) when configured.
-  const rawTools = getComposioTools({ entityId: projectId });
+  const rawTools = isComposioConfigured() ? getComposioTools({ entityId: projectId }) : {};
   const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
 
   const result = streamText({

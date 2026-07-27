@@ -37,7 +37,7 @@ export function FloatingTestimonial() {
     return () => clearInterval(interval);
   }, []);
 
-  const t = testimonials[current];
+  const t = testimonials[current] ?? testimonials[0]!;
 
   return (
     <div className="relative">
@@ -55,17 +55,17 @@ export function FloatingTestimonial() {
             className="mb-3 h-6 w-6 text-[color:var(--color-gold)]/60"
           />
           <p className="text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
-            {t?.quote}
+            {t.quote}
           </p>
           <div className="mt-4 flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-gold)]/15 text-xs font-semibold text-[color:var(--color-gold)]">
-              {t?.avatar}
+              {t.avatar}
             </div>
             <div>
               <p className="text-sm font-medium text-[color:var(--color-text-primary)]">
-                {t?.name}
+                {t.name}
               </p>
-              <p className="text-xs text-[color:var(--color-text-dim)]">{t?.role}</p>
+              <p className="text-xs text-[color:var(--color-text-dim)]">{t.role}</p>
             </div>
           </div>
         </motion.div>
