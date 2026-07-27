@@ -74,14 +74,15 @@ export type ProvisionSummary = {
   next: string | null;
 };
 
+/** Plain language for artists — no pipeline jargon reaches the UI. */
 export const STATUS_LABEL: Record<TaskStatus, string> = {
-  planned: "Planned",
+  planned: "Up next",
   in_progress: "Working",
-  needs_approval: "Needs you",
+  needs_approval: "Your call",
   approved: "Approved",
   done: "Done",
-  blocked: "Blocked",
-  rejected: "Rejected",
+  blocked: "Waiting",
+  rejected: "Sent back",
 };
 
 export const STATUS_TONE: Record<TaskStatus, string> = {

@@ -359,11 +359,12 @@ function Header({
               <p className="font-heading text-[15px]">Artispreneur</p>
               <span className="badge-agent">AGENT</span>
             </div>
-            <p className="font-mono text-[10px] text-[color:var(--color-text-dim)]">
-              {provision
-                ? `workspace ${provision.status} · ${provision.done}/${provision.total}`
-                : "workspace not provisioned"}
-              {summary ? ` · ${summary.done}/${summary.total} tasks done` : ""}
+            <p className="text-[11px] text-[color:var(--color-text-dim)]">
+              {summary?.needs_approval
+                ? `${summary.needs_approval} waiting on you`
+                : provision?.status === "complete"
+                  ? "Your team is ready"
+                  : "Setting up your workspace"}
             </p>
           </div>
         </div>
@@ -489,12 +490,13 @@ function ApprovalQueue({
     <section className="mt-5 rounded-[12px] border border-[color:var(--color-crimson)] bg-[color:var(--color-surface)] p-5">
       <div className="mb-3 flex items-center gap-2">
         <span className="h-2 w-2 rounded-full bg-[color:var(--color-crimson)]" />
-        <p className="type-mono-label text-[color:var(--color-crimson)]">
-          Waiting on you · {tasks.length}
+        <p className="font-heading text-[15px] text-[color:var(--color-text-primary)]">
+          {tasks.length === 1 ? "One thing needs your OK" : `${tasks.length} things need your OK`}
         </p>
       </div>
       <p className="mb-4 text-[13px] text-[color:var(--color-text-muted)]">
-        These are drafts. Nothing has been sent, published, or filed.
+        Read it first — nothing has been sent, published, or filed. It only goes out if you
+        say so.
       </p>
       <ul className="space-y-2.5">
         {tasks.map((t) => (
@@ -551,29 +553,39 @@ function TaskBoard({
   onOpen: (t: BoardTask) => void;
   hasDraft: (t: BoardTask) => boolean;
 }) {
+  const [showSetup, setShowSetup] = useState(false);
+
   if (!tasks.length) {
     return (
       <section className="rounded-[12px] border border-dashed border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-10 text-center">
-        <p className="font-heading text-lg text-[color:var(--color-text-primary)]">No plan yet</p>
+        <p className="font-heading text-lg text-[color:var(--color-text-primary)]">
+          Nothing in progress
+        </p>
         <p className="mx-auto mt-2 max-w-sm text-[13px] text-[color:var(--color-text-muted)]">
-          Describe what you want to get done above. Your agents will break it into steps,
-          do the work, and bring anything consequential back to you for approval.
+          Tell your team what you want to get done. They&apos;ll figure out the steps, do the
+          work, and check with you before anything goes out.
         </p>
       </section>
     );
   }
 
+  // "N" steps are workspace scaffolding — real work, but not the artist's
+  // problem. They collapse into one line so the board shows what the artist
+  // actually asked for.
+  const setup = tasks.filter((t) => t.npao === "N");
+  const work = tasks.filter((t) => t.npao !== "N");
+  const setupDone = setup.filter((t) => t.status === "done").length;
+  const workDone = work.filter((t) => t.status === "done").length;
+
   return (
     <section className="rounded-[12px] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="type-overline">Your plan</p>
-          {summary && (
-            <p className="mt-1 font-mono text-[10px] text-[color:var(--color-text-dim)]">
-              {summary.done}/{summary.total} done
-              {summary.needs_approval ? ` · ${summary.needs_approval} awaiting you` : ""}
-            </p>
-          )}
+          <p className="type-overline">What we&apos;re doing</p>
+          <p className="mt-1 text-[12px] text-[color:var(--color-text-dim)]">
+            {workDone} of {work.length} finished
+            {summary?.needs_approval ? ` · ${summary.needs_approval} waiting on you` : ""}
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -582,46 +594,107 @@ function TaskBoard({
             disabled={busy !== null || runnable === 0}
             className="btn btn--outline btn--sm disabled:opacity-40"
           >
-            Run next
+            Do one
           </button>
           <button
             type="button"
-            onClick={() => onRun(5)}
+            onClick={() => onRun(6)}
             disabled={busy !== null || runnable === 0}
             className="btn btn--primary btn--sm disabled:opacity-40"
           >
-            {busy === "execute" ? "Working…" : "Run all"}
+            {busy === "execute" ? "Working…" : "Start working"}
           </button>
         </div>
       </div>
 
+      {setup.length > 0 && (
+        <div className="mb-3">
+          <button
+            type="button"
+            onClick={() => setShowSetup((v) => !v)}
+            className="flex w-full items-center gap-2.5 rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-bg-page)] px-4 py-2.5 text-left transition-colors hover:border-[color:var(--color-border-dark)]"
+          >
+            <span
+              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                setupDone === setup.length
+                  ? "bg-[color:var(--color-success)]"
+                  : "bg-[color:var(--color-text-dim)]"
+              }`}
+            />
+            <span className="flex-1 text-[12.5px] text-[color:var(--color-text-muted)]">
+              {setupDone === setup.length
+                ? "Workspace ready"
+                : `Setting up your workspace — ${setupDone} of ${setup.length}`}
+            </span>
+            <span className="text-[11px] text-[color:var(--color-text-dim)]">
+              {showSetup ? "Hide" : "Details"}
+            </span>
+          </button>
+          {showSetup && (
+            <ul className="mt-2 space-y-1.5 pl-4">
+              {setup.map((t) => (
+                <li
+                  key={t.id}
+                  className="flex items-center gap-2 text-[12px] text-[color:var(--color-text-dim)]"
+                >
+                  <span>{t.status === "done" ? "✓" : "·"}</span>
+                  <span className="flex-1">{t.title}</span>
+                  {hasDraft(t) && (
+                    <button
+                      type="button"
+                      onClick={() => onOpen(t)}
+                      className="text-[11px] text-[color:var(--color-gold)] underline"
+                    >
+                      view
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       <ol className="space-y-2">
-        {tasks.map((t) => (
+        {work.map((t) => (
           <li
             key={t.id}
-            className="flex items-start gap-3 rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-4 py-3"
+            className={`flex items-start gap-3 rounded-[10px] border bg-[color:var(--color-card)] px-4 py-3 ${
+              t.status === "needs_approval"
+                ? "border-[color:var(--color-crimson)]"
+                : "border-[color:var(--color-border)]"
+            }`}
           >
-            <span className="mt-0.5 rounded bg-[color:var(--color-gold-muted)] px-1.5 py-0.5 font-mono text-[10px] font-bold text-[color:var(--color-gold)]">
-              {t.npao}
-            </span>
+            <span
+              className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${
+                t.status === "done"
+                  ? "bg-[color:var(--color-success)]"
+                  : t.status === "needs_approval"
+                    ? "bg-[color:var(--color-crimson)]"
+                    : t.status === "in_progress"
+                      ? "bg-[color:var(--color-gold)]"
+                      : "bg-[color:var(--color-gray-mid)]"
+              }`}
+            />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-[color:var(--color-text-primary)]">{t.title}</p>
-              <p className="mt-0.5 font-mono text-[10px] text-[color:var(--color-text-dim)]">
-                {t.owner}
-                {t.requires_approval ? " · approval required" : ""}
+              <p className="mt-0.5 text-[11.5px] text-[color:var(--color-text-dim)]">
+                {t.requires_approval
+                  ? "We'll draft this and check with you before it goes out"
+                  : t.owner}
               </p>
             </div>
             {hasDraft(t) && (
               <button
                 type="button"
                 onClick={() => onOpen(t)}
-                className="font-mono text-[10px] text-[color:var(--color-gold)] underline hover:text-[color:var(--color-gold-light)]"
+                className="shrink-0 text-[11.5px] text-[color:var(--color-gold)] underline hover:text-[color:var(--color-gold-light)]"
               >
-                view
+                Read it
               </button>
             )}
             <span
-              className={`shrink-0 rounded border px-2 py-0.5 font-mono text-[9.5px] uppercase ${STATUS_TONE[t.status]}`}
+              className={`shrink-0 rounded border px-2 py-0.5 text-[10.5px] ${STATUS_TONE[t.status]}`}
             >
               {STATUS_LABEL[t.status]}
             </span>
