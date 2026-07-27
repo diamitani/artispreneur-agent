@@ -183,7 +183,7 @@ export async function ensureAwsInstance(input: {
     project_id: input.projectId,
     runtime: "hermes+pal-rostr",
     llm_provider: "amazon_bedrock",
-    model_id: process.env.BEDROCK_MODEL_ID || "deepseek.v3-v1:0",
+    model_id: process.env.BEDROCK_MODEL_ID || "deepseek.v3.2",
     soul_loaded: false,
     active_skills: project.active_skill_slugs.length,
     updated_at: now,

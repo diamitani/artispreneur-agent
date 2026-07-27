@@ -46,14 +46,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [agentId, setAgentId] = useState<AgentId>("orchestrator");
   const [sessionId, setSessionId] = useState("s3");
   const [messages, setMessages] = useState<ChatMessage[]>(STARTER_THREAD);
-  const [selectedArtifactId, setSelectedArtifactId] = useState(ARTIFACTS[0].id);
+  const [selectedArtifactId, setSelectedArtifactId] = useState(ARTIFACTS[0]?.id ?? "");
   const [chatOpen, setChatOpen] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [thinking, setThinking] = useState(false);
 
+  // ARTIFACTS is a non-empty literal, so the fallback always resolves.
   const selectedArtifact =
-    ARTIFACTS.find((a) => a.id === selectedArtifactId) ?? ARTIFACTS[0];
+    ARTIFACTS.find((a) => a.id === selectedArtifactId) ?? (ARTIFACTS[0] as Artifact);
 
   const openArtifact = useCallback((id: string) => {
     setSelectedArtifactId(id);

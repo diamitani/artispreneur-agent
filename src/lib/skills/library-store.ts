@@ -160,15 +160,17 @@ export async function markSkillInstalled(
   const i = lib.skills.findIndex((s) => s.skill_id === skillId);
   if (i < 0) return false;
 
+  const owned = lib.skills[i];
+  if (!owned) return null;
   const skill = getSkillById(skillId);
   if (skill) {
-    await writePackFiles(userId, projectId, skill, lib.skills[i]);
+    await writePackFiles(userId, projectId, skill, owned);
   }
 
   lib.skills[i] = {
-    ...lib.skills[i],
+    ...owned,
     installed,
-    installed_at: installed ? new Date().toISOString() : lib.skills[i].installed_at,
+    installed_at: installed ? new Date().toISOString() : owned.installed_at,
   };
   await writeLibrary(lib);
   return true;

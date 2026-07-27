@@ -34,7 +34,7 @@ function Icon({ name, size = 16, color = "currentColor" }: { name: string; size?
     "book-open": "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
     zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
   };
-  const d = paths[name] || paths.zap;
+  const d = paths[name] ?? paths.zap ?? "";
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
       {d.split(" M").map((seg, i) => (

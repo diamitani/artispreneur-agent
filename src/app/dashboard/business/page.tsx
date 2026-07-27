@@ -31,10 +31,10 @@ const iconPaths: Record<string, string> = {
 };
 
 function Icon({ name, size = 18, color = "#777" }: { name: string; size?: number; color?: string }) {
-  const d = iconPaths[name] || iconPaths["file-text"];
+  const d = iconPaths[name] ?? iconPaths["file-text"] ?? "";
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      {d.split(" M").map((seg, i) => (
+      {d.split(" M").map((seg: string, i: number) => (
         <path key={i} d={i === 0 ? seg : "M" + seg} />
       ))}
     </svg>
@@ -76,7 +76,7 @@ export default function BusinessCenterPage() {
         {/* Services grid */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {services.map((svc) => {
-            const st = statusStyle[svc.status];
+            const st = statusStyle[svc.status]!;
             return (
               <div
                 key={svc.id}

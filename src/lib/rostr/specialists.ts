@@ -87,8 +87,9 @@ export function specialistsForSurfaces(surfaces: string[]): Specialist[] {
   if (matched.length === 0) {
     return SPECIALISTS.filter((s) => s.id === "brand-epk" || s.id === "contracts");
   }
-  if (matched.length === 1 && matched[0].id !== "brand-epk") {
-    return [SPECIALISTS[0], ...matched];
+  const first = SPECIALISTS[0];
+  if (matched.length === 1 && matched[0]?.id !== "brand-epk" && first) {
+    return [first, ...matched];
   }
   return matched;
 }

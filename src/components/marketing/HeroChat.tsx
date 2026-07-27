@@ -36,7 +36,7 @@ function staticReply(text: string): string {
   for (const [key, val] of Object.entries(DEMO_RESPONSES)) {
     if (key !== "default" && low.includes(key)) return val;
   }
-  return DEMO_RESPONSES.default;
+  return DEMO_RESPONSES.default!;
 }
 
 type Mode = "live-demo" | "live-auth";

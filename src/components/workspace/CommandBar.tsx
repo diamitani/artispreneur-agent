@@ -49,9 +49,9 @@ export function CommandBar() {
             </span>
           </div>
           <p className="truncate text-[11px] text-[color:var(--muted)]">
-            <span className="text-[color:var(--gold)]/90">{meta.eyebrow}</span>
+            <span className="text-[color:var(--gold)]/90">{meta?.eyebrow}</span>
             <span className="mx-1.5 text-white/20">/</span>
-            {meta.title}
+            {meta?.title}
           </p>
         </div>
       </div>

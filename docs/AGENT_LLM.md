@@ -5,7 +5,7 @@
 | Setting | Value |
 |---------|--------|
 | Provider | Amazon Bedrock (server-side) |
-| Model | `deepseek.v3-v1:0` (override `BEDROCK_MODEL_ID`) |
+| Model | `deepseek.v3.2` (override `BEDROCK_MODEL_ID`) |
 | Route | `POST /api/agent/chat` |
 | UI | Mission Control `MasterAgentChat` |
 

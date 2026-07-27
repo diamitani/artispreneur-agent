@@ -12,17 +12,38 @@ import { recordUsage } from "@/lib/agent/usage-ledger";
 import { getSessionUser } from "@/lib/auth";
 import { agentProjectScope, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
 import { buildHermesSystemPrompt } from "@/lib/hermes/runtime";
+import {
+  recallMemory,
+  rememberTurns,
+  runtimeSessionId,
+  type MemoryTurn,
+} from "@/lib/agentcore";
 import { getComposioTools, isComposioConfigured } from "@/lib/composio";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+/** Plain text of the most recent user message, for memory recall and write. */
+function extractLatestUserText(messages: UIMessage[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (!message || message.role !== "user") continue;
+    const text = (message.parts ?? [])
+      .filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join(" ")
+      .trim();
+    if (text) return text;
+  }
+  return "";
+}
 
 /**
  * Hermes Agent chat — Amazon Bedrock DeepSeek + PAL/ROSTR runtime + Skills Library.
  *
  * Auth (either):
  * 1. Cognito session cookie (browser Mission Control)
- * 2. Workspace Agent API key: Authorization: Bearer apa_… or X-Artispreneur-Agent-Key
+ * 2. Workspace Agent API key: Authorization: Bearer *** or X-Artispreneur-Agent-Key
  */
 export async function POST(req: Request) {
   if (!isBedrockConfigured()) {
@@ -79,17 +100,43 @@ export async function POST(req: Request) {
   const modelId = getAgentModelId();
   const bedrock = createBedrockProvider();
 
-  const rawTools = getComposioTools({ entityId: projectId });
+  // AgentCore Memory: recall prior context for this workspace, then persist the
+  // turn after the response completes. Both are best-effort — memory must never
+  // break a chat turn.
+  const scope = agentProjectScope(userId, projectId);
+  const sessionId = runtimeSessionId(scope);
+  const latestUserText = extractLatestUserText(body.messages);
+  const recalled = latestUserText
+    ? await recallMemory({ scope, query: latestUserText, limit: 5 }).catch(() => [])
+    : [];
+
+  const systemWithMemory = recalled.length
+    ? `${system}\n\n## Recalled artist memory\n${recalled
+        .map((m) => `- ${m.text.slice(0, 400)}`)
+        .join("\n")}`
+    : system;
+
+  // Composio integrations (Gmail, Drive, Sheets, Calendar, Slack) when configured.
+  const rawTools = isComposioConfigured() ? getComposioTools({ entityId: projectId }) : {};
   const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
 
   const result = streamText({
     model: bedrock(modelId),
-    system,
+    system: systemWithMemory,
     messages: await convertToModelMessages(body.messages),
     tools,
     temperature: 0.6,
     maxOutputTokens: 4096,
-    onFinish: async ({ usage }) => {
+    onFinish: async ({ usage, text }) => {
+      const turns: MemoryTurn[] = [];
+      if (latestUserText) turns.push({ role: "artist", text: latestUserText });
+      if (text?.trim()) turns.push({ role: "agent", text: text.trim() });
+      if (turns.length) {
+        await rememberTurns({ scope, sessionId, turns }).catch((e) =>
+          console.error("[agentcore:memory]", e),
+        );
+      }
+
       const input = usage?.inputTokens ?? 0;
       const output = usage?.outputTokens ?? 0;
       await recordUsage({
