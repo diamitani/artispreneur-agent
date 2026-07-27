@@ -14,6 +14,7 @@
 
 import type { WorkspaceScope } from "@/lib/tenancy/hierarchy";
 import { hubReadText } from "@/lib/hub/store";
+import { searchVault } from "@/lib/vault/ingest";
 import type {
   PalStageOutput,
   RagDalStageOutput,
@@ -146,6 +147,16 @@ export async function runRagDal(
       path: src.path,
       kind: src.kind,
       excerpt: text.trim().slice(0, EXCERPT_CHARS),
+    });
+  }
+
+  // Files the artist dropped into the vault become build context too.
+  const vaultHits = await searchVault(scope, pal.intent.goal, 4).catch(() => []);
+  for (const file of vaultHits) {
+    workspace_sources.push({
+      path: file.path,
+      kind: `upload:${file.category}`,
+      excerpt: (file.excerpt ?? "").slice(0, EXCERPT_CHARS),
     });
   }
 
