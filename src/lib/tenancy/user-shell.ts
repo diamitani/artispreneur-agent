@@ -49,7 +49,7 @@ export async function ensureUserShell(input: {
       },
       llm: {
         provider: "amazon_bedrock",
-        model: process.env.BEDROCK_MODEL_ID || "deepseek.v3-v1:0",
+        model: process.env.BEDROCK_MODEL_ID || "deepseek.v3.2",
       },
     });
   }

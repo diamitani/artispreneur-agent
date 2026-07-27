@@ -168,7 +168,7 @@ AGENTCORE_GATEWAY_URL=https://...
 HUB_BACKEND=fs|s3
 S3_HUB_BUCKET=...
 DYNAMODB_INSTANCE_TABLE=...
-BEDROCK_MODEL_ID=deepseek.v3-v1:0
+BEDROCK_MODEL_ID=deepseek.v3.2
 
 # Local development without Cognito
 AUTH_DEV_BYPASS=1
@@ -178,7 +178,19 @@ AUTH_DEV_BYPASS=1
 
 ## Verified end-to-end
 
-Against a running dev server with `AUTH_DEV_BYPASS=1`:
+Against a running dev server with `AUTH_DEV_BYPASS=1` and **live Bedrock**
+(`deepseek.v3.2`), running the full artist flow for a test artist:
+
+- Dropped `artist-notes.md` into the vault → indexed and retrievable
+- Rendered a Prompt Library opener → compiled to 10 NPAO steps
+- RAG-DAL pulled the dropped file into build context
+- Provisioning completed 4/4
+- **Executor produced 9 real deliverables** (2,991–16,589 chars each), citing
+  the dropped file and using the artist's actual voice, genre, and release date
+- 8 safe tasks auto-completed; the outbound task stopped at `needs_approval`
+  with *"Nothing has been sent, published, or filed."*
+
+Earlier structural checks:
 
 - ROSTR compile produced 9 NPAO steps and wrote all 6 artifacts
 - UserOps provisioned all 4 steps; re-running skipped completed steps (idempotent)
@@ -195,5 +207,4 @@ Against a running dev server with `AUTH_DEV_BYPASS=1`:
 
 - **Composio integrations** — planned; no code yet
 - **AgentCore Gateway targets** — config surface exists, targets not registered
-- **Agent execution** — the task board tracks work; agents do not yet autonomously execute steps
 - **RDS** — control plane is DynamoDB/hub JSON; RDS remains the blueprint target

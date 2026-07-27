@@ -6,9 +6,20 @@
 
 import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
 
-/** Default: DeepSeek V3 on Bedrock (Artispreneur infra standard). Override via BEDROCK_MODEL_ID. */
-export const DEFAULT_DEEPSEEK_MODEL =
-  process.env.BEDROCK_MODEL_ID || "deepseek.v3-v1:0";
+/**
+ * Default agent model. Override via BEDROCK_MODEL_ID.
+ *
+ * `deepseek.v3.2` is the verified id in the Artispreneur Bedrock account —
+ * the previous default (`deepseek.v3-v1:0`) is not a real model id and fails
+ * with "The provided model identifier is invalid."
+ *
+ * For higher-quality agent work, `anthropic.claude-sonnet-4-5-20250929-v1:0`
+ * is also available in this account at higher cost per token.
+ */
+export const DEFAULT_AGENT_MODEL = process.env.BEDROCK_MODEL_ID || "deepseek.v3.2";
+
+/** @deprecated Use DEFAULT_AGENT_MODEL. Kept for existing imports. */
+export const DEFAULT_DEEPSEEK_MODEL = DEFAULT_AGENT_MODEL;
 
 export function getBedrockRegion() {
   return process.env.BEDROCK_REGION || process.env.AWS_REGION || "us-east-1";
