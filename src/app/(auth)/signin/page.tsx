@@ -1,12 +1,19 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
 import { ROUTES } from "@/lib/constants";
+import { SignInError } from "@/components/auth/SignInError";
 
 export const metadata = {
   title: "Sign In",
 };
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; missing?: string }>;
+}) {
+  const { error, missing } = await searchParams;
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -14,10 +21,10 @@ export default function SignInPage() {
         <h1 className="mt-6 font-[var(--font-display)] text-2xl font-bold text-gray-900">
           Welcome back
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
-          Sign in to your workspace
-        </p>
+        <p className="mt-2 text-sm text-gray-500">Sign in to your workspace</p>
       </div>
+
+      {error && <SignInError error={error} missing={missing} />}
 
       <div className="space-y-5">
         <a
