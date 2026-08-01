@@ -14,19 +14,19 @@ const TIERS = Object.values(PRICING);
 const FAQ = [
   {
     q: "Can I really use it for free?",
-    a: "Yes. The Starter plan gives you access to the Academy, Tutor Agent, and one project workspace at no cost, forever. No credit card required.",
+    a: "Yes. The Free plan gives you the Master Agent, the Academy, and one project workspace at no cost, forever \u2014 and it still deploys a real workspace. No credit card required.",
   },
   {
     q: "What happens when I hit my project limit?",
-    a: "You can archive a project to free up your slot, or upgrade to Workspace for unlimited projects.",
+    a: "You can archive a project to free up your slot, or upgrade to Artist ($9.99/month) for unlimited projects.",
   },
   {
     q: "Is there a contract or commitment?",
-    a: "No. Workspace is billed monthly and you can cancel anytime. You keep access through the end of your billing period.",
+    a: "No. Paid plans are billed monthly and you can cancel anytime. You keep access through the end of your billing period.",
   },
   {
-    q: "What is the Agency plan for?",
-    a: "The Agency & Label plan is built for managers, labels, and collectives managing multiple artists. You get shared playbooks, team roles, and a Director agent that oversees all rosters.",
+    q: "What is the Unlimited plan for?",
+    a: "Unlimited is built for power users, managers, labels, and collectives running multiple artists. You get unmetered usage, multi-artist workspaces, shared playbooks, team roles, and a Director agent overseeing every roster.",
   },
   {
     q: "Do agents send things without my approval?",
@@ -159,13 +159,13 @@ export default function PricingPage() {
                     Feature
                   </th>
                   <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">
-                    Starter
+                    {PRICING.starter.name}
                   </th>
                   <th className="px-4 py-4 text-center text-sm font-semibold text-crimson">
-                    Workspace
+                    {PRICING.workspace.name}
                   </th>
                   <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">
-                    Agency
+                    {PRICING.agency.name}
                   </th>
                 </tr>
               </thead>

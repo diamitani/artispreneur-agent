@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Skips auth check when AUTH_DEV_BYPASS=1.
  */
 
-const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
+const PROTECTED_PREFIXES = ["/dashboard", "/onboarding", "/deploy"];
 const SESSION_COOKIE = "aa_session";
 
 export function middleware(request: NextRequest): NextResponse {
@@ -42,5 +42,5 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding/:path*"],
+  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/deploy/:path*"],
 };

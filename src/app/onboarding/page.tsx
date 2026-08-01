@@ -154,7 +154,9 @@ export default function OnboardingPage() {
 
       const data = await res.json();
       if (data.success) {
-        router.push(data.redirect ?? "/dashboard");
+        // Intake is compiled — now deploy the workspace the agent will live
+        // in. /deploy runs the UserOps pipeline and forwards to the dashboard.
+        router.push("/deploy");
       }
     } catch {
       setErrors(["Network error. Please try again."]);

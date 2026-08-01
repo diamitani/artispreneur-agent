@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 const services = [
   { id: "ein", icon: "file-text", title: "EIN Registration", desc: "Get your Employer Identification Number", status: "action" as const },
@@ -46,15 +46,12 @@ export default function BusinessCenterPage() {
   const tabs = ["overview", "documents", "tasks"];
 
   return (
-    <DashboardShell title="Business Center" subtitle="Legal, finance & publishing">
-      <div className="p-5 md:p-7">
-        <div className="mb-5">
-          <p className="type-mono-label mb-1 text-[color:var(--color-crimson)]">Workspace</p>
-          <h2 className="font-heading text-xl text-[color:var(--color-black)] md:text-[22px]">Business Center</h2>
-          <p className="mt-1 text-[13px] text-[color:var(--color-gray-mid)]">
-            Legal formation, financial operations, and publishing administration.
-          </p>
-        </div>
+    <div className="mx-auto max-w-5xl">
+      <PageHeader
+        eyebrow="Workspace"
+        title="Business Center"
+        subtitle="Legal formation, financial operations, and publishing administration."
+      />
 
         {/* Tabs */}
         <div className="mb-5 flex border-b-2 border-[color:var(--color-border)]">
@@ -114,7 +111,6 @@ export default function BusinessCenterPage() {
             );
           })}
         </div>
-      </div>
-    </DashboardShell>
+    </div>
   );
 }

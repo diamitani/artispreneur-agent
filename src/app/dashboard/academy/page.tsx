@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 const courses = [
   { title: "Music Business 101", lessons: 12, badge: "Free" as const, progress: 60, color: "#111" },
@@ -11,15 +11,12 @@ const courses = [
 
 export default function AcademyPage() {
   return (
-    <DashboardShell title="Academy" subtitle="Courses, articles & resources">
-      <div className="p-5 md:p-7">
-        <div className="mb-5">
-          <p className="type-mono-label mb-1 text-[color:var(--color-crimson)]">Learn</p>
-          <h2 className="font-heading text-xl text-[color:var(--color-black)] md:text-[22px]">Academy</h2>
-          <p className="mt-1 text-[13px] text-[color:var(--color-gray-mid)]">
-            Courses, articles, and resources for music entrepreneurs.
-          </p>
-        </div>
+    <div className="mx-auto max-w-5xl">
+      <PageHeader
+        eyebrow="Learn"
+        title="Academy"
+        subtitle="Courses, articles, and resources for music entrepreneurs."
+      />
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((c, i) => (
@@ -75,7 +72,6 @@ export default function AcademyPage() {
             </div>
           ))}
         </div>
-      </div>
-    </DashboardShell>
+    </div>
   );
 }

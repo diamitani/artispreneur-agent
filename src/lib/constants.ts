@@ -11,6 +11,7 @@ export const ROUTES = {
   signin: "/signin",
   signup: "/signup",
   onboarding: "/onboarding",
+  deploy: "/deploy",
   dashboard: "/dashboard",
   projects: "/dashboard/projects",
   outputs: "/dashboard/outputs",
@@ -18,6 +19,16 @@ export const ROUTES = {
   skills: "/dashboard/skills",
   chat: "/dashboard/chat",
   settings: "/dashboard/settings",
+  // Centers
+  business: "/dashboard/business",
+  brand: "/dashboard/brand",
+  booking: "/dashboard/booking",
+  academy: "/dashboard/academy",
+  profile: "/dashboard/profile",
+  // Outside the dashboard shell
+  workspace: "/workspace",
+  skillsMarketplace: "/skills",
+  skillsLibrary: "/skills/library",
 } as const;
 
 export const BRAND = {
@@ -31,55 +42,62 @@ export const BRAND = {
   },
 } as const;
 
+/**
+ * Plan catalog — the single source of truth for pricing.
+ *
+ * Both the homepage and `/pricing` render from this, and the plan keys
+ * (`starter` / `workspace` / `agency`) are the values stored on the user
+ * profile in DynamoDB — see `src/types/user.ts`. Renaming a key is a data
+ * migration; renaming a `name` is just copy.
+ */
 export const PRICING = {
   starter: {
-    name: "Starter",
+    name: "Free",
     price: 0,
     period: "forever",
     cta: "Start Free",
     featured: false,
-    description: "Academy + Tutor Agent, directory browsing, your first workspace.",
+    description: "Meet your agent, take the Academy, and get your first workspace deployed.",
     features: [
-      "Artispreneur Master Agent (light model)",
+      "Artispreneur Master Agent",
       "Academy courses + Tutor",
       "1 active project",
       "Basic knowledge vault",
-      "Community support",
+      "Workspace auto-deployed on signup",
     ],
   },
   workspace: {
-    name: "Workspace",
-    price: 79,
+    name: "Artist",
+    price: 9.99,
     period: "month",
-    cta: "Get the Workspace",
+    cta: "Start Artist",
     featured: true,
     description: "The full AI business team. Every agent, every skill, one command center.",
     features: [
-      "All specialist agents + Master Agent",
+      "All 8 specialist agents",
       "Unlimited projects",
       "Full knowledge vault + RAG",
-      "Skills marketplace access",
+      "Every skill in the marketplace",
       "Approval queue + audit log",
       "Composio integrations (Gmail, Drive, Sheets)",
       "Priority model access",
-      "API access (apa_* keys)",
     ],
   },
   agency: {
-    name: "Agency & Label",
-    price: null,
-    period: "per roster",
-    cta: "Talk to Us",
+    name: "Unlimited",
+    price: 99,
+    period: "month",
+    cta: "Go Unlimited",
     featured: false,
-    description: "Organization hub, staff roles, client workspaces, and the Director agent.",
+    description: "Unlimited everything — built for power users, agencies, and labels.",
     features: [
-      "Agency/Label Director Agent",
+      "Everything in Artist, unmetered",
       "Multi-artist workspaces",
-      "Shared playbooks + templates",
-      "Portfolio reporting",
+      "Agency / Label Director Agent",
+      "Shared playbooks + portfolio reporting",
       "Team roles + permissions",
       "SSO + audit export",
-      "Dedicated compute options",
+      "API access (apa_* keys)",
     ],
   },
 } as const;

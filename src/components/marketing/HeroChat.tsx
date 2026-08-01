@@ -45,6 +45,7 @@ export function HeroChat() {
   const [input, setInput] = useState("");
   const [mode] = useState<Mode>("live-demo");
   const [rateLimited, setRateLimited] = useState(false);
+  const [offline, setOffline] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   // Live-demo transport → /api/agent/demo (no auth, rate-limited Bedrock)
@@ -86,31 +87,45 @@ export function HeroChat() {
     }
   }, [messages, busy]);
 
-  // Detect 429 from demo endpoint
+  // The demo endpoint fails in two recoverable ways: 429 once an IP burns
+  // through its hourly allowance, and 503 on a deployment without Bedrock
+  // credentials. Both fall back to scripted replies — a marketing page must
+  // never show a visitor a raw error string.
   useEffect(() => {
-    if (error?.message?.includes("429") || error?.message?.toLowerCase().includes("rate limit")) {
+    if (!error) return;
+    const msg = error.message?.toLowerCase() ?? "";
+    if (msg.includes("429") || msg.includes("rate limit")) {
       setRateLimited(true);
+    } else if (msg.includes("503") || msg.includes("not configured")) {
+      setOffline(true);
+    } else {
+      // Anything else (network drop, gateway timeout) still degrades rather
+      // than stranding the visitor mid-conversation.
+      setOffline(true);
     }
   }, [error]);
+
+  /** Append a scripted exchange without touching the live transport. */
+  function appendScripted(text: string) {
+    const now = Date.now();
+    setMessages((prev) => [
+      ...prev,
+      { id: `u-${now}`, role: "user", parts: [{ type: "text", text }] } as UIMessage,
+      {
+        id: `a-${now}`,
+        role: "assistant",
+        parts: [{ type: "text", text: staticReply(text) }],
+      } as UIMessage,
+    ]);
+  }
 
   async function handleSend() {
     const text = input.trim();
     if (!text || busy) return;
     setInput("");
 
-    if (rateLimited) {
-      // Fall back to static responses when rate-limited
-      const fakeUserMsg = {
-        id: `u-${Date.now()}`,
-        role: "user",
-        parts: [{ type: "text", text }],
-      } as UIMessage;
-      const fakeAgentMsg = {
-        id: `a-${Date.now()}`,
-        role: "assistant",
-        parts: [{ type: "text", text: staticReply(text) }],
-      } as UIMessage;
-      setMessages((prev) => [...prev, fakeUserMsg, fakeAgentMsg]);
+    if (rateLimited || offline) {
+      appendScripted(text);
       return;
     }
 
@@ -173,11 +188,8 @@ export function HeroChat() {
             Agent is thinking…
           </div>
         )}
-        {error && !rateLimited && (
-          <div className="self-start rounded px-3 py-2 text-[12px] text-[color:var(--color-crimson)] bg-red-50">
-            {error.message}
-          </div>
-        )}
+        {/* `error` is intentionally not rendered — it is surfaced as the
+            rate-limit or offline notice below instead. */}
         {rateLimited && (
           <div className="self-start rounded-lg bg-[color:var(--color-gold)]/10 px-3.5 py-2.5 text-[12px] text-[color:var(--color-black)]">
             Demo limit reached.{" "}
