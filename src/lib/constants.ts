@@ -18,6 +18,7 @@ export const ROUTES = {
   knowledge: "/dashboard/knowledge",
   skills: "/dashboard/skills",
   chat: "/dashboard/chat",
+  integrations: "/dashboard/integrations",
   settings: "/dashboard/settings",
   // Centers
   business: "/dashboard/business",
@@ -105,6 +106,7 @@ export const PRICING = {
 export type SpecialistId =
   | "master"
   | "epk-brand"
+  | "publishing"
   | "contracts"
   | "release"
   | "content"
@@ -124,8 +126,8 @@ export type Specialist = {
 export const SPECIALISTS: Specialist[] = [
   {
     id: "master",
-    name: "Artispreneur Agent",
-    role: "Your AI Chief of Staff",
+    name: "Day to Day Manager",
+    role: "Master Agent / Artist COO",
     description:
       "Plans, clarifies, coordinates. Understands your goals, loads your context, and delegates work to the right specialist — so you never have to pick an agent yourself.",
     capabilities: [
@@ -138,17 +140,26 @@ export const SPECIALISTS: Specialist[] = [
   },
   {
     id: "epk-brand",
-    name: "Brand & EPK",
-    role: "Identity & Press Kit",
+    name: "Brand Manager",
+    role: "Brand & Creative Direction",
     description:
       "Builds your bios, EPK, brand voice, visual briefs, and press-ready packages — all matched to your Soul.md.",
     capabilities: ["EPK assembly", "Bio variants", "Brand system", "Asset checklists"],
     mvp: true,
   },
   {
+    id: "publishing",
+    name: "Publishing Manager",
+    role: "Rights & Royalty Operations",
+    description:
+      "Registers your works with PROs, audits for unclaimed royalties, builds your catalogue, and generates split sheets.",
+    capabilities: ["PRO registration", "Royalty recovery", "Catalogue & metadata", "Split sheets"],
+    mvp: true,
+  },
+  {
     id: "press",
-    name: "PR & Outreach",
-    role: "Media, Playlist & Radio",
+    name: "PR Manager",
+    role: "Campaigns, Press & Advertising",
     description:
       "Researches targets, drafts pitches, manages follow-ups — nothing sends without your approval.",
     capabilities: ["Media research", "Pitch drafts", "Playlist targeting", "Follow-up management"],
@@ -192,8 +203,8 @@ export const SPECIALISTS: Specialist[] = [
   },
   {
     id: "contracts",
-    name: "Contracts & Business",
-    role: "Legal Ops (Guided)",
+    name: "Legal Manager",
+    role: "Legal Ops & Business Formation",
     description:
       "Split sheets, agreement drafts, LLC/PRO checklists — always educational, always human-approved.",
     capabilities: ["Split sheets", "Contract review", "PRO setup", "Entity formation"],

@@ -14,6 +14,7 @@ import {
   CalendarDays,
   GraduationCap,
   Zap,
+  Plug,
   X,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
@@ -48,6 +49,7 @@ const navGroups = [
     label: "Account",
     items: [
       { label: "Skills", href: ROUTES.skills, icon: Sparkles },
+      { label: "Integrations", href: ROUTES.integrations, icon: Plug },
       { label: "Settings", href: ROUTES.settings, icon: Settings },
     ],
   },

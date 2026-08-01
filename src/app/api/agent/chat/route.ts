@@ -19,6 +19,7 @@ import {
   type MemoryTurn,
 } from "@/lib/agentcore";
 import { getComposioTools, isComposioConfigured } from "@/lib/composio";
+import { getMusicTools } from "@/lib/mcp/music/ai-tools";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -116,8 +117,14 @@ export async function POST(req: Request) {
         .join("\n")}`
     : system;
 
-  // Composio integrations (Gmail, Drive, Sheets, Calendar, Slack) when configured.
-  const rawTools = isComposioConfigured() ? getComposioTools({ entityId: projectId }) : {};
+  // Tool surface: Composio for mainstream OAuth apps (Gmail, Drive, Sheets,
+  // Calendar, Slack, Notion) plus our own music MCP tools for the rights and
+  // catalogue work Composio does not cover. Music tools need no per-artist
+  // connection, so they are always on.
+  const rawTools: ToolSet = {
+    ...(isComposioConfigured() ? getComposioTools({ entityId: projectId }) : {}),
+    ...getMusicTools(),
+  };
   const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
 
   const result = streamText({
