@@ -38,7 +38,11 @@ export function isAuthDevBypass(): boolean {
   );
 }
 
-export const SESSION_COOKIE = "artispreneur_session";
-export const PKCE_VERIFIER_COOKIE = "artispreneur_pkce_verifier";
+// These are the names actually written and read. They previously disagreed
+// with the literals in session.ts / the auth routes ("aa_session",
+// "aa_pkce_verifier"); nothing imported the wrong values, but any future
+// import would have silently read a cookie that is never set.
+export const SESSION_COOKIE = "aa_session";
+export const PKCE_VERIFIER_COOKIE = "aa_pkce_verifier";
 export const OAUTH_STATE_COOKIE = "artispreneur_oauth_state";
 export const OAUTH_RETURN_COOKIE = "artispreneur_oauth_return";

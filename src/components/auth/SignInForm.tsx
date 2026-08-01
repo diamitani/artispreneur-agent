@@ -5,9 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Field, FormError, fieldClass } from "./AuthShell";
 
-export function SignInForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
+export function SignInForm({
+  returnTo = "/dashboard",
+  initialEmail = "",
+}: {
+  returnTo?: string;
+  initialEmail?: string;
+}) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);

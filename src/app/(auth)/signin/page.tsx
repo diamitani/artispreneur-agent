@@ -28,7 +28,12 @@ export default async function SignInPage({
           : "Your agents have been keeping the lights on."
       }
     >
-      {isDirectAuthConfigured() ? <SignInForm returnTo={next} /> : <AuthUnavailable />}
+      {isDirectAuthConfigured() ? (
+        // `email` is set when arriving from verification, so the field is prefilled.
+        <SignInForm returnTo={next} initialEmail={sp.email} />
+      ) : (
+        <AuthUnavailable />
+      )}
     </AuthShell>
   );
 }

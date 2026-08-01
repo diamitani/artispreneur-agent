@@ -92,7 +92,9 @@ export function buildAuthUrl(options: BuildAuthUrlOptions): string {
     params.set("state", options.returnTo);
   }
 
-  const baseUrl = `https://${domain}`;
+  // DEPLOY.md documents COGNITO_DOMAIN with the scheme included, and
+  // config.ts strips it — do the same here or we emit https://https://…
+  const baseUrl = `https://${domain.replace(/^https?:\/\//, "")}`;
   const path = options.signup ? "/signup" : "/oauth2/authorize";
 
   return `${baseUrl}${path}?${params.toString()}`;
