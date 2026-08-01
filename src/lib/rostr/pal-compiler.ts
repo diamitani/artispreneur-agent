@@ -332,7 +332,7 @@ export function compilePalIntake(input: {
   const surfaces = arr(answers.priority_surfaces);
   const active = specialistsForSurfaces(surfaces);
   const deferred = specialistsForSurfaces(
-    ["epk_brand", "contracts", "release", "content", "press", "booking", "finance"].filter(
+    ["epk_brand", "publishing", "contracts", "release", "content", "press", "booking", "finance"].filter(
       (s) => !surfaces.includes(s),
     ),
   ).filter((s) => !active.some((a) => a.id === s.id));

@@ -25,7 +25,7 @@ function FieldInput({
         onChange={(e) => onChange(e.target.value)}
         rows={3}
         placeholder={field.placeholder}
-        className="w-full rounded-lg border border-[color:var(--border)] bg-white px-3 py-2.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--red)]"
+        className="w-full rounded-lg border border-[color:var(--color-border-dark)] bg-white px-3 py-2.5 text-sm text-[color:var(--color-black)] outline-none focus:border-[color:var(--color-crimson)]"
       />
     );
   }
@@ -35,7 +35,7 @@ function FieldInput({
       <select
         value={typeof value === "string" ? value : ""}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[color:var(--border)] bg-white px-3 py-2.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--red)]"
+        className="w-full rounded-lg border border-[color:var(--color-border-dark)] bg-white px-3 py-2.5 text-sm text-[color:var(--color-black)] outline-none focus:border-[color:var(--color-crimson)]"
       >
         <option value="">Select…</option>
         {field.options?.map((o) => (
@@ -64,8 +64,8 @@ function FieldInput({
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                 on
-                  ? "border-[color:var(--red)] bg-[color:var(--red)] text-white"
-                  : "border-[color:var(--border)] bg-white text-[color:var(--ink)] hover:border-[color:var(--red)]/40",
+                  ? "border-[color:var(--color-crimson)] bg-[color:var(--color-crimson)] text-white"
+                  : "border-[color:var(--color-border-dark)] bg-white text-[color:var(--color-black)] hover:border-[color:var(--color-crimson)]/40",
               )}
             >
               {o.label}
@@ -84,7 +84,7 @@ function FieldInput({
                 (e.target as HTMLInputElement).value = "";
               }
             }}
-            className="min-w-[140px] flex-1 rounded-full border border-dashed border-[color:var(--border)] bg-white px-3 py-1.5 text-xs outline-none"
+            className="min-w-[140px] flex-1 rounded-full border border-dashed border-[color:var(--color-border-dark)] bg-white px-3 py-1.5 text-xs outline-none"
           />
         )}
       </div>
@@ -97,7 +97,7 @@ function FieldInput({
       value={typeof value === "string" ? value : ""}
       onChange={(e) => onChange(e.target.value)}
       placeholder={field.placeholder}
-      className="w-full rounded-lg border border-[color:var(--border)] bg-white px-3 py-2.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--red)]"
+      className="w-full rounded-lg border border-[color:var(--color-border-dark)] bg-white px-3 py-2.5 text-sm text-[color:var(--color-black)] outline-none focus:border-[color:var(--color-crimson)]"
     />
   );
 }
@@ -169,45 +169,45 @@ export function OnboardingWizard() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-10">
         <Header progress={100} />
-        <div className="mt-8 rounded-2xl border border-[color:var(--border)] bg-white p-6 shadow-sm">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--red)]">
+        <div className="mt-8 rounded-2xl border border-[color:var(--color-border-dark)] bg-white p-6 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--color-crimson)]">
             PAL compiled · Roster ready
           </p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[color:var(--ink)]">
+          <h2 className="mt-2 font-[family-name:var(--font-serif)] text-2xl text-[color:var(--color-black)]">
             {String(result.workspace_config.artist_profile.stage_name)}&apos;s workspace is live
           </h2>
-          <p className="mt-2 text-sm text-[color:var(--muted)]">
+          <p className="mt-2 text-sm text-[color:var(--color-gray-mid)]">
             Completeness {result.workspace_config.completeness}% · Mode {result.workspace_config.mode} ·{" "}
             {result.workspace_config.roster.active.length} specialists activated
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {result.workspace_config.roster.active.map((s) => (
-              <div key={s.id} className="rounded-xl border border-[color:var(--border)] bg-[color:var(--parchment)] px-3 py-3">
-                <p className="text-sm font-semibold text-[color:var(--ink)]">{s.name}</p>
-                <p className="text-xs text-[color:var(--muted)]">{s.role}</p>
+              <div key={s.id} className="rounded-xl border border-[color:var(--color-border-dark)] bg-[color:var(--color-bg-surface)] px-3 py-3">
+                <p className="text-sm font-semibold text-[color:var(--color-black)]">{s.name}</p>
+                <p className="text-xs text-[color:var(--color-gray-mid)]">{s.role}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--muted)]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--color-gray-mid)]">
               Next actions (NPAO)
             </p>
             <ol className="mt-2 space-y-1.5">
               {result.next_actions.map((a) => (
-                <li key={a} className="text-sm text-[color:var(--ink)]">
+                <li key={a} className="text-sm text-[color:var(--color-black)]">
                   → {a}
                 </li>
               ))}
             </ol>
           </div>
 
-          <details className="mt-6 rounded-xl border border-[color:var(--border)] bg-[color:var(--parchment)] p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-[color:var(--ink)]">
+          <details className="mt-6 rounded-xl border border-[color:var(--color-border-dark)] bg-[color:var(--color-bg-surface)] p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-[color:var(--color-black)]">
               Preview Master Soul.md
             </summary>
-            <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-[color:var(--ink)]/80">
+            <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-[color:var(--color-black)]/80">
               {result.master_soul_md}
             </pre>
           </details>
@@ -215,11 +215,11 @@ export function OnboardingWizard() {
           <button
             type="button"
             onClick={() =>
-              router.push(`/dashboard`)
+              router.push("/deploy")
             }
-            className="mt-8 w-full rounded-xl bg-[color:var(--red)] px-4 py-3 text-sm font-semibold text-white hover:bg-[#a81f24]"
+            className="mt-8 w-full rounded-xl bg-[color:var(--color-crimson)] px-4 py-3 text-sm font-semibold text-white hover:bg-[color:var(--color-crimson-dark)]"
           >
-            Enter Mission Control
+            Deploy my workspace
           </button>
         </div>
       </div>
@@ -230,22 +230,22 @@ export function OnboardingWizard() {
     <div className="mx-auto max-w-2xl px-4 py-10">
       <Header progress={progress} />
 
-      <div className="mt-8 rounded-2xl border border-[color:var(--border)] bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-2xl border border-[color:var(--color-border-dark)] bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--gold)]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--color-gold)]">
               Step {stepIdx + 1} of {ONBOARDING_STEPS.length} · NPAO {step?.npao}
             </p>
-            <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[color:var(--ink)]">
+            <h1 className="mt-1 font-[family-name:var(--font-serif)] text-2xl text-[color:var(--color-black)]">
               {step?.title}
             </h1>
-            <p className="mt-1 text-sm leading-relaxed text-[color:var(--muted)]">{step?.subtitle}</p>
+            <p className="mt-1 text-sm leading-relaxed text-[color:var(--color-gray-mid)]">{step?.subtitle}</p>
           </div>
           <button
             type="button"
             disabled={busy}
             onClick={() => runPal({ seed: "patrick" })}
-            className="shrink-0 rounded-lg border border-[color:var(--border)] px-3 py-1.5 text-[11px] font-semibold text-[color:var(--muted)] hover:border-[color:var(--gold)] hover:text-[color:var(--ink)]"
+            className="shrink-0 rounded-lg border border-[color:var(--color-border-dark)] px-3 py-1.5 text-[11px] font-semibold text-[color:var(--color-gray-mid)] hover:border-[color:var(--color-gold)] hover:text-[color:var(--color-black)]"
           >
             Use Patrick demo
           </button>
@@ -254,12 +254,12 @@ export function OnboardingWizard() {
         <div className="mt-6 space-y-5">
           {(step?.fields ?? []).map((field) => (
             <label key={field.id} className="block">
-              <span className="text-sm font-medium text-[color:var(--ink)]">
+              <span className="text-sm font-medium text-[color:var(--color-black)]">
                 {field.label}
-                {field.required && <span className="text-[color:var(--red)]"> *</span>}
+                {field.required && <span className="text-[color:var(--color-crimson)]"> *</span>}
               </span>
               {field.help && (
-                <span className="mt-0.5 block text-xs text-[color:var(--muted)]">{field.help}</span>
+                <span className="mt-0.5 block text-xs text-[color:var(--color-gray-mid)]">{field.help}</span>
               )}
               <div className="mt-1.5">
                 <FieldInput
@@ -281,7 +281,7 @@ export function OnboardingWizard() {
             type="button"
             disabled={stepIdx === 0 || busy}
             onClick={() => setStepIdx((i) => Math.max(0, i - 1))}
-            className="rounded-xl border border-[color:var(--border)] px-4 py-2.5 text-sm font-medium text-[color:var(--ink)] disabled:opacity-40"
+            className="rounded-xl border border-[color:var(--color-border-dark)] px-4 py-2.5 text-sm font-medium text-[color:var(--color-black)] disabled:opacity-40"
           >
             Back
           </button>
@@ -289,7 +289,7 @@ export function OnboardingWizard() {
             type="button"
             disabled={busy}
             onClick={onContinue}
-            className="rounded-xl bg-[color:var(--red)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#a81f24] disabled:opacity-60"
+            className="rounded-xl bg-[color:var(--color-crimson)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[color:var(--color-crimson-dark)] disabled:opacity-60"
           >
             {busy
               ? "Running PAL Roster Agent…"
@@ -300,7 +300,7 @@ export function OnboardingWizard() {
         </div>
       </div>
 
-      <p className="mt-4 text-center text-[11px] text-[color:var(--muted)]">
+      <p className="mt-4 text-center text-[11px] text-[color:var(--color-gray-mid)]">
         Intake runs through ROSTR PAL · webhook <code className="font-mono">/api/pal/intake</code>
       </p>
     </div>
@@ -313,13 +313,13 @@ function Header({ progress }: { progress: number }) {
       <div className="flex items-center gap-3">
         <Image src="/artispreneur-logo.png" alt="Artispreneur" width={36} height={36} />
         <div>
-          <p className="text-sm font-semibold text-[color:var(--ink)]">Agent by Artispreneur</p>
-          <p className="text-xs text-[color:var(--muted)]">PAL-compiled onboarding</p>
+          <p className="text-sm font-semibold text-[color:var(--color-black)]">Agent by Artispreneur</p>
+          <p className="text-xs text-[color:var(--color-gray-mid)]">PAL-compiled onboarding</p>
         </div>
       </div>
-      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[color:var(--border)]">
+      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[color:var(--color-border-dark)]">
         <div
-          className="h-full rounded-full bg-[color:var(--red)] transition-all duration-300"
+          className="h-full rounded-full bg-[color:var(--color-crimson)] transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>

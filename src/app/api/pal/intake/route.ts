@@ -1,159 +1,94 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, tableName } from "@/lib/db/client";
-import { userPk, projectSk, taskSk } from "@/lib/db/schema";
-import { hubWriteText, hubWriteJson } from "@/lib/hub/index";
-import { onboardingIntakeSchema } from "@/lib/pal/schemas";
-import { compileSoulMd, generateInitialTasks } from "@/lib/pal/compiler";
-import { getSession } from "@/lib/auth/session";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { getSessionUser } from "@/lib/auth";
+import { compilePalIntake, type IntakeAnswers } from "@/lib/rostr/pal-compiler";
+import { persistIntakeToDisk, saveIntakeMemory } from "@/lib/rostr/intake-store";
+import { PATRICK_DEMO_ANSWERS } from "@/lib/rostr/onboarding-questions";
 
-export async function POST(request: NextRequest) {
-  // Authenticate
-  const session = await getSession();
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+/**
+ * PAL intake — compile the onboarding questionnaire into Master Soul.md.
+ *
+ * This route previously used `@/lib/pal/compiler` and wrote to a flat hub key
+ * (`{userId}/00-config/soul.md`) through the non-scoped hub API. The Hermes
+ * runtime reads `00-config/master-soul.md` from the *tenancy-scoped* workspace,
+ * so nothing the artist filled in ever reached their agent — `soul_loaded`
+ * stayed false no matter how many times they completed onboarding.
+ *
+ * It now runs the ROSTR compiler and persists via `persistIntakeToDisk`, which
+ * writes master-soul.md, artist-profile.json, workspace-config.json,
+ * permissions.yaml, and the NPAO plan to the correct scope, and syncs the
+ * instance registry.
+ */
+const Body = z.object({
+  /** Answers keyed by field id — see src/lib/rostr/onboarding-questions.ts */
+  answers: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
+  /** "demo" / "patrick" load the seeded example answers for a preview. */
+  seed: z.string().optional(),
+  /** Set false to preview a compile without writing to the workspace. */
+  persist: z.boolean().optional(),
+});
+
+export async function POST(req: Request) {
+  const session = await getSessionUser();
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = session.userId;
-
-  // Parse and validate body
-  let body: unknown;
+  let raw: unknown;
   try {
-    body = await request.json();
+    raw = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const parsed = onboardingIntakeSchema.safeParse(body);
+  const parsed = Body.safeParse(raw);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Validation failed", issues: parsed.error.issues },
-      { status: 422 }
+      { ok: false, error: "Invalid request", issues: parsed.error.issues },
+      { status: 400 },
     );
   }
 
-  const intake = parsed.data;
+  const answers: IntakeAnswers =
+    parsed.data.seed === "demo" || parsed.data.seed === "patrick"
+      ? { ...PATRICK_DEMO_ANSWERS }
+      : (parsed.data.answers ?? {});
 
-  // Compile Soul.MD
-  const { soulMd, markdown } = compileSoulMd(intake);
-
-  // Write Soul.MD to hub
-  const hubKey = `${userId}/00-config/soul.md`;
-  await hubWriteText(hubKey, markdown);
-
-  // Also persist structured SoulMd as JSON for programmatic access
-  const soulJsonKey = `${userId}/00-config/soul.json`;
-  await hubWriteJson(soulJsonKey, soulMd);
-
-  // Create default project in DynamoDB
-  const now = new Date().toISOString();
-  const projectId = crypto.randomUUID();
-
-  await ddb().send(
-    new PutCommand({
-      TableName: tableName(),
-      Item: {
-        pk: userPk(userId),
-        sk: projectSk(projectId),
-        gsi1pk: `PROJECT#${projectId}`,
-        gsi1sk: userPk(userId),
-        id: projectId,
-        userId,
-        name: `${intake.artistName} — Main Workspace`,
-        description: `Primary workspace for ${intake.artistName}. Mode: ${intake.mode}.`,
-        color: "#CC0000",
-        status: "active",
-        defaultView: "kanban",
-        taskCount: 0,
-        createdAt: now,
-        updatedAt: now,
-      },
-    })
-  );
-
-  // Generate and create initial NPAO tasks
-  const starterTasks = generateInitialTasks(intake);
-  let taskCount = 0;
-
-  for (const task of starterTasks) {
-    const taskId = crypto.randomUUID();
-    taskCount++;
-
-    await ddb().send(
-      new PutCommand({
-        TableName: tableName(),
-        Item: {
-          pk: userPk(userId),
-          sk: taskSk(taskId),
-          gsi1pk: `PROJECT#${projectId}`,
-          gsi1sk: taskSk(taskId),
-          id: taskId,
-          projectId,
-          userId,
-          title: task.title,
-          description: task.description,
-          status: "todo",
-          priority: task.priority,
-          npaoPhase: task.npaoPhase,
-          tags: [],
-          subtaskCount: 0,
-          subtasksDone: 0,
-          commentCount: 0,
-          sortOrder: taskCount,
-          createdAt: now,
-          updatedAt: now,
-        },
-      })
-    );
+  if (!Object.keys(answers).length) {
+    return NextResponse.json({ ok: false, error: "No answers supplied." }, { status: 400 });
   }
 
-  // Update project task count
-  await ddb().send(
-    new PutCommand({
-      TableName: tableName(),
-      Item: {
-        pk: userPk(userId),
-        sk: projectSk(projectId),
-        gsi1pk: `PROJECT#${projectId}`,
-        gsi1sk: userPk(userId),
-        id: projectId,
-        userId,
-        name: `${intake.artistName} — Main Workspace`,
-        description: `Primary workspace for ${intake.artistName}. Mode: ${intake.mode}.`,
-        color: "#CC0000",
-        status: "active",
-        defaultView: "kanban",
-        taskCount,
-        createdAt: now,
-        updatedAt: now,
-      },
-    })
-  );
+  try {
+    const result = compilePalIntake({ userId: session.sub, answers });
 
-  // Update user profile: mark onboarding as completed
-  await ddb().send(
-    new PutCommand({
-      TableName: tableName(),
-      Item: {
-        pk: userPk(userId),
-        sk: "PROFILE",
-        userId,
-        email: session.email,
-        name: session.name,
-        artistName: intake.artistName,
-        mode: intake.mode,
-        plan: session.plan ?? "starter",
-        onboardingCompleted: true,
-        createdAt: now,
-        updatedAt: now,
-      },
-    })
-  );
+    // The compiler derives an artist_id by slugifying the stage name. Force it
+    // to the session's project id so the Soul lands in the workspace this
+    // user's agent actually reads, rather than a parallel one keyed by name.
+    result.workspace_config.artist_id = session.projectId;
 
-  return NextResponse.json({
-    success: true,
-    redirect: "/dashboard",
-    projectId,
-    tasksCreated: taskCount,
-  });
+    saveIntakeMemory(result);
+
+    let workspacePath: string | null = null;
+    if (parsed.data.persist !== false) {
+      workspacePath = await persistIntakeToDisk(result);
+    }
+
+    return NextResponse.json({
+      ok: true,
+      persisted: parsed.data.persist !== false,
+      workspace_path: workspacePath,
+      result,
+    });
+  } catch (e) {
+    console.error("[pal/intake]", e);
+    return NextResponse.json(
+      { ok: false, error: e instanceof Error ? e.message : "PAL compilation failed" },
+      { status: 500 },
+    );
+  }
 }
