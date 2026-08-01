@@ -5,6 +5,7 @@
 
 import { type ToolSet } from "ai";
 import { z } from "zod";
+import type { SpecialistId } from "@/lib/rostr/specialists";
 import { executeAction, isComposioConfigured } from "./client";
 
 export type ComposioToolContext = {
@@ -157,27 +158,55 @@ export function getComposioTools(ctx: ComposioToolContext): ToolSet {
 export type ComposioToolName = keyof ReturnType<typeof getComposioTools>;
 
 /**
- * Get only the tools relevant to a specific specialist agent.
+ * Composio tools scoped to one specialist.
+ *
+ * Keys are `SpecialistId` values from `@/lib/rostr/specialists` — an earlier
+ * version keyed this map on names that no longer exist (`pr_outreach`,
+ * `distribution`, `licensing`), so every lookup missed and each specialist
+ * silently received the full tool set. An unknown key now yields no tools
+ * rather than all of them, so a future rename fails closed.
  */
 export function getToolsForSpecialist(
-  specialist: string,
+  specialist: SpecialistId | "master",
   ctx: ComposioToolContext,
 ): ToolSet {
   const all = getComposioTools(ctx);
   if (!Object.keys(all).length) return {};
 
   type ToolName = keyof typeof all;
-  const toolMap: Record<string, ToolName[]> = {
-    pr_outreach: ["gmail_send_draft", "gmail_list_messages", "google_drive_create_file"],
-    distribution: ["google_sheets_read", "google_sheets_write", "google_drive_list_files"],
-    licensing: ["gmail_send_draft", "google_drive_create_file", "google_sheets_read"],
-    legal: ["google_drive_create_file", "google_drive_list_files"],
+  const everything = Object.keys(all) as ToolName[];
+
+  const toolMap: Record<SpecialistId | "master", ToolName[]> = {
+    // The master agent orchestrates, so it holds the full surface.
+    master: everything,
+    "brand-epk": ["google_drive_create_file", "google_drive_list_files", "notion_create_page"],
+    publishing: [
+      "google_sheets_read",
+      "google_sheets_write",
+      "google_drive_list_files",
+      "google_drive_create_file",
+    ],
+    contracts: ["google_drive_create_file", "google_drive_list_files"],
+    release: [
+      "google_sheets_read",
+      "google_sheets_write",
+      "google_calendar_create_event",
+      "google_drive_list_files",
+    ],
+    content: ["notion_create_page", "google_drive_create_file", "slack_send_message"],
+    press: ["gmail_send_draft", "gmail_list_messages", "google_drive_create_file"],
+    booking: [
+      "gmail_send_draft",
+      "gmail_list_messages",
+      "google_calendar_create_event",
+      "google_calendar_list_events",
+    ],
     finance: ["google_sheets_read", "google_sheets_write", "google_calendar_list_events"],
-    manager: Object.keys(all) as ToolName[],
-    master: Object.keys(all) as ToolName[],
   };
 
-  const allowed = toolMap[specialist] || (Object.keys(all) as ToolName[]);
+  const allowed = toolMap[specialist];
+  if (!allowed) return {};
+
   const filtered: ToolSet = {};
   for (const key of allowed) {
     if (all[key]) filtered[key] = all[key];

@@ -10,6 +10,7 @@ import type { SpecialistId } from "@/lib/rostr/specialists";
 
 export type SkillCategory =
   | "epk"
+  | "publishing"
   | "legal"
   | "release"
   | "outreach"
@@ -42,6 +43,7 @@ export type SkillProduct = {
 
 export const SKILL_CATEGORIES: { id: SkillCategory | "all"; label: string }[] = [
   { id: "all", label: "All skills" },
+  { id: "publishing", label: "Publishing & Royalties" },
   { id: "epk", label: "EPK & Press" },
   { id: "legal", label: "Legal & Rights" },
   { id: "release", label: "Release Ops" },
@@ -77,6 +79,53 @@ export const SKILLS_CATALOG: SkillProduct[] = [
     featured: true,
     popular: true,
     badge: "Bestseller",
+  },
+  {
+    id: "skill_pro_royalty_recovery",
+    slug: "pro-royalty-recovery",
+    name: "PRO & Royalty Recovery",
+    tagline: "Find the royalties you never claimed.",
+    description:
+      "Teaches your Publishing Manager to audit PRO databases for unregistered and unclaimed tracks, register your catalogue correctly, and track what each DSP and PRO actually owes you — with a payment calendar so nothing slips.",
+    category: "publishing",
+    priceCents: 0,
+    includes: [
+      "PRO registration walkthrough (ASCAP / BMI / SESAC)",
+      "Unclaimed-track audit prompts",
+      "Royalty tracking spreadsheet schema",
+      "Payment calendar template",
+      "Writer vs publisher share explainer",
+    ],
+    format: "Workflow + templates",
+    fileSize: "156 KB",
+    version: "1.0.0",
+    agent: "Publishing",
+    specialistId: "publishing",
+    featured: true,
+    popular: true,
+    badge: "Highest ROI",
+  },
+  {
+    id: "skill_catalogue_metadata",
+    slug: "catalogue-metadata",
+    name: "Catalogue & Metadata",
+    tagline: "Your masters, cleaned for business.",
+    description:
+      "Turns a pile of files and DSP links into a structured catalogue: extracted metadata (BPM, key, mood, ISRC, UPC), AI-enhanced genre tags, release status, and a shareable catalogue page you can send to supervisors and partners.",
+    category: "publishing",
+    priceCents: 0,
+    includes: [
+      "Metadata extraction checklist",
+      "ISRC / UPC hygiene rules",
+      "AI genre + sonic descriptor prompts",
+      "Released / Unreleased / Vault tagging",
+      "Shareable catalogue page brief",
+    ],
+    format: "SKILL.md pack",
+    fileSize: "132 KB",
+    version: "1.0.0",
+    agent: "Publishing",
+    specialistId: "publishing",
   },
   {
     id: "skill_contract_redflags",

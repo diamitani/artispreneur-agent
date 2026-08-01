@@ -6,8 +6,10 @@
 import { cookies } from "next/headers";
 import type { Session } from "@/types/user";
 import { verifyToken, type CognitoIdTokenPayload } from "./cognito";
+import { SESSION_COOKIE as CONFIG_SESSION_COOKIE, isAuthDevBypass } from "./config";
 
-const SESSION_COOKIE = "aa_session";
+// Single source of truth — see src/lib/auth/config.ts
+const SESSION_COOKIE = CONFIG_SESSION_COOKIE;
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 // ─── Crypto helpers (AES-GCM via Web Crypto) ──────────────────────────────────
@@ -138,8 +140,12 @@ export async function createSession(tokens: SessionTokens): Promise<Session> {
  * Read and decrypt the session cookie. Returns the Session or null if invalid/missing.
  */
 export async function getSession(): Promise<Session | null> {
-  // Dev bypass mode
-  if (process.env.AUTH_DEV_BYPASS === "1") {
+  // Dev bypass. This deliberately uses the same strict predicate as
+  // getSessionUser() rather than a bare env check: isAuthDevBypass() also
+  // requires NODE_ENV !== "production" and Cognito to be unconfigured. The two
+  // used to disagree, so setting AUTH_DEV_BYPASS=1 on a production deployment
+  // would have handed every caller a session here while the other path refused.
+  if (isAuthDevBypass()) {
     return {
       userId: "dev-user-001",
       email: "dev@artispreneur.ai",
@@ -163,6 +169,12 @@ export async function getSession(): Promise<Session | null> {
       plan: data.plan,
     };
   } catch {
+    // A cookie we cannot decrypt (rotated SESSION_SECRET, truncated value,
+    // tampering) would otherwise survive every request: middleware sees a
+    // non-empty cookie and lets the request through, the page decrypts it,
+    // fails, and redirects back to sign-in — forever. Drop it so the next
+    // request is cleanly signed out.
+    await clearSession().catch(() => undefined);
     return null;
   }
 }

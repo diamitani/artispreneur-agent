@@ -6,8 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
  * Skips auth check when AUTH_DEV_BYPASS=1.
  */
 
-const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
-const SESSION_COOKIE = "aa_session";
+const PROTECTED_PREFIXES = ["/dashboard", "/onboarding", "/deploy"];
+const SESSION_COOKIE = "aa_session"; // must match src/lib/auth/config.ts
 
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
@@ -32,7 +32,9 @@ export function middleware(request: NextRequest): NextResponse {
   if (!sessionCookie?.value) {
     // No session — redirect to sign in
     const signInUrl = new URL("/signin", request.url);
-    signInUrl.searchParams.set("return", pathname);
+    // The auth pages read `next`; `return` was silently ignored,
+    // so the user always landed on /dashboard instead of where they were going.
+    signInUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(signInUrl);
   }
 
@@ -42,5 +44,5 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding/:path*"],
+  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/deploy/:path*"],
 };

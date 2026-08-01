@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 
 const details = [
   ["Artist Name", "Your Stage Name"],
@@ -9,9 +9,10 @@ const details = [
 
 export default function ProfilePage() {
   return (
-    <DashboardShell title="Profile" subtitle="Your artist account">
-      <div className="p-5 md:p-7">
-        <div className="mx-auto max-w-[520px]">
+    <div className="mx-auto max-w-[560px]">
+      <PageHeader eyebrow="Account" title="Profile" subtitle="Your artist account" />
+      <div>
+        <div>
           {/* Profile card */}
           <div className="mb-4 overflow-hidden rounded-[10px] bg-white shadow-[var(--shadow-md)]">
             <div className="relative h-[100px] bg-[color:var(--color-bg-dark)]">
@@ -55,6 +56,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
+    </div>
   );
 }

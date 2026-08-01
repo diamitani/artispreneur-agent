@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Nav } from "@/components/marketing/Nav";
 import { Footer } from "@/components/marketing/Footer";
 import { SkillCard } from "@/components/skills/SkillCard";
+import { AgentCapabilities } from "@/components/skills/AgentCapabilities";
 import { brand } from "@/lib/brand";
 import { SKILLS_CATALOG, SKILL_CATEGORIES } from "@/lib/skills/catalog";
 
@@ -60,6 +61,9 @@ export default async function SkillsMarketplacePage({
                 <Link href="/skills/library" className="btn btn--gold btn--md">
                   My library
                 </Link>
+                <a href="#capabilities" className="btn btn--outline-on-dark btn--md">
+                  All agent skills
+                </a>
                 <Link href="/workspace" className="btn btn--outline-on-dark btn--md">
                   Open workspace
                 </Link>
@@ -113,7 +117,17 @@ export default async function SkillsMarketplacePage({
           </div>
         </section>
 
-        <section className="border-t border-[color:var(--color-border)] bg-white py-14">
+        {/* Full capability index from the Core Agents & Skills v1 spec */}
+        <section
+          id="capabilities"
+          className="section border-t border-[color:var(--color-border)] bg-white"
+        >
+          <div className="container-page">
+            <AgentCapabilities />
+          </div>
+        </section>
+
+        <section className="border-t border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] py-14">
           <div className="container-page grid gap-10 md:grid-cols-3">
             {[
               {

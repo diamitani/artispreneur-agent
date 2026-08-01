@@ -129,7 +129,7 @@ export function LandingHero() {
               transition={{ duration: 0.6, delay: 0.24, ease }}
             >
               <a
-                href="/api/auth/login?signup=1&return=/onboarding"
+                href="/signup?next=/onboarding"
                 className="btn btn--primary btn--lg"
               >
                 Start for Free

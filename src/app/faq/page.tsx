@@ -20,7 +20,7 @@ export default function FaqPage() {
         body="Nothing ships without you. Education on deals and money — not a substitute for counsel. Your workspace stays yours."
       >
         <a
-          href="/api/auth/login?signup=1&return=/onboarding"
+          href="/signup?next=/onboarding"
           className="btn btn--primary btn--lg"
         >
           Start for Free

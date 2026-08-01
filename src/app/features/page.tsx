@@ -22,7 +22,7 @@ export default function FeaturesPage() {
         body="For independent artists, managers, agencies, and label operators. Your Agent drafts the EPK, the pitch list, the release plan, and the split sheet. You greenlight before anything ships."
       >
         <a
-          href="/api/auth/login?signup=1&return=/onboarding"
+          href="/signup?next=/onboarding"
           className="btn btn--primary btn--lg"
         >
           Start for Free

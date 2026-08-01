@@ -38,51 +38,8 @@ export const brand = {
     alt: "Artispreneur — Art Means Business.",
   },
 
-  pricing: {
-    starter: {
-      name: "Starter",
-      price: 0,
-      period: "forever",
-      cta: "Start free",
-      featured: false,
-      blurb: "Academy + Tutor Agent, directory browsing, your first workspace.",
-      features: [
-        "Academy courses + Tutor Agent",
-        "Master Agent (light model)",
-        "Directory browsing",
-        "Catalog upload on Cataba",
-      ],
-    },
-    workspace: {
-      name: "Workspace",
-      price: 79,
-      period: "month",
-      cta: "Get the Workspace",
-      featured: true,
-      blurb: "The full AI business team. Every agent, every skill, one command center.",
-      features: [
-        "All 7 specialist agents + Master Agent",
-        "Approval queue + audit log",
-        "Full Composio integrations (Gmail, Drive, Sheets)",
-        "Priority jobs + larger models",
-        "BYOK supported",
-      ],
-    },
-    agency: {
-      name: "Agency & Label",
-      price: null,
-      period: "per roster",
-      cta: "Talk to us",
-      featured: false,
-      blurb: "Organization hub, staff roles, client workspaces, and the Director agent.",
-      features: [
-        "Agency Director / Roster Director",
-        "Client artist workspaces",
-        "Shared playbooks + reporting",
-        "SSO, audit export, dedicated compute options",
-      ],
-    },
-  },
+  // Pricing lives in `src/lib/constants.ts` (PRICING) — the single source of
+  // truth rendered by both the homepage and /pricing. Import it from there.
 
   products: [
     {

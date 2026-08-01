@@ -1,10 +1,11 @@
 /**
  * Specialist roster — Agent by Artispreneur
- * Master Agent routes; specialists execute. Max 7 active on day one.
+ * Master Agent routes; specialists execute. Roster per the Core Agents & Skills v1 spec.
  */
 
 export type SpecialistId =
   | "brand-epk"
+  | "publishing"
   | "contracts"
   | "release"
   | "content"
@@ -24,19 +25,28 @@ export type Specialist = {
 export const SPECIALISTS: Specialist[] = [
   {
     id: "brand-epk",
-    name: "Brand & EPK",
-    role: "Identity & press kit",
+    name: "Brand Manager",
+    role: "Brand & creative direction",
     surface: "epk_brand",
     blurb: "Bios, EPK, brand voice, visual briefs, and press-ready packages.",
     skills: ["EPK builder", "Bio writer", "Brand system", "Press kit"],
   },
   {
+    id: "publishing",
+    name: "Publishing Manager",
+    role: "Rights & royalty operations",
+    surface: "publishing",
+    blurb:
+      "PRO registration, royalty tracking across DSPs, catalogue metadata, and split sheets.",
+    skills: ["PRO registration", "Royalty tracking", "Catalogue", "Split sheets"],
+  },
+  {
     id: "contracts",
-    name: "Contracts & Business",
-    role: "Legal ops (guided)",
+    name: "Legal Manager",
+    role: "Legal ops & business formation (guided)",
     surface: "contracts",
-    blurb: "Split sheets, agreements, LLC/PRO checklists — always human-approved.",
-    skills: ["Split sheets", "Contract drafts", "PRO checklist", "Entity setup"],
+    blurb: "Contracts, LLC/EIN formation, and registrations — always human-approved.",
+    skills: ["Contract drafts", "Entity formation", "EIN filing", "E-signature"],
   },
   {
     id: "release",
@@ -56,8 +66,8 @@ export const SPECIALISTS: Specialist[] = [
   },
   {
     id: "press",
-    name: "Press & Outreach",
-    role: "PR / playlist / radio",
+    name: "PR Manager",
+    role: "PR, campaigns & advertising",
     surface: "press",
     blurb: "Target lists, pitch drafts, and submission tracking — send only after approval.",
     skills: ["Media list", "Pitch drafts", "Playlist targets", "Follow-ups"],

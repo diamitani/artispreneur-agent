@@ -66,7 +66,7 @@ export function PricingGrid({ showAddons = true }: { showAddons?: boolean }) {
                 href={
                   plan.name.includes("Agency")
                     ? `mailto:hello@artispreneur.com?subject=Agency%20plan`
-                    : "/api/auth/login?signup=1&return=/onboarding"
+                    : "/signup?next=/onboarding"
                 }
                 className={`btn btn--md btn--block mt-6 ${
                   plan.featured ? "btn--primary" : "btn--outline"
