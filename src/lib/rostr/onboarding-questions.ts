@@ -226,6 +226,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         type: "multiselect",
         required: true,
         options: [
+          { value: "publishing", label: "PROs, royalties & unclaimed money" },
           { value: "epk_brand", label: "EPK & brand assets" },
           { value: "contracts", label: "Contracts, splits, business setup" },
           { value: "release", label: "Release & distribution planning" },
@@ -283,7 +284,7 @@ export const PATRICK_DEMO_ANSWERS: Record<string, string | string[]> = {
   do_not:
     "No hype. No promising editorial playlist adds, sync placements, or stream counts. Never distribute, license, or send outreach without named approval. Never invent ownership or splits.",
   approval_policy: "approval_required",
-  priority_surfaces: ["epk_brand", "contracts", "release", "press", "booking"],
+  priority_surfaces: ["publishing", "epk_brand", "contracts", "release", "press"],
   next_release: "Midnight Circuit — Aug 29, 2026",
   links: "https://diamitani-music.vercel.app/",
   open_prompt:
