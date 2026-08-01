@@ -25,7 +25,7 @@ export function CheckoutButton({
       });
       const data = await res.json();
       if (res.status === 401) {
-        window.location.href = `/api/auth/login?signup=1&return=/skills/${slug}`;
+        window.location.href = `/signup?next=/skills/${slug}`;
         return;
       }
       if (!res.ok || !data.ok) throw new Error(data.error || "Checkout failed");

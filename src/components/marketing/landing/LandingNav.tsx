@@ -6,8 +6,8 @@ import Link from "next/link";
 import { brand } from "@/lib/brand";
 import { NAV_LINKS } from "./landing-data";
 
-const SIGNUP_HREF = "/api/auth/login?signup=1&return=/onboarding";
-const SIGNIN_HREF = "/api/auth/login?return=/dashboard";
+const SIGNUP_HREF = "/signup?next=/onboarding";
+const SIGNIN_HREF = "/signin?next=/dashboard";
 
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);

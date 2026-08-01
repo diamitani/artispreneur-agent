@@ -10,6 +10,6 @@ export const metadata = { title: "Your Command Center" };
  */
 export default async function WorkspacePage() {
   const session = await getSessionUser();
-  if (!session) redirect("/api/auth/login?return=/workspace");
+  if (!session) redirect("/signin?next=/workspace");
   return <CommandCenter />;
 }

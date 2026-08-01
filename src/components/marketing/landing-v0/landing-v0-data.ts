@@ -145,7 +145,7 @@ export const FOOTER_LINKS = [
   { href: "#ecosystem", label: "Academy" },
   { href: "https://directory.artispreneur.com", label: "Directory", external: true },
   { href: "https://contracts.artispreneur.com", label: "Contracts", external: true },
-  { href: "/api/auth/login?return=/workspace", label: "Dashboard" },
+  { href: "/signin?next=/workspace", label: "Dashboard" },
   { href: "#pricing", label: "Pricing" },
 ] as const;
 
@@ -167,4 +167,4 @@ export const CHAT_RESPONSES: Record<string, string> = {
 };
 
 export const CHAT_FOLLOWUP_HTML =
-  'Ready to get started for real? <a href="/api/auth/login?signup=1&return=/onboarding" class="lv0-chat-cta">Create your free workspace →</a>';
+  'Ready to get started for real? <a href="/signup?next=/onboarding" class="lv0-chat-cta">Create your free workspace →</a>';

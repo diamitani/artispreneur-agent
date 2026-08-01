@@ -173,7 +173,7 @@ export function HeroChat() {
                 <span>
                   {" "}
                   <a
-                    href="/api/auth/login?signup=1&return=/onboarding"
+                    href="/signup?next=/onboarding"
                     className="font-semibold text-[color:var(--color-crimson)] underline underline-offset-2"
                   >
                     Start your real workspace →
@@ -194,7 +194,7 @@ export function HeroChat() {
           <div className="self-start rounded-lg bg-[color:var(--color-gold)]/10 px-3.5 py-2.5 text-[12px] text-[color:var(--color-black)]">
             Demo limit reached.{" "}
             <a
-              href="/api/auth/login?signup=1&return=/onboarding"
+              href="/signup?next=/onboarding"
               className="font-semibold text-[color:var(--color-crimson)]"
             >
               Sign up free for unlimited access →
@@ -235,7 +235,7 @@ export function HeroChat() {
           </p>
           {mode === "live-demo" && (
             <a
-              href="/api/auth/login?signup=1&return=/onboarding"
+              href="/signup?next=/onboarding"
               className="font-mono text-[10px] font-semibold text-[color:var(--color-crimson)] hover:underline"
             >
               Sign up for full workspace →

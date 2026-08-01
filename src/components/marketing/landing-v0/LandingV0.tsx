@@ -20,8 +20,8 @@ import {
   RIGHTS_CARDS,
 } from "./landing-v0-data";
 
-const SIGNUP_HREF = "/api/auth/login?signup=1&return=/onboarding";
-const DASHBOARD_HREF = "/api/auth/login?return=/workspace";
+const SIGNUP_HREF = "/signup?next=/onboarding";
+const DASHBOARD_HREF = "/signin?next=/workspace";
 
 /** Artispreneur Landing v0 — imported from Claude Design (claude.ai/design/p/c761442d…). */
 export function LandingV0() {

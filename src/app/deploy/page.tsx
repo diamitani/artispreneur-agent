@@ -14,7 +14,7 @@ export const metadata = {
  */
 export default async function DeployPage() {
   const session = await getSessionUser();
-  if (!session) redirect("/api/auth/login?return=/deploy");
+  if (!session) redirect("/signin?next=/deploy");
 
   return <DeployWorkspace nextHref="/dashboard" />;
 }

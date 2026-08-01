@@ -27,7 +27,7 @@ export function FinalCta({
         </h2>
         <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/75">{body}</p>
         <a
-          href="/api/auth/login?signup=1&return=/onboarding"
+          href="/signup?next=/onboarding"
           className="btn btn--gold btn--lg mt-9"
         >
           Create Your Workspace &rarr;

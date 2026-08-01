@@ -51,7 +51,7 @@ export default function SkillsLibraryPage() {
     fetch("/api/skills/library")
       .then(async (r) => {
         if (r.status === 401) {
-          window.location.href = "/api/auth/login?return=/skills/library";
+          window.location.href = "/signin?next=/skills/library";
           return null;
         }
         return r.json();

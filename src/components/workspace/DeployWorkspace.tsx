@@ -51,7 +51,7 @@ export function DeployWorkspace({ nextHref = "/dashboard" }: { nextHref?: string
       });
 
       if (res.status === 401) {
-        window.location.href = "/api/auth/login?return=/deploy";
+        window.location.href = "/signin?next=/deploy";
         return;
       }
 

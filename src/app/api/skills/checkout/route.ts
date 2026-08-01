@@ -20,7 +20,7 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   const session = await getSessionUser();
   if (!session) {
-    return NextResponse.json({ error: "Sign in required", login: "/api/auth/login?return=/skills" }, { status: 401 });
+    return NextResponse.json({ error: "Sign in required", login: "/signin?next=/skills" }, { status: 401 });
   }
 
   const body = (await req.json()) as { slug?: string };

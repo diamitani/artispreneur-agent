@@ -1,39 +1,34 @@
-import Link from "next/link";
-import { Logo } from "@/components/shared/logo";
-import { ROUTES } from "@/lib/constants";
+import { redirect } from "next/navigation";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { SignInForm } from "@/components/auth/SignInForm";
+import { isDirectAuthConfigured } from "@/lib/auth/cognito-direct";
+import { isAuthDevBypass } from "@/lib/auth/config";
+import { AuthUnavailable } from "@/components/auth/AuthUnavailable";
 
-export const metadata = {
-  title: "Sign In",
-};
+export const metadata = { title: "Sign in" };
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; verified?: string; email?: string }>;
+}) {
+  const sp = await searchParams;
+  // Only same-origin paths — an open redirect here would be a phishing vector.
+  const next = sp.next?.startsWith("/") ? sp.next : "/dashboard";
+
+  if (isAuthDevBypass()) redirect(next);
+
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <Logo className="text-3xl" />
-        <h1 className="mt-6 font-[var(--font-display)] text-2xl font-bold text-gray-900">
-          Welcome back
-        </h1>
-        <p className="mt-2 text-sm text-gray-500">
-          Sign in to your workspace
-        </p>
-      </div>
-
-      <div className="space-y-5">
-        <a
-          href="/api/auth/login?return=/dashboard"
-          className="block w-full rounded-md bg-crimson px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-crimson-dark focus:outline-none focus:ring-2 focus:ring-crimson focus:ring-offset-2 transition-colors"
-        >
-          Sign In
-        </a>
-      </div>
-
-      <p className="text-center text-sm text-gray-500">
-        Don&apos;t have an account?{" "}
-        <Link href={ROUTES.signup} className="font-medium text-crimson hover:text-crimson-dark">
-          Sign up
-        </Link>
-      </p>
-    </div>
+    <AuthShell
+      eyebrow="Welcome back"
+      title="Sign in to your workspace."
+      subtitle={
+        sp.verified
+          ? "Email verified. Sign in to finish setting up."
+          : "Your agents have been keeping the lights on."
+      }
+    >
+      {isDirectAuthConfigured() ? <SignInForm returnTo={next} /> : <AuthUnavailable />}
+    </AuthShell>
   );
 }

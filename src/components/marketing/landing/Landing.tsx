@@ -13,10 +13,11 @@ import {
   HERO_STAT_LABELS,
   HOW_IT_WORKS,
   PRODUCT_SURFACES,
+  REPLACES,
   TRUST_POINTS,
 } from "./landing-data";
 
-const SIGNUP_HREF = "/api/auth/login?signup=1&return=/onboarding";
+const SIGNUP_HREF = "/signup?next=/onboarding";
 const TIERS = Object.values(PRICING);
 
 /** Computed from the specs themselves so the public claims cannot drift. */
@@ -37,6 +38,7 @@ export function Landing() {
         <HowItWorks />
         <ProductSection />
         <RosterSection />
+        <ReplacesSection />
         <DeploySection />
         <TrustSection />
         <PricingSection />
@@ -99,6 +101,35 @@ function Hero() {
           <p className="mt-5 text-[13px] text-white/40">
             No credit card. Your workspace deploys in about a minute.
           </p>
+
+          {/* Capability ticker — concrete asks, so the value is not abstract. */}
+          <div className="relative mt-10 hidden overflow-hidden md:block">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#0b0b0b] to-transparent"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#0b0b0b] to-transparent"
+            />
+            <div className="flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {[
+                "Register my songs with BMI",
+                "Draft my EPK",
+                "Find venues in Atlanta",
+                "Plan my next release",
+                "Start my LLC",
+                "Who owns what on this track?",
+              ].map((q) => (
+                <span
+                  key={q}
+                  className="whitespace-nowrap rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 text-[12.5px] text-white/55"
+                >
+                  {q}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* The product itself is the hero image — a live agent. */}
@@ -300,6 +331,67 @@ function RosterSection() {
               </svg>
             </span>
           </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ReplacesSection() {
+  return (
+    <section className="section">
+      <div className="container-page">
+        <SectionHead
+          eyebrow="The math"
+          title="What a team like this normally costs."
+          blurb="Independent artists pay for this expertise piecemeal, or go without it and lose money quietly. Typical US market rates — not quotes, and not a promise you can fire anyone."
+        />
+
+        <div className="mt-14 grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+          <ul className="overflow-hidden rounded-[10px] border border-[color:var(--color-border)]">
+            {REPLACES.map((r, i) => (
+              <li
+                key={r.role}
+                className={`flex flex-wrap items-baseline gap-x-4 gap-y-1 bg-white px-6 py-5 ${
+                  i > 0 ? "border-t border-[color:var(--color-border)]" : ""
+                }`}
+              >
+                <span className="text-[15px] font-bold text-[color:var(--color-black)]">
+                  {r.role}
+                </span>
+                <span className="font-mono text-[13px] text-[color:var(--color-crimson)]">
+                  {r.rate}
+                </span>
+                <span className="ml-auto text-[12.5px] text-[color:var(--color-gray-mid)]">
+                  {r.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="rounded-[10px] bg-[color:var(--color-black)] p-8 text-white">
+            <p className="type-mono-label text-[color:var(--color-gold)]">
+              Artispreneur
+            </p>
+            <div className="mt-4 flex items-baseline gap-2">
+              <span className="font-heading text-[46px] leading-none text-white">
+                ${PRICING.workspace.price}
+              </span>
+              <span className="text-[14px] text-white/50">
+                /{PRICING.workspace.period}
+              </span>
+            </div>
+            <p className="mt-4 text-[14px] leading-relaxed text-white/60">
+              Every agent, every skill, unlimited projects. It will not replace a
+              lawyer when you need one — it tells you when that is.
+            </p>
+            <a href={SIGNUP_HREF} className="btn btn--gold btn--md btn--block mt-7">
+              Start free
+            </a>
+            <p className="mt-3 text-center text-[12px] text-white/35">
+              Free plan available forever
+            </p>
+          </div>
         </div>
       </div>
     </section>

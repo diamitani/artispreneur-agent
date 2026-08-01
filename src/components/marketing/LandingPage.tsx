@@ -226,7 +226,7 @@ function RoiComparisonSection() {
                   Workspace plan: $79/month ($948/year)
                 </p>
               </div>
-              <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--md">
+              <a href="/signup?next=/onboarding" className="btn btn--primary btn--md">
                 Start Saving Now
               </a>
             </div>
@@ -257,7 +257,7 @@ function DashboardPreviewSection() {
             Your Agent runs tasks in the background.
           </p>
           <a
-            href="/api/auth/login?signup=1&return=/onboarding"
+            href="/signup?next=/onboarding"
             className="btn btn--primary btn--md mt-7 inline-flex"
           >
             Open your workspace
@@ -682,7 +682,7 @@ function AcademySection() {
             ))}
           </div>
           <a
-            href="/api/auth/login?signup=1&return=/onboarding"
+            href="/signup?next=/onboarding"
             className="btn btn--primary btn--md mt-7"
           >
             Start learning free

@@ -103,7 +103,7 @@ export function NewHeroChat() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.28, ease }}
             >
-              <a href="/api/auth/login?signup=1&return=/onboarding" className="btn btn--primary btn--lg">
+              <a href="/signup?next=/onboarding" className="btn btn--primary btn--lg">
                 Start for Free
               </a>
               <a href="#how" className="btn btn--outline-on-dark btn--lg">

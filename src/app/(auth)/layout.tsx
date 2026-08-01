@@ -1,7 +1,7 @@
+/**
+ * Auth routes render edge to edge — AuthShell provides the split layout,
+ * so this group adds no container of its own.
+ */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4">
-      <div className="w-full max-w-md">{children}</div>
-    </div>
-  );
+  return <div className="bg-white">{children}</div>;
 }

@@ -97,6 +97,20 @@ export const AGENT_ROSTER = [
   { name: "Brand Manager", role: "Brand identity, EPK, website, merch" },
 ] as const;
 
+/**
+ * What an independent artist would otherwise pay a human team.
+ *
+ * These are typical US market rates, not quotes or guarantees — the copy on
+ * the page says so plainly. Keep them conservative and keep the caveat.
+ */
+export const REPLACES = [
+  { role: "Manager", rate: "15–20% of gross", note: "Commission on everything you earn" },
+  { role: "Publicist", rate: "$1,500–5,000/mo", note: "Usually a 3-month minimum" },
+  { role: "Booking agent", rate: "10% of fees", note: "Plus their own minimums" },
+  { role: "Business manager", rate: "5% of gross", note: "Bookkeeping and royalty admin" },
+  { role: "Entertainment lawyer", rate: "$350–750/hr", note: "Every contract, every time" },
+] as const;
+
 export const TRUST_POINTS = [
   {
     title: "Approval-first, always",
