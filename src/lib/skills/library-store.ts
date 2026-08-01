@@ -10,8 +10,11 @@ import {
   hubWriteJson,
   hubWriteText,
 } from "@/lib/hub/store";
-import { syncInstanceRuntime } from "@/lib/aws/instance-registry";
-import { getSkillById, type SkillProduct } from "./catalog";
+import {
+  getAwsInstanceProject,
+  syncInstanceRuntime,
+} from "@/lib/aws/instance-registry";
+import { getSkillById, SKILLS_CATALOG, type SkillProduct } from "./catalog";
 import { renderSkillPackMarkdown } from "./packs";
 
 export type OwnedSkill = {
@@ -176,9 +179,45 @@ export async function markSkillInstalled(
   return true;
 }
 
+/** Paid plans carry a full-catalogue entitlement; Free is per-pack. */
+export function isPaidPlan(plan?: string | null) {
+  return plan === "workspace" || plan === "agency";
+}
+
+/**
+ * Skills the workspace is entitled to.
+ *
+ * On a paid plan every catalogue pack is owned and active by default — the
+ * artist should never have to shop for a capability they already pay for.
+ * Explicitly stored rows still win, so a paid user can toggle a pack off and
+ * that choice survives.
+ */
 export async function enrichOwned(userId: string, projectId: string) {
-  const owned = await listOwnedSkills(userId, projectId);
-  return owned.map((o) => ({
+  const [owned, project] = await Promise.all([
+    listOwnedSkills(userId, projectId),
+    getAwsInstanceProject(userId, projectId).catch(() => null),
+  ]);
+
+  const paid = isPaidPlan(project?.plan);
+  const byId = new Map(owned.map((o) => [o.skill_id, o]));
+
+  const rows: (OwnedSkill & { entitled_by_plan?: boolean })[] = paid
+    ? SKILLS_CATALOG.map((product) => {
+        const stored = byId.get(product.id);
+        if (stored) return stored;
+        return {
+          skill_id: product.id,
+          slug: product.slug,
+          name: product.name,
+          acquired_at: project?.created_at ?? new Date().toISOString(),
+          source: "admin" as const,
+          installed: true,
+          entitled_by_plan: true,
+        };
+      })
+    : owned;
+
+  return rows.map((o) => ({
     ...o,
     product: getSkillById(o.skill_id),
     hermes_active: o.installed,

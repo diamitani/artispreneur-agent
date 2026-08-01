@@ -14,13 +14,17 @@ export const NAV_LINKS = [
   { href: "#pricing", label: "Pricing" },
 ] as const;
 
-/** Numbers shown under the hero. Keep these honest — they are public claims. */
-export const HERO_STATS = [
-  { value: "8", label: "Specialist agents" },
-  { value: "17", label: "Workspace folders deployed" },
-  { value: "8", label: "Skill packs included" },
-  { value: "60s", label: "From signup to workspace" },
-] as const;
+/**
+ * Numbers shown under the hero. These are public claims, so the two that can
+ * drift are computed from the source of truth in Landing.tsx rather than
+ * typed here — see HERO_STATS usage.
+ */
+export const HERO_STAT_LABELS = {
+  agents: "Agents in your roster",
+  skills: "Documented agent skills",
+  folders: "Workspace folders deployed",
+  deploy: "From signup to workspace",
+} as const;
 
 export const HOW_IT_WORKS = [
   {
@@ -75,16 +79,22 @@ export const PRODUCT_SURFACES = [
   },
 ] as const;
 
-/** The eight specialists the master agent routes to. */
+/**
+ * Roster shown on the homepage. Sourced from the Core Agents & Skills v1
+ * spec — see `src/lib/agents/roster.ts` for the full skill inventory.
+ */
 export const AGENT_ROSTER = [
-  { name: "Master Agent", role: "Chief of staff — plans, clarifies, routes" },
-  { name: "Brand & EPK", role: "Identity, bios, press kits" },
-  { name: "PR & Outreach", role: "Media, playlist, radio pitching" },
-  { name: "Release Manager", role: "42-day calendars, metadata QC" },
-  { name: "Content Producer", role: "Hooks, calendars, campaign assets" },
-  { name: "Booking Manager", role: "Venues, riders, routing" },
-  { name: "Finance Manager", role: "Budgets, royalties, payout gates" },
-  { name: "Contracts", role: "Splits, agreements, PRO setup" },
+  {
+    name: "Day to Day Manager",
+    role: "Master agent — plans, delegates, follows up",
+    master: true,
+  },
+  { name: "Publishing Manager", role: "PROs, royalties, catalogue, splits" },
+  { name: "Finance Manager", role: "Banking, income tracking, P&L" },
+  { name: "PR Manager", role: "Campaigns, press, social, advertising" },
+  { name: "Booking Manager", role: "Gig discovery, outreach, booking CRM" },
+  { name: "Legal Manager", role: "LLC & EIN formation, contracts" },
+  { name: "Brand Manager", role: "Brand identity, EPK, website, merch" },
 ] as const;
 
 export const TRUST_POINTS = [

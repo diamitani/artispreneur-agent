@@ -5,10 +5,12 @@ import { PRICING } from "@/lib/constants";
 import { HeroChat } from "@/components/marketing/HeroChat";
 import { LandingNav } from "./LandingNav";
 import { FaqAccordion } from "./FaqAccordion";
+import { AGENT_SPECS, TOTAL_SKILL_COUNT } from "@/lib/agents/roster";
+import { WORKSPACE_FOLDER_COUNT } from "@/lib/userops/workspace-tree";
 import {
   AGENT_ROSTER,
   FOOTER_SECTIONS,
-  HERO_STATS,
+  HERO_STAT_LABELS,
   HOW_IT_WORKS,
   PRODUCT_SURFACES,
   TRUST_POINTS,
@@ -16,6 +18,14 @@ import {
 
 const SIGNUP_HREF = "/api/auth/login?signup=1&return=/onboarding";
 const TIERS = Object.values(PRICING);
+
+/** Computed from the specs themselves so the public claims cannot drift. */
+const HERO_STATS = [
+  { value: String(AGENT_SPECS.length), label: HERO_STAT_LABELS.agents },
+  { value: String(TOTAL_SKILL_COUNT), label: HERO_STAT_LABELS.skills },
+  { value: String(WORKSPACE_FOLDER_COUNT), label: HERO_STAT_LABELS.folders },
+  { value: "60s", label: HERO_STAT_LABELS.deploy },
+];
 
 export function Landing() {
   return (
@@ -228,24 +238,68 @@ function RosterSection() {
       <div className="container-page">
         <SectionHead
           eyebrow="The roster"
-          title="Eight specialists. You only ever talk to one."
-          blurb="The Master Agent reads your request, loads your context, and routes it to whoever should actually handle it. You never pick an agent from a menu."
+          title="Six specialists. You only ever talk to one."
+          blurb="The Day to Day Manager reads your request, loads your context, and routes it to whoever should actually handle it. You never pick an agent from a menu."
         />
 
         <div className="mt-14 grid gap-px overflow-hidden rounded-[10px] border border-[color:var(--color-border)] bg-[color:var(--color-border)] sm:grid-cols-2 lg:grid-cols-4">
-          {AGENT_ROSTER.map((a, i) => (
-            <div key={a.name} className="bg-white p-6">
-              <span className="type-mono-label text-[color:var(--color-gray-subtle)]">
-                {String(i + 1).padStart(2, "0")}
+          {AGENT_ROSTER.map((a) => (
+            <div
+              key={a.name}
+              className={`p-6 ${
+                "master" in a && a.master
+                  ? "bg-[color:var(--color-black)] sm:col-span-2 lg:col-span-1"
+                  : "bg-white"
+              }`}
+            >
+              <span
+                className={`type-mono-label ${
+                  "master" in a && a.master
+                    ? "text-[color:var(--color-gold)]"
+                    : "text-[color:var(--color-gray-subtle)]"
+                }`}
+              >
+                {"master" in a && a.master ? "Master" : "Specialist"}
               </span>
-              <h3 className="mt-3 text-[15px] font-bold text-[color:var(--color-black)]">
+              <h3
+                className={`mt-3 text-[15px] font-bold ${
+                  "master" in a && a.master ? "text-white" : "text-[color:var(--color-black)]"
+                }`}
+              >
                 {a.name}
               </h3>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-[color:var(--color-gray-mid)]">
+              <p
+                className={`mt-1.5 text-[13px] leading-relaxed ${
+                  "master" in a && a.master
+                    ? "text-white/55"
+                    : "text-[color:var(--color-gray-mid)]"
+                }`}
+              >
                 {a.role}
               </p>
             </div>
           ))}
+
+          {/* Fills the trailing grid cell and routes to the full skill index. */}
+          <Link
+            href="/skills#capabilities"
+            className="group flex flex-col justify-between bg-[color:var(--color-bg-surface)] p-6 transition-colors hover:bg-white"
+          >
+            <div>
+              <span className="type-mono-label text-[color:var(--color-crimson)]">
+                {TOTAL_SKILL_COUNT} skills
+              </span>
+              <h3 className="mt-3 text-[15px] font-bold text-[color:var(--color-black)]">
+                See what each one can do
+              </h3>
+            </div>
+            <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-crimson)]">
+              Full capability index
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-0.5">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
+          </Link>
         </div>
       </div>
     </section>
