@@ -107,7 +107,21 @@ export function SignInForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
         {busy ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="pt-2 text-center text-[13.5px] text-[color:var(--color-gray-mid)]">
+      {/* The pool runs with PreventUserExistenceErrors enabled, so Cognito
+          masks UserNotConfirmedException behind a generic failure. Without a
+          standing link here, someone who abandoned signup mid-way would see
+          only "incorrect email or password" and have no route forward. */}
+      <p className="pt-1 text-center text-[12.5px] text-[color:var(--color-gray-mid)]">
+        Signed up but never got the code?{" "}
+        <Link
+          href={`/signup/confirm?email=${encodeURIComponent(email)}`}
+          className="font-medium text-[color:var(--color-crimson)] hover:underline"
+        >
+          Verify your email
+        </Link>
+      </p>
+
+      <p className="pt-1 text-center text-[13.5px] text-[color:var(--color-gray-mid)]">
         New here?{" "}
         <Link
           href="/signup"

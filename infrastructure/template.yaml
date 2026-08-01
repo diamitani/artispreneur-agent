@@ -119,10 +119,16 @@ Resources:
     Properties:
       ClientName: !Sub "artispreneur-web-${Environment}"
       UserPoolId: !Ref UserPool
+      # Public web client — no secret, so nothing sensitive ships to the browser.
       GenerateSecret: false
       ExplicitAuthFlows:
         - ALLOW_REFRESH_TOKEN_AUTH
         - ALLOW_USER_SRP_AUTH
+        # Required by the branded sign-in pages, which call InitiateAuth with
+        # USER_PASSWORD_AUTH from the server instead of using the Hosted UI.
+        # Credentials never touch the browser: the Next.js route handler holds
+        # them for the length of one request and returns only a session cookie.
+        - ALLOW_USER_PASSWORD_AUTH
       SupportedIdentityProviders: [COGNITO]
       AllowedOAuthFlows: [code]
       AllowedOAuthFlowsUserPoolClient: true
@@ -133,7 +139,18 @@ Resources:
       LogoutURLs:
         - !Sub "https://${AppDomain}"
         - "http://localhost:3000"
+      # Cognito returns a generic error instead of revealing whether an address
+      # is registered. The app's error mapping already collapses those cases to
+      # one message, so the two layers agree.
       PreventUserExistenceErrors: ENABLED
+      EnableTokenRevocation: true
+      AccessTokenValidity: 60
+      IdTokenValidity: 60
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: minutes
+        IdToken: minutes
+        RefreshToken: days
 
   # ---------------------------------------------------------------------------
   # IAM — App Role (for Vercel / ECS / Lambda runtime)
@@ -152,6 +169,18 @@ Resources:
                 - ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
       Policies:
+        - PolicyName: CognitoIntrospect
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Read-only, scoped to this stack's pool. Lets the app verify at
+              # runtime that the client is configured for the branded sign-in
+              # pages instead of failing at a user's first attempt.
+              - Effect: Allow
+                Action:
+                  - cognito-idp:DescribeUserPoolClient
+                  - cognito-idp:DescribeUserPool
+                Resource: !GetAtt UserPool.Arn
         - PolicyName: BedrockAccess
           PolicyDocument:
             Version: "2012-10-17"

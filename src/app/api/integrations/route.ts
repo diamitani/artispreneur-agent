@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth";
 import { INTEGRATIONS } from "@/lib/integrations/registry";
 import { getConnectedAccounts, isComposioConfigured } from "@/lib/composio";
 import { isSpotifyConfigured } from "@/lib/mcp/music/tools";
+import { authPreflight } from "@/lib/auth/cognito-direct";
 
 export const runtime = "nodejs";
 
@@ -42,6 +43,10 @@ export async function GET() {
     }
   }
 
+  // Verify the Cognito app client can actually serve the branded sign-in
+  // pages. Best-effort — a missing describe permission must not fail the page.
+  const auth = await authPreflight().catch(() => null);
+
   const items = INTEGRATIONS.map((i) => {
     const configured =
       i.provider === "affiliate"
@@ -52,15 +57,22 @@ export async function GET() {
             ? Boolean(process.env[i.envVar])
             : true;
 
+    // Cognito is only truly ready when its app client carries the auth flows
+    // the branded sign-in pages need — being "configured" is not enough.
+    const authIssues = i.id === "cognito" ? (auth?.issues ?? []) : [];
+
     const connected =
       i.provider === "composio"
         ? connectedApps.has((i.handle ?? i.id).toLowerCase())
-        : // Non-OAuth providers need no per-artist grant.
-          configured && i.status !== "planned";
+        : i.id === "cognito"
+          ? configured && auth?.ready !== false
+          : // Non-OAuth providers need no per-artist grant.
+            configured && i.status !== "planned";
 
     return {
       id: i.id,
       name: i.name,
+      issues: authIssues,
       category: i.category,
       provider: i.provider,
       status: i.status,
@@ -78,6 +90,14 @@ export async function GET() {
     workspace_path: session.workspacePath,
     composio_configured: isComposioConfigured(),
     composio_error: composioError,
+    auth: auth
+      ? {
+          configured: auth.configured,
+          ready: auth.ready,
+          auth_flows: auth.authFlows,
+          issues: auth.issues,
+        }
+      : null,
     mcp_servers: [
       {
         id: "music",

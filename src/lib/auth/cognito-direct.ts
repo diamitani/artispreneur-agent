@@ -20,6 +20,7 @@ import {
   ResendConfirmationCodeCommand,
   ForgotPasswordCommand,
   ConfirmForgotPasswordCommand,
+  DescribeUserPoolClientCommand,
   type AuthenticationResultType,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { getCognitoConfig } from "./config";
@@ -293,6 +294,93 @@ export async function confirmForgotPassword(input: {
     );
   } catch (e) {
     throw translate(e);
+  }
+}
+
+/**
+ * Verify the user pool client can actually serve the branded pages.
+ *
+ * The single most common misconfiguration is an app client without
+ * ALLOW_USER_PASSWORD_AUTH, which fails only at a real user's first sign-in
+ * with an opaque InvalidParameterException. This surfaces it up front.
+ *
+ * Requires `cognito-idp:DescribeUserPoolClient`. If the runtime role lacks it,
+ * that is reported as unknown rather than as a failure.
+ */
+export async function authPreflight(): Promise<{
+  configured: boolean;
+  ready: boolean | null;
+  authFlows: string[];
+  hasClientSecret: boolean;
+  issues: string[];
+}> {
+  const cfg = getCognitoConfig();
+  if (!cfg) {
+    return {
+      configured: false,
+      ready: false,
+      authFlows: [],
+      hasClientSecret: false,
+      issues: ["COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID are not set."],
+    };
+  }
+
+  const { client } = cognito();
+  const issues: string[] = [];
+
+  try {
+    const res = await client.send(
+      new DescribeUserPoolClientCommand({
+        UserPoolId: cfg.userPoolId,
+        ClientId: cfg.clientId,
+      }),
+    );
+
+    const flows = res.UserPoolClient?.ExplicitAuthFlows ?? [];
+    const hasSecret = Boolean(res.UserPoolClient?.ClientSecret);
+
+    if (!flows.includes("ALLOW_USER_PASSWORD_AUTH")) {
+      issues.push(
+        "App client is missing ALLOW_USER_PASSWORD_AUTH — the branded sign-in pages cannot authenticate without it.",
+      );
+    }
+    if (!flows.includes("ALLOW_REFRESH_TOKEN_AUTH")) {
+      issues.push("App client is missing ALLOW_REFRESH_TOKEN_AUTH — sessions will not refresh.");
+    }
+    if (hasSecret && !process.env.COGNITO_CLIENT_SECRET) {
+      issues.push(
+        "App client has a secret but COGNITO_CLIENT_SECRET is not set — every call will fail on SECRET_HASH.",
+      );
+    }
+    if (!hasSecret && process.env.COGNITO_CLIENT_SECRET) {
+      issues.push(
+        "COGNITO_CLIENT_SECRET is set but the app client has no secret — remove it or Cognito will reject the hash.",
+      );
+    }
+
+    return {
+      configured: true,
+      ready: issues.length === 0,
+      authFlows: flows,
+      hasClientSecret: hasSecret,
+      issues,
+    };
+  } catch (e) {
+    const name = (e as { name?: string })?.name ?? "";
+    // Missing describe permission is a gap in observability, not in auth.
+    const permissionDenied =
+      name === "AccessDeniedException" || name === "NotAuthorizedException";
+    return {
+      configured: true,
+      ready: null,
+      authFlows: [],
+      hasClientSecret: Boolean(process.env.COGNITO_CLIENT_SECRET),
+      issues: [
+        permissionDenied
+          ? "Could not read the app client — grant cognito-idp:DescribeUserPoolClient to check configuration automatically."
+          : `Could not read the app client: ${(e as Error)?.message ?? name}`,
+      ],
+    };
   }
 }
 

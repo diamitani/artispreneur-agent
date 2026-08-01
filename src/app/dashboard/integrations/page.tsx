@@ -14,6 +14,8 @@ type Integration = {
   configured: boolean;
   connected: boolean;
   connectable: boolean;
+  /** Config problems detected at runtime (currently Cognito only). */
+  issues?: string[];
 };
 
 type Payload = {
@@ -192,6 +194,16 @@ function IntegrationCard({ integration: i }: { integration: Integration }) {
       </div>
 
       <p className="mt-2.5 text-[13px] leading-relaxed text-gray-600">{i.purpose}</p>
+
+      {i.issues && i.issues.length > 0 && (
+        <ul className="mt-3 space-y-1.5 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          {i.issues.map((msg) => (
+            <li key={msg} className="text-[12px] leading-relaxed text-amber-800">
+              {msg}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-4 flex items-center gap-2">
         {planned ? (
