@@ -178,26 +178,44 @@ export async function DELETE(
   }
 
   try {
-    // Query all tasks for this project via GSI1
+    const ownerPk = userPk(user.userId);
+
+    // Confirm the caller owns this project before deleting anything. Without
+    // this the request silently no-ops on the project row while still reaching
+    // the task deletion below.
+    const owned = await ddb().send(
+      new GetCommand({
+        TableName: tableName(),
+        Key: { pk: ownerPk, sk: projectSk(id) },
+      })
+    );
+    if (!owned.Item) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // GSI1 is partitioned by PROJECT#, not by owner, so this query can return
+    // another user's task rows. The filter keeps it to the caller's partition —
+    // critical here because the delete below uses the keys this query returns,
+    // and item.pk would otherwise be the victim's USER# partition.
     const tasksResult = await ddb().send(
       new QueryCommand({
         TableName: tableName(),
         IndexName: "GSI1",
         KeyConditionExpression: "gsi1pk = :gsi1pk AND begins_with(gsi1sk, :gsi1skPrefix)",
+        FilterExpression: "pk = :ownerPk",
         ExpressionAttributeValues: {
           ":gsi1pk": `PROJECT#${id}`,
           ":gsi1skPrefix": "TASK#",
+          ":ownerPk": ownerPk,
         },
       })
     );
 
-    const taskItems = tasksResult.Items ?? [];
+    // Belt and braces: never build a delete key from an item we do not own.
+    const taskItems = (tasksResult.Items ?? []).filter((item) => item.pk === ownerPk);
 
-    // Batch delete tasks and the project
     const deleteRequests = [
-      // Delete the project itself
-      { DeleteRequest: { Key: { pk: userPk(user.userId), sk: projectSk(id) } } },
-      // Delete all tasks
+      { DeleteRequest: { Key: { pk: ownerPk, sk: projectSk(id) } } },
       ...taskItems.map((item) => ({
         DeleteRequest: { Key: { pk: item.pk, sk: item.sk } },
       })),

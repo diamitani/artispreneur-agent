@@ -10,7 +10,7 @@ import {
 } from "@/lib/agent/workspace-api-key";
 import { recordUsage } from "@/lib/agent/usage-ledger";
 import { getSessionUser } from "@/lib/auth";
-import { agentProjectScope, workspaceLogicalPath } from "@/lib/tenancy/hierarchy";
+import { agentProjectScope } from "@/lib/tenancy/hierarchy";
 import { buildHermesSystemPrompt } from "@/lib/hermes/runtime";
 import {
   recallMemory,
@@ -89,13 +89,14 @@ export async function POST(req: Request) {
 
   const body = (await req.json()) as {
     messages: UIMessage[];
-    artistId?: string;
   };
 
-  if (body.artistId) {
-    projectId = body.artistId;
-    workspacePath = workspaceLogicalPath(agentProjectScope(userId, projectId));
-  }
+  // `artistId` used to be accepted here and used to overwrite the
+  // session-derived projectId. Because projectId is passed to Composio as the
+  // entity key (a flat, account-global namespace), that let any signed-in user
+  // address another artist's connected Gmail, Drive, and Slack — including
+  // write actions — and billed the usage to them. Identity comes from the
+  // session only; see the guarantee in src/lib/auth/index.ts.
 
   const { system, snapshot } = await buildHermesSystemPrompt(userId, projectId);
   const modelId = getAgentModelId();

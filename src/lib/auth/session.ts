@@ -14,20 +14,76 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 // ─── Crypto helpers (AES-GCM via Web Crypto) ──────────────────────────────────
 
-function getSessionSecret(): Uint8Array {
+/** Shipped in .env.example — must never reach a real deployment. */
+const PLACEHOLDER_SECRET = "change-me-to-a-random-32-char-string";
+const MIN_SECRET_LENGTH = 32;
+
+/**
+ * Validate SESSION_SECRET.
+ *
+ * The previous implementation claimed to hash but did
+ * `secret.padEnd(32,"0").slice(0,32)` and used those bytes directly as the
+ * AES-256 key. Three consequences, all silent:
+ *   - a short secret was accepted and padded with ASCII zeros, so "hunter2"
+ *     produced a 256-bit key carrying about seven characters of entropy;
+ *   - padEnd/slice count UTF-16 code units while TextEncoder emits UTF-8, so a
+ *     secret containing any non-ASCII character encoded to more than 32 bytes
+ *     and importKey threw on every request — bricking auth for the life of the
+ *     deployment, presenting as a sign-in redirect loop;
+ *   - the .env.example placeholder is 36 ASCII characters, so copying it
+ *     unchanged passed every check and made the key public knowledge. The
+ *     session cookie is a self-contained blob of {userId, email, plan, tokens}
+ *     with no server-side store, so that is forgeable sessions for any user.
+ */
+function readSessionSecret(): string {
   const secret = process.env.SESSION_SECRET;
-  if (!secret) throw new Error("SESSION_SECRET environment variable is not set");
-  // Derive a 256-bit key from the secret by hashing
-  const encoder = new TextEncoder();
-  return encoder.encode(secret.padEnd(32, "0").slice(0, 32));
+  if (!secret) {
+    throw new Error("SESSION_SECRET is not set");
+  }
+  if (secret === PLACEHOLDER_SECRET) {
+    throw new Error(
+      "SESSION_SECRET is still the .env.example placeholder — generate a real one",
+    );
+  }
+  if (secret.length < MIN_SECRET_LENGTH) {
+    throw new Error(
+      `SESSION_SECRET must be at least ${MIN_SECRET_LENGTH} characters (got ${secret.length})`,
+    );
+  }
+  return secret;
 }
 
+/** Exposed for the config preflight so misconfiguration surfaces before sign-in. */
+export function sessionSecretIssue(): string | null {
+  try {
+    readSessionSecret();
+    return null;
+  } catch (e) {
+    return e instanceof Error ? e.message : "SESSION_SECRET is invalid";
+  }
+}
+
+// Importing the key on every request is wasteful; the secret cannot change
+// within a process lifetime.
+let cachedKey: CryptoKey | null = null;
+
 async function getEncryptionKey(): Promise<CryptoKey> {
-  const rawKey = getSessionSecret();
-  return crypto.subtle.importKey("raw", rawKey.buffer as ArrayBuffer, { name: "AES-GCM" }, false, [
+  if (cachedKey) return cachedKey;
+
+  const secret = readSessionSecret();
+  // SHA-256 always yields exactly 32 bytes, whatever the secret's length or
+  // encoding — which is what "derive a 256-bit key by hashing" should have
+  // meant all along.
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(secret),
+  );
+
+  cachedKey = await crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, [
     "encrypt",
     "decrypt",
   ]);
+  return cachedKey;
 }
 
 async function encrypt(plaintext: string): Promise<string> {

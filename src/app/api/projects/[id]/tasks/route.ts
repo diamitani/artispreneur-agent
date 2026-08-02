@@ -24,14 +24,19 @@ export async function GET(
   }
 
   try {
+    // GSI1 is partitioned by PROJECT#, not by owner, so without this filter any
+    // signed-in caller who knows a project id reads that project's task list.
+    // Sibling routes all partition on pk = USER#{sub}; this one was the outlier.
     const result = await ddb().send(
       new QueryCommand({
         TableName: tableName(),
         IndexName: "GSI1",
         KeyConditionExpression: "gsi1pk = :gsi1pk AND begins_with(gsi1sk, :gsi1skPrefix)",
+        FilterExpression: "pk = :ownerPk",
         ExpressionAttributeValues: {
           ":gsi1pk": `PROJECT#${projectId}`,
           ":gsi1skPrefix": "TASK#",
+          ":ownerPk": userPk(user.userId),
         },
       })
     );
