@@ -141,6 +141,37 @@ export async function createSession(tokens: SessionTokens): Promise<Session> {
 }
 
 /**
+ * Build session data + a Set-Cookie header string for use in Route Handlers.
+ * Route Handlers cannot use cookies().set() — they must set the header on the Response.
+ */
+export async function buildSessionCookie(
+  tokens: SessionTokens,
+): Promise<{ session: Session; cookieHeader: string }> {
+  const payload: CognitoIdTokenPayload = decodeJwtPayload(tokens.id_token);
+
+  const session: Session = {
+    userId: payload.sub,
+    email: payload.email ?? "",
+    name: payload.name ?? payload["cognito:username"] ?? "",
+    plan: "starter",
+  };
+
+  const sessionData = JSON.stringify({
+    ...session,
+    tokens: {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+    },
+  });
+
+  const encrypted = await encrypt(sessionData);
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  const cookieHeader = `${SESSION_COOKIE}=${encrypted}; Path=/; HttpOnly${secure}; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}`;
+
+  return { session, cookieHeader };
+}
+
+/**
  * Read and decrypt the session cookie. Returns the Session or null if invalid/missing.
  */
 export async function getSession(): Promise<Session | null> {

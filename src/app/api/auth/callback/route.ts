@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exchangeCode } from "@/lib/auth/cognito";
-import { createSession } from "@/lib/auth/session";
+import { buildSessionCookie } from "@/lib/auth/session";
 import { ddb, tableName } from "@/lib/db/client";
 import { userPk } from "@/lib/db/schema";
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
@@ -43,8 +43,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Exchange authorization code for tokens
     const tokens = await exchangeCode(code, codeVerifier);
 
-    // Create the encrypted session cookie
-    const session = await createSession(tokens);
+    // Build session cookie
+    const { session, cookieHeader } = await buildSessionCookie(tokens);
 
     // Check if user exists in DynamoDB, create if new
     let isNewUser = false;
@@ -96,6 +96,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Build response with redirect
     const response = NextResponse.redirect(new URL(redirectTo, request.url));
+
+    // Set session cookie on the redirect response
+    response.headers.set("Set-Cookie", cookieHeader);
 
     // Clear the PKCE verifier cookie
     response.cookies.set("aa_pkce_verifier", "", {

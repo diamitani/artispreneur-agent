@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, signIn } from "@/lib/auth/cognito-direct";
-import { createSession } from "@/lib/auth/session";
+import { buildSessionCookie } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -10,7 +10,6 @@ const Body = z.object({
   password: z.string().min(1),
 });
 
-/** Email + password sign-in against the Cognito user pool. */
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
@@ -22,15 +21,17 @@ export async function POST(req: Request) {
 
   try {
     const tokens = await signIn(parsed.data.email, parsed.data.password);
-    await createSession(tokens);
-    return NextResponse.json({ ok: true });
+    const { session, cookieHeader } = await buildSessionCookie(tokens);
+
+    const res = NextResponse.json({ ok: true, session });
+    res.headers.set("Set-Cookie", cookieHeader);
+    return res;
   } catch (e) {
     const err = e instanceof AuthError ? e : null;
     return NextResponse.json(
       {
         error: err?.message ?? "Sign-in failed.",
         code: err?.code ?? "auth_error",
-        // Lets the UI jump straight to the code screen.
         email: err?.code === "unconfirmed" ? parsed.data.email : undefined,
       },
       { status: err?.status ?? 500 },

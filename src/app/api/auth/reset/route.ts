@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, confirmForgotPassword, passwordIssues, signIn } from "@/lib/auth/cognito-direct";
-import { createSession } from "@/lib/auth/session";
+import { buildSessionCookie } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -31,8 +31,10 @@ export async function POST(req: Request) {
   try {
     await confirmForgotPassword(parsed.data);
     const tokens = await signIn(parsed.data.email, parsed.data.password);
-    await createSession(tokens);
-    return NextResponse.json({ ok: true, signedIn: true });
+    const { session, cookieHeader } = await buildSessionCookie(tokens);
+    const res = NextResponse.json({ ok: true, signedIn: true, session });
+    res.headers.set("Set-Cookie", cookieHeader);
+    return res;
   } catch (e) {
     const err = e instanceof AuthError ? e : null;
     return NextResponse.json(
