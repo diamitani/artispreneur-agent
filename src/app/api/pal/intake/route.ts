@@ -86,8 +86,10 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("[pal/intake]", e);
+    // Logged above with the detail. The client gets a fixed string — this path
+    // reaches S3 and DynamoDB, whose errors name buckets, tables, and accounts.
     return NextResponse.json(
-      { ok: false, error: e instanceof Error ? e.message : "PAL compilation failed" },
+      { ok: false, error: "Could not compile your intake. Try again." },
       { status: 500 },
     );
   }

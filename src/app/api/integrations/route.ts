@@ -39,7 +39,10 @@ export async function GET() {
           .filter(Boolean),
       );
     } catch (e) {
-      composioError = e instanceof Error ? e.message : "Composio lookup failed";
+      // Composio's errors quote request URLs and key prefixes. The page only
+      // needs to know the lookup failed.
+      console.error("[integrations:composio]", e);
+      composioError = "Could not reach Composio. Connected apps may be stale.";
     }
   }
 

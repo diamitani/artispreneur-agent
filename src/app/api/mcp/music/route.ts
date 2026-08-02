@@ -100,10 +100,17 @@ async function handle(req: JsonRpcRequest) {
       } catch (e) {
         // Upstream failures are tool-level errors, not protocol errors — the
         // model should see them and can explain or retry.
-        const message =
-          e instanceof MusicToolError
-            ? e.message
-            : `Tool ${name} failed: ${e instanceof Error ? e.message : String(e)}`;
+        // MusicToolError carries text written for the model ("no recording
+        // matched that ISRC"). Anything else is an internal fault whose message
+        // can name upstream hosts and credentials, and this route is
+        // unauthenticated — log it, return a generic line.
+        let message: string;
+        if (e instanceof MusicToolError) {
+          message = e.message;
+        } else {
+          console.error(`[mcp/music] ${name}`, e);
+          message = `Tool ${name} failed. Try again, or narrow the query.`;
+        }
         return result(id, {
           content: [{ type: "text", text: message }],
           isError: true,

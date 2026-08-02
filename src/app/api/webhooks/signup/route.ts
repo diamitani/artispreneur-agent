@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
+import { createHash, timingSafeEqual } from "crypto";
 import { compilePalIntake, type IntakeAnswers } from "@/lib/rostr/pal-compiler";
 import { persistIntakeToDisk, saveIntakeMemory } from "@/lib/rostr/intake-store";
 import { ensureUserShell } from "@/lib/tenancy/user-shell";
 import { defaultProjectId } from "@/lib/tenancy/hierarchy";
+
+/** Constant-time compare that does not leak the secret's length either. */
+function timingSafeEqualStrings(a: string, b: string): boolean {
+  const ha = createHash("sha256").update(a).digest();
+  const hb = createHash("sha256").update(b).digest();
+  return timingSafeEqual(ha, hb);
+}
 
 /**
  * Cognito (or other IdP) post-signup hook.
@@ -11,14 +19,19 @@ import { defaultProjectId } from "@/lib/tenancy/hierarchy";
  */
 export async function POST(req: Request) {
   try {
+    // Skip-if-unset was fail-open: with no PAL_WEBHOOK_SECRET this route
+    // provisions a workspace and compiles a Master Soul for any `userId` a
+    // stranger cares to POST. The secret is mandatory.
     const secret = process.env.PAL_WEBHOOK_SECRET;
-    if (secret) {
-      const provided =
-        req.headers.get("x-pal-webhook-secret") ||
-        req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-      if (provided !== secret) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!secret) {
+      console.error("[webhooks/signup] PAL_WEBHOOK_SECRET is required");
+      return NextResponse.json({ error: "Webhook is not configured." }, { status: 503 });
+    }
+    const provided =
+      req.headers.get("x-pal-webhook-secret") ||
+      req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+    if (!provided || !timingSafeEqualStrings(provided, secret)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = (await req.json()) as {
@@ -77,7 +90,13 @@ export async function POST(req: Request) {
       result,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Signup webhook failed";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    // Never echo the internal error. This route reaches DynamoDB, S3, and the
+    // PAL compiler, and their messages carry bucket names, table names, and
+    // account ids.
+    console.error("[webhooks/signup]", err);
+    return NextResponse.json(
+      { ok: false, error: "Signup webhook failed." },
+      { status: 500 },
+    );
   }
 }
