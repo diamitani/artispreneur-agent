@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 const AGENT_ICONS: Record<string, typeof Sparkles> = {
   master: Sparkles,
-  "epk-brand": Mic2,
+  "brand-epk": Mic2,
   press: Radio,
   release: CalendarCheck,
   content: Video,

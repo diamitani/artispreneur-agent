@@ -108,7 +108,7 @@ export const PRICING = {
 
 export type SpecialistId =
   | "master"
-  | "epk-brand"
+  | "brand-epk"
   | "publishing"
   | "contracts"
   | "release"
@@ -142,7 +142,7 @@ export const SPECIALISTS: Specialist[] = [
     mvp: true,
   },
   {
-    id: "epk-brand",
+    id: "brand-epk",
     name: "Brand Manager",
     role: "Brand & Creative Direction",
     description:
