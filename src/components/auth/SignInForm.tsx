@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Field, FormError, fieldClass } from "./AuthShell";
 
 export function SignInForm({
@@ -12,7 +11,6 @@ export function SignInForm({
   returnTo?: string;
   initialEmail?: string;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -29,12 +27,19 @@ export function SignInForm({
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, returnTo }),
+        redirect: "follow",
       });
-      const data = await res.json();
+
+      // Signin route returns 303 redirect on success — browser followed it.
+      // If we're still here it means an error JSON was returned.
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
 
       if (!res.ok) {
-        // An unverified account isn't a dead end — send them to the code screen.
+        const data = await res.json();
         if (data.code === "unconfirmed") {
           window.location.href = `/signup/confirm?email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`;
           return;
@@ -44,9 +49,7 @@ export function SignInForm({
         return;
       }
 
-      // Hard redirect so the new session cookie is included on the very first
-      // request to the destination — router.push() can race with the cookie
-      // being set and land the user back on signin.
+      // Fallback — should not reach here
       window.location.href = returnTo;
     } catch {
       setError("Network error. Check your connection and try again.");
@@ -113,10 +116,6 @@ export function SignInForm({
         {busy ? "Signing in…" : "Sign in"}
       </button>
 
-      {/* The pool runs with PreventUserExistenceErrors enabled, so Cognito
-          masks UserNotConfirmedException behind a generic failure. Without a
-          standing link here, someone who abandoned signup mid-way would see
-          only "incorrect email or password" and have no route forward. */}
       <p className="pt-1 text-center text-[12.5px] text-[color:var(--color-gray-mid)]">
         Signed up but never got the code?{" "}
         <Link

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, signIn } from "@/lib/auth/cognito-direct";
 import { buildSessionCookie } from "@/lib/auth/session";
@@ -8,9 +8,10 @@ export const runtime = "nodejs";
 const Body = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  returnTo: z.string().optional(),
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
@@ -19,11 +20,18 @@ export async function POST(req: Request) {
     );
   }
 
+  const returnTo = parsed.data.returnTo ?? "/dashboard";
+
   try {
     const tokens = await signIn(parsed.data.email, parsed.data.password);
-    const { session, cookieHeader } = await buildSessionCookie(tokens);
+    const { cookieHeader } = await buildSessionCookie(tokens);
 
-    const res = NextResponse.json({ ok: true, session });
+    // Redirect with cookie in same response — avoids race between
+    // Set-Cookie and the client-side window.location.href navigation.
+    const res = NextResponse.redirect(
+      new URL(returnTo, req.url),
+      { status: 303 }
+    );
     res.headers.set("Set-Cookie", cookieHeader);
     return res;
   } catch (e) {
