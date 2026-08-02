@@ -68,17 +68,21 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
         return;
       }
 
-      // A pool set to auto-confirm skips verification entirely.
+      // A pool set to auto-confirm skips verification entirely — POST directly
+      // so the browser handles the 303 + Set-Cookie natively (fetch drops cookies on redirects).
       if (!data.needsConfirmation) {
-        const signin = await fetch("/api/auth/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/api/auth/signin";
+        const pairs: [string, string][] = [["email", email], ["password", password], ["returnTo", returnTo ?? "/onboarding"]];
+        pairs.forEach(([k, v]) => {
+          const inp = document.createElement("input");
+          inp.type = "hidden"; inp.name = k; inp.value = v;
+          form.appendChild(inp);
         });
-        if (signin.ok) {
-          finish();
-          return;
-        }
+        document.body.appendChild(form);
+        form.submit();
+        return;
       }
 
       setDestination(data.destination ?? null);

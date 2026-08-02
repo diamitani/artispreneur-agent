@@ -12,7 +12,17 @@ const Body = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const parsed = Body.safeParse(await req.json().catch(() => null));
+  // Accept both JSON (fetch) and form-urlencoded (native form submit)
+  let body: unknown;
+  const ct = req.headers.get("content-type") ?? "";
+  if (ct.includes("application/json")) {
+    body = await req.json().catch(() => null);
+  } else {
+    const fd = await req.formData().catch(() => null);
+    body = fd ? Object.fromEntries(fd.entries()) : null;
+  }
+
+  const parsed = Body.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Enter a valid email and password.", code: "invalid_input" },
