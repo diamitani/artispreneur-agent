@@ -36,9 +36,7 @@ export function SignInForm({
       if (!res.ok) {
         // An unverified account isn't a dead end — send them to the code screen.
         if (data.code === "unconfirmed") {
-          router.push(
-            `/signup/confirm?email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`,
-          );
+          window.location.href = `/signup/confirm?email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`;
           return;
         }
         setError(data.error ?? "Sign-in failed.");
@@ -46,8 +44,10 @@ export function SignInForm({
         return;
       }
 
-      router.push(returnTo);
-      router.refresh();
+      // Hard redirect so the new session cookie is included on the very first
+      // request to the destination — router.push() can race with the cookie
+      // being set and land the user back on signin.
+      window.location.href = returnTo;
     } catch {
       setError("Network error. Check your connection and try again.");
       setBusy(false);

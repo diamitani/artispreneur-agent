@@ -45,8 +45,7 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
   const ready = Boolean(email) && passed === RULES.length;
 
   function finish() {
-    router.push(returnTo);
-    router.refresh();
+    window.location.href = returnTo;
   }
 
   async function createAccount(e: React.FormEvent) {
@@ -120,9 +119,7 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
 
       // Confirmed but the sign-in leg did not take — send them to sign in
       // rather than stranding them on a form that now does nothing.
-      router.push(
-        `/signin?verified=1&email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`,
-      );
+      window.location.href = `/signin?verified=1&email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`;
     } catch {
       setError("Network error. Try again.");
       setBusy(false);
