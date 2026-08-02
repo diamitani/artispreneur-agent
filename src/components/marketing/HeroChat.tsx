@@ -140,7 +140,7 @@ export function HeroChat() {
   const showCta = userCount >= 2;
 
   return (
-    <div className="flex h-[520px] w-full max-w-[500px] flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-white shadow-[0_24px_72px_rgba(0,0,0,0.13)]">
+    <div className="flex h-[440px] w-full max-w-[480px] flex-col overflow-hidden rounded-2xl border border-[color:var(--color-border)] bg-white shadow-[0_24px_72px_rgba(0,0,0,0.13)] sm:h-[480px] lg:h-[520px] lg:max-w-[500px]">
       {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-[color:var(--color-border)] bg-[color:var(--color-bg-surface)] px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--color-crimson)]" />
