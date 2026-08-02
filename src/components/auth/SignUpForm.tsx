@@ -45,8 +45,7 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
   const ready = Boolean(email) && passed === RULES.length;
 
   function finish() {
-    router.push(returnTo);
-    router.refresh();
+    window.location.href = returnTo;
   }
 
   async function createAccount(e: React.FormEvent) {
@@ -69,17 +68,21 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
         return;
       }
 
-      // A pool set to auto-confirm skips verification entirely.
+      // A pool set to auto-confirm skips verification entirely — POST directly
+      // so the browser handles the 303 + Set-Cookie natively (fetch drops cookies on redirects).
       if (!data.needsConfirmation) {
-        const signin = await fetch("/api/auth/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/api/auth/signin";
+        const pairs: [string, string][] = [["email", email], ["password", password], ["returnTo", returnTo ?? "/onboarding"]];
+        pairs.forEach(([k, v]) => {
+          const inp = document.createElement("input");
+          inp.type = "hidden"; inp.name = k; inp.value = v;
+          form.appendChild(inp);
         });
-        if (signin.ok) {
-          finish();
-          return;
-        }
+        document.body.appendChild(form);
+        form.submit();
+        return;
       }
 
       setDestination(data.destination ?? null);
@@ -120,9 +123,7 @@ export function SignUpForm({ returnTo = "/onboarding" }: { returnTo?: string }) 
 
       // Confirmed but the sign-in leg did not take — send them to sign in
       // rather than stranding them on a form that now does nothing.
-      router.push(
-        `/signin?verified=1&email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`,
-      );
+      window.location.href = `/signin?verified=1&email=${encodeURIComponent(email)}&next=${encodeURIComponent(returnTo)}`;
     } catch {
       setError("Network error. Try again.");
       setBusy(false);

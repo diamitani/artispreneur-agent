@@ -5,6 +5,8 @@ import { isDirectAuthConfigured } from "@/lib/auth/cognito-direct";
 import { isAuthDevBypass } from "@/lib/auth/config";
 import { AuthUnavailable } from "@/components/auth/AuthUnavailable";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: "Create your workspace" };
 
 export default async function SignUpPage({

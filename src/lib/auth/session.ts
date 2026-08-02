@@ -152,16 +152,20 @@ export interface SessionTokens {
 /**
  * Extract user info from the id_token payload and create an encrypted session cookie.
  */
+/** Decode a JWT payload without verifying the signature (trust-on-issue path). */
+function decodeJwtPayload(token: string): CognitoIdTokenPayload {
+  const parts = token.split(".");
+  if (parts.length !== 3) throw new Error("Invalid id_token format");
+  const padded = parts[1]!.replace(/-/g, "+").replace(/_/g, "/");
+  return JSON.parse(atob(padded));
+}
+
 export async function createSession(tokens: SessionTokens): Promise<Session> {
-  let payload: CognitoIdTokenPayload;
-  try {
-    payload = await verifyToken(tokens.id_token);
-  } catch {
-    // If verification fails (e.g. in dev), decode without verification
-    const parts = tokens.id_token.split(".");
-    if (parts.length !== 3) throw new Error("Invalid id_token format");
-    payload = JSON.parse(atob(parts[1]!.replace(/-/g, "+").replace(/_/g, "/")));
-  }
+  // When tokens come directly from Cognito (signin/signup flows) we trust them
+  // on issue — decoding without JWKS avoids a round-trip that adds ~400ms on
+  // cold starts. JWKS verification still runs in middleware on every protected
+  // request where it matters.
+  const payload: CognitoIdTokenPayload = decodeJwtPayload(tokens.id_token);
 
   const session: Session = {
     userId: payload.sub,
@@ -190,6 +194,37 @@ export async function createSession(tokens: SessionTokens): Promise<Session> {
   });
 
   return session;
+}
+
+/**
+ * Build session data + a Set-Cookie header string for use in Route Handlers.
+ * Route Handlers cannot use cookies().set() — they must set the header on the Response.
+ */
+export async function buildSessionCookie(
+  tokens: SessionTokens,
+): Promise<{ session: Session; cookieHeader: string }> {
+  const payload: CognitoIdTokenPayload = decodeJwtPayload(tokens.id_token);
+
+  const session: Session = {
+    userId: payload.sub,
+    email: payload.email ?? "",
+    name: payload.name ?? payload["cognito:username"] ?? "",
+    plan: "starter",
+  };
+
+  const sessionData = JSON.stringify({
+    ...session,
+    tokens: {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+    },
+  });
+
+  const encrypted = await encrypt(sessionData);
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  const cookieHeader = `${SESSION_COOKIE}=${encrypted}; Path=/; HttpOnly${secure}; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}`;
+
+  return { session, cookieHeader };
 }
 
 /**

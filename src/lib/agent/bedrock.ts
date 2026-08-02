@@ -16,7 +16,7 @@ import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
  * For higher-quality agent work, `anthropic.claude-sonnet-4-5-20250929-v1:0`
  * is also available in this account at higher cost per token.
  */
-export const DEFAULT_AGENT_MODEL = process.env.BEDROCK_MODEL_ID || "deepseek.v3.2";
+export const DEFAULT_AGENT_MODEL = process.env.BEDROCK_MODEL_ID || "us.anthropic.claude-sonnet-4-6";
 
 /** @deprecated Use DEFAULT_AGENT_MODEL. Kept for existing imports. */
 export const DEFAULT_DEEPSEEK_MODEL = DEFAULT_AGENT_MODEL;

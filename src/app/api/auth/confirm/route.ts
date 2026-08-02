@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, confirmSignUp, signIn } from "@/lib/auth/cognito-direct";
-import { createSession } from "@/lib/auth/session";
+import { buildSessionCookie } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
 const Body = z.object({
   email: z.string().email(),
   code: z.string().min(4).max(12),
-  /** When present, the artist is signed in immediately after confirming. */
   password: z.string().min(1).optional(),
 });
 
@@ -26,8 +25,10 @@ export async function POST(req: Request) {
 
     if (parsed.data.password) {
       const tokens = await signIn(parsed.data.email, parsed.data.password);
-      await createSession(tokens);
-      return NextResponse.json({ ok: true, signedIn: true });
+      const { session, cookieHeader } = await buildSessionCookie(tokens);
+      const res = NextResponse.json({ ok: true, signedIn: true, session });
+      res.headers.set("Set-Cookie", cookieHeader);
+      return res;
     }
 
     return NextResponse.json({ ok: true, signedIn: false });

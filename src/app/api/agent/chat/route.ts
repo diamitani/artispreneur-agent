@@ -5,6 +5,11 @@ import {
   isBedrockConfigured,
 } from "@/lib/agent/bedrock";
 import {
+  createDeepSeekProvider,
+  DEFAULT_DEEPSEEK_MODEL,
+  isDeepSeekConfigured,
+} from "@/lib/agent/deepseek";
+import {
   extractApiKeyFromRequest,
   resolveWorkspaceApiKey,
 } from "@/lib/agent/workspace-api-key";
@@ -27,11 +32,11 @@ import {
 } from "@/lib/agent/limits";
 import { consumeRateLimit } from "@/lib/agent/rate-limit";
 import { getAwsInstanceProject } from "@/lib/aws/instance-registry";
+import { log } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** Plain text of the most recent user message, for memory recall and write. */
 function extractLatestUserText(messages: UIMessage[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
@@ -46,20 +51,14 @@ function extractLatestUserText(messages: UIMessage[]): string {
   return "";
 }
 
-/**
- * Hermes Agent chat — Amazon Bedrock DeepSeek + PAL/ROSTR runtime + Skills Library.
- *
- * Auth (either):
- * 1. Cognito session cookie (browser Mission Control)
- * 2. Workspace Agent API key: Authorization: Bearer *** or X-Artispreneur-Agent-Key
- */
 export async function POST(req: Request) {
-  if (!isBedrockConfigured()) {
+  const hasDeepSeek = isDeepSeekConfigured();
+  const hasBedrock = isBedrockConfigured();
+
+  if (!hasDeepSeek && !hasBedrock) {
+    log.error("agent.chat.no_llm", { hasDeepSeek, hasBedrock });
     return Response.json(
-      {
-        error: "Bedrock not configured",
-        hint: "Set AWS_BEARER_TOKEN_BEDROCK (or AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY) and BEDROCK_MODEL_ID.",
-      },
+      { error: "No LLM configured", hint: "Set DEEPSEEK_API_KEY or Bedrock credentials." },
       { status: 503 },
     );
   }
@@ -94,6 +93,7 @@ export async function POST(req: Request) {
     workspacePath = session.workspacePath;
   }
 
+  // `artistId` is deliberately absent from this type. See the note below.
   let body: { messages?: UIMessage[] };
   try {
     body = (await req.json()) as { messages?: UIMessage[] };
@@ -153,12 +153,8 @@ export async function POST(req: Request) {
   }
 
   const { system, snapshot } = await buildHermesSystemPrompt(userId, projectId);
-  const modelId = getAgentModelId();
-  const bedrock = createBedrockProvider();
 
-  // AgentCore Memory: recall prior context for this workspace, then persist the
-  // turn after the response completes. Both are best-effort — memory must never
-  // break a chat turn.
+  // Memory recall
   const scope = agentProjectScope(userId, projectId);
   const sessionId = runtimeSessionId(scope);
   const latestUserText = extractLatestUserText(messages);
@@ -167,29 +163,61 @@ export async function POST(req: Request) {
     : [];
 
   const systemWithMemory = recalled.length
-    ? `${system}\n\n## Recalled artist memory\n${recalled
-        .map((m) => `- ${m.text.slice(0, 400)}`)
-        .join("\n")}`
+    ? `${system}\n\n## Recalled artist memory\n${recalled.map((m) => `- ${m.text.slice(0, 400)}`).join("\n")}`
     : system;
 
-  // Tool surface: Composio for mainstream OAuth apps (Gmail, Drive, Sheets,
-  // Calendar, Slack, Notion) plus our own music MCP tools for the rights and
-  // catalogue work Composio does not cover. Music tools need no per-artist
-  // connection, so they are always on.
+  // Tools
   const rawTools: ToolSet = {
     ...(isComposioConfigured() ? getComposioTools({ entityId: projectId }) : {}),
     ...getMusicTools(),
   };
   const tools: ToolSet | undefined = Object.keys(rawTools).length ? rawTools : undefined;
 
+  // Pick provider — DeepSeek first, Bedrock fallback
+  let model;
+  let modelId: string;
+
+  if (hasDeepSeek) {
+    const deepseek = createDeepSeekProvider();
+    modelId = DEFAULT_DEEPSEEK_MODEL;
+    model = deepseek(modelId);
+  } else {
+    modelId = getAgentModelId();
+    model = createBedrockProvider()(modelId);
+  }
+
+  log.info("agent.chat.request", {
+    userId,
+    projectId,
+    modelId,
+    provider: hasDeepSeek ? "deepseek" : "bedrock",
+    keyPrefix,
+    messageCount: body.messages.length,
+    hasMemory: recalled.length > 0,
+    toolCount: Object.keys(rawTools).length,
+  });
+
   const result = streamText({
-    model: bedrock(modelId),
+    model,
     system: systemWithMemory,
     messages: await convertToModelMessages(messages),
     tools,
     temperature: 0.6,
     maxOutputTokens: 4096,
     onFinish: async ({ usage, text }) => {
+      const input = usage?.inputTokens ?? 0;
+      const output = usage?.outputTokens ?? 0;
+
+      log.info("agent.chat.finish", {
+        userId,
+        projectId,
+        modelId,
+        provider: hasDeepSeek ? "deepseek" : "bedrock",
+        inputTokens: input,
+        outputTokens: output,
+        responseLength: text?.length ?? 0,
+      });
+
       const turns: MemoryTurn[] = [];
       if (latestUserText) turns.push({ role: "artist", text: latestUserText });
       if (text?.trim()) turns.push({ role: "agent", text: text.trim() });
@@ -198,9 +226,6 @@ export async function POST(req: Request) {
           console.error("[agentcore:memory]", e),
         );
       }
-
-      const input = usage?.inputTokens ?? 0;
-      const output = usage?.outputTokens ?? 0;
       await recordUsage({
         key_id: keyId,
         key_prefix: keyPrefix,
@@ -212,6 +237,7 @@ export async function POST(req: Request) {
         output_tokens: output,
         route: "/api/agent/chat",
       }).catch((e) => console.error("[usage]", e));
+      await log.flush();
     },
   });
 
