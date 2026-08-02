@@ -25,6 +25,7 @@ import {
 } from "@/lib/agentcore";
 import { getComposioTools, isComposioConfigured } from "@/lib/composio";
 import { getMusicTools } from "@/lib/mcp/music/ai-tools";
+import { log } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
   const hasBedrock = isBedrockConfigured();
 
   if (!hasDeepSeek && !hasBedrock) {
+    log.error("agent.chat.no_llm", { hasDeepSeek, hasBedrock });
     return Response.json(
       { error: "No LLM configured", hint: "Set DEEPSEEK_API_KEY or Bedrock credentials." },
       { status: 503 },
@@ -125,6 +127,17 @@ export async function POST(req: Request) {
     model = createBedrockProvider()(modelId);
   }
 
+  log.info("agent.chat.request", {
+    userId,
+    projectId,
+    modelId,
+    provider: hasDeepSeek ? "deepseek" : "bedrock",
+    keyPrefix,
+    messageCount: body.messages.length,
+    hasMemory: recalled.length > 0,
+    toolCount: Object.keys(rawTools).length,
+  });
+
   const result = streamText({
     model,
     system: systemWithMemory,
@@ -133,6 +146,19 @@ export async function POST(req: Request) {
     temperature: 0.6,
     maxOutputTokens: 4096,
     onFinish: async ({ usage, text }) => {
+      const input = usage?.inputTokens ?? 0;
+      const output = usage?.outputTokens ?? 0;
+
+      log.info("agent.chat.finish", {
+        userId,
+        projectId,
+        modelId,
+        provider: hasDeepSeek ? "deepseek" : "bedrock",
+        inputTokens: input,
+        outputTokens: output,
+        responseLength: text?.length ?? 0,
+      });
+
       const turns: MemoryTurn[] = [];
       if (latestUserText) turns.push({ role: "artist", text: latestUserText });
       if (text?.trim()) turns.push({ role: "agent", text: text.trim() });
@@ -141,8 +167,6 @@ export async function POST(req: Request) {
           console.error("[agentcore:memory]", e),
         );
       }
-      const input = usage?.inputTokens ?? 0;
-      const output = usage?.outputTokens ?? 0;
       await recordUsage({
         key_id: keyId,
         key_prefix: keyPrefix,
@@ -154,6 +178,7 @@ export async function POST(req: Request) {
         output_tokens: output,
         route: "/api/agent/chat",
       }).catch((e) => console.error("[usage]", e));
+      await log.flush();
     },
   });
 
