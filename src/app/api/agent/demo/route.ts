@@ -1,29 +1,15 @@
 import { streamText, type UIMessage, convertToModelMessages } from "ai";
 import { createBedrockProvider, getAgentModelId, isBedrockConfigured, MASTER_AGENT_SYSTEM } from "@/lib/agent/bedrock";
 import { headers } from "next/headers";
+import { consumeRateLimit } from "@/lib/agent/rate-limit";
+import { messagesTooLarge } from "@/lib/agent/limits";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-/** In-memory IP rate limiter — 20 messages per IP per hour. */
-const ipLog = new Map<string, { count: number; reset: number }>();
-
-function checkRateLimit(ip: string): { ok: boolean; remaining: number } {
-  const now = Date.now();
-  const window = 60 * 60 * 1000; // 1 hour
-  const limit = 20;
-
-  const entry = ipLog.get(ip);
-  if (!entry || entry.reset < now) {
-    ipLog.set(ip, { count: 1, reset: now + window });
-    return { ok: true, remaining: limit - 1 };
-  }
-  if (entry.count >= limit) {
-    return { ok: false, remaining: 0 };
-  }
-  entry.count++;
-  return { ok: true, remaining: limit - entry.count };
-}
+/** 20 messages per IP per hour, counted in a store shared across instances. */
+const DEMO_LIMIT = 20;
+const DEMO_WINDOW_SECONDS = 60 * 60;
 
 const DEMO_SYSTEM = `${MASTER_AGENT_SYSTEM}
 
@@ -45,13 +31,21 @@ export async function POST(req: Request) {
     hdrs.get("x-real-ip") ||
     "unknown";
 
-  const { ok, remaining } = checkRateLimit(ip);
+  const { ok, remaining, resetsInSeconds } = await consumeRateLimit({
+    namespace: "agent-demo",
+    subject: ip,
+    limit: DEMO_LIMIT,
+    windowSeconds: DEMO_WINDOW_SECONDS,
+  });
   if (!ok) {
     return Response.json(
-      { error: "Demo rate limit reached. Sign up for unlimited access." },
+      { error: "Demo rate limit reached. Sign up for your own workspace." },
       {
         status: 429,
-        headers: { "Retry-After": "3600", "X-Demo-Remaining": "0" },
+        headers: {
+          "Retry-After": String(resetsInSeconds),
+          "X-Demo-Remaining": "0",
+        },
       },
     );
   }
@@ -70,6 +64,12 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
+  if (messagesTooLarge(body.messages ?? [])) {
+    return Response.json(
+      { error: "That's too long for the demo. Sign up for your own workspace." },
+      { status: 413 },
+    );
+  }
   const messages = (body.messages ?? []).slice(-6); // cap context window for demo
   const bedrock = createBedrockProvider();
   const modelId = getAgentModelId();

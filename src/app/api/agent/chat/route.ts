@@ -20,6 +20,13 @@ import {
 } from "@/lib/agentcore";
 import { getComposioTools, isComposioConfigured } from "@/lib/composio";
 import { getMusicTools } from "@/lib/mcp/music/ai-tools";
+import {
+  MAX_MESSAGES_PER_REQUEST,
+  checkDailyTokenBudget,
+  messagesTooLarge,
+} from "@/lib/agent/limits";
+import { consumeRateLimit } from "@/lib/agent/rate-limit";
+import { getAwsInstanceProject } from "@/lib/aws/instance-registry";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -87,9 +94,12 @@ export async function POST(req: Request) {
     workspacePath = session.workspacePath;
   }
 
-  const body = (await req.json()) as {
-    messages: UIMessage[];
-  };
+  let body: { messages?: UIMessage[] };
+  try {
+    body = (await req.json()) as { messages?: UIMessage[] };
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
   // `artistId` used to be accepted here and used to overwrite the
   // session-derived projectId. Because projectId is passed to Composio as the
@@ -97,6 +107,50 @@ export async function POST(req: Request) {
   // address another artist's connected Gmail, Drive, and Slack — including
   // write actions — and billed the usage to them. Identity comes from the
   // session only; see the guarantee in src/lib/auth/index.ts.
+
+  // Cost control. Bedrock bills every input token, so an uncapped message array
+  // is the expensive half of an abusive request — cap it before anything else
+  // spends money. Newest messages win; the oldest turns are the ones the model
+  // needs least and AgentCore memory recalls them anyway.
+  if (!Array.isArray(body.messages) || body.messages.length === 0) {
+    return Response.json({ error: "messages is required" }, { status: 400 });
+  }
+  if (messagesTooLarge(body.messages)) {
+    return Response.json(
+      { error: "That conversation is too long to send. Start a new chat." },
+      { status: 413 },
+    );
+  }
+  const messages = body.messages.slice(-MAX_MESSAGES_PER_REQUEST);
+
+  // Burst limit, shared across serverless instances where DynamoDB is set up.
+  const burst = await consumeRateLimit({
+    namespace: "agent-chat",
+    subject: `${userId}:${projectId}`,
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (!burst.ok) {
+    return Response.json(
+      { error: "Too many messages at once. Give it a moment." },
+      { status: 429, headers: { "Retry-After": String(burst.resetsInSeconds) } },
+    );
+  }
+
+  // Daily token budget for the plan on this workspace.
+  const workspaceProject = await getAwsInstanceProject(userId, projectId).catch(() => null);
+  const budget = await checkDailyTokenBudget({ userId, plan: workspaceProject?.plan });
+  if (!budget.allowed) {
+    return Response.json(
+      {
+        error:
+          "You've used today's agent allowance. It resets at midnight UTC — upgrading raises the limit.",
+        used_tokens: budget.used,
+        daily_token_budget: budget.budget,
+      },
+      { status: 429, headers: { "Retry-After": String(budget.resetsInSeconds) } },
+    );
+  }
 
   const { system, snapshot } = await buildHermesSystemPrompt(userId, projectId);
   const modelId = getAgentModelId();
@@ -107,7 +161,7 @@ export async function POST(req: Request) {
   // break a chat turn.
   const scope = agentProjectScope(userId, projectId);
   const sessionId = runtimeSessionId(scope);
-  const latestUserText = extractLatestUserText(body.messages);
+  const latestUserText = extractLatestUserText(messages);
   const recalled = latestUserText
     ? await recallMemory({ scope, query: latestUserText, limit: 5 }).catch(() => [])
     : [];
@@ -131,7 +185,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: bedrock(modelId),
     system: systemWithMemory,
-    messages: await convertToModelMessages(body.messages),
+    messages: await convertToModelMessages(messages),
     tools,
     temperature: 0.6,
     maxOutputTokens: 4096,

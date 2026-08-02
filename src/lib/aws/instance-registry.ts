@@ -387,6 +387,45 @@ export async function getApiKeyIndex(keyHash: string) {
   }>(`agent-keys/by-hash/${keyHash}.json`);
 }
 
+export type InstanceUsageDay = {
+  project_id: string;
+  input_tokens: number;
+  output_tokens: number;
+  estimated_cost_usd: number;
+  calls: number;
+  updated_at: string;
+};
+
+function usageDayFile(userId: string, day: string) {
+  return `aws-instances/${userPk(userId).replace(/#/g, "_")}/USAGE_${day}.json`;
+}
+
+/**
+ * Today's usage for a user, used to enforce the per-plan daily token budget.
+ *
+ * Reads DynamoDB when the instance table is configured (the counter there is
+ * atomic across serverless instances) and falls back to the hub mirror
+ * otherwise, so the budget is still enforced in local and single-instance
+ * deployments rather than silently disabled.
+ */
+export async function getInstanceUsageDay(
+  userId: string,
+  day: string,
+): Promise<InstanceUsageDay | null> {
+  if (isInstanceTableConfigured()) {
+    try {
+      const out = await ddb().send(
+        new GetCommand({ TableName: table(), Key: { pk: userPk(userId), sk: `USAGE#${day}` } }),
+      );
+      return (out.Item as InstanceUsageDay) || null;
+    } catch (e) {
+      console.error("[instance-usage:read]", e);
+      return null;
+    }
+  }
+  return hubReadGlobalJson<InstanceUsageDay>(usageDayFile(userId, day));
+}
+
 export async function touchInstanceUsageDay(input: {
   userId: string;
   projectId: string;
@@ -395,7 +434,25 @@ export async function touchInstanceUsageDay(input: {
   outputTokens: number;
   costUsd: number;
 }) {
-  if (!isInstanceTableConfigured()) return;
+  // Previously this returned early without DynamoDB, so no daily rollup existed
+  // at all on a hub-only deployment — and a daily budget cannot be enforced
+  // against a counter nobody writes. The hub branch is read-modify-write and so
+  // can undercount under concurrency; it is a floor, not an accountant.
+  if (!isInstanceTableConfigured()) {
+    const file = usageDayFile(input.userId, input.day);
+    const prev = await hubReadGlobalJson<InstanceUsageDay>(file);
+    await hubWriteGlobalJson(file, {
+      project_id: input.projectId,
+      input_tokens: (prev?.input_tokens ?? 0) + input.inputTokens,
+      output_tokens: (prev?.output_tokens ?? 0) + input.outputTokens,
+      estimated_cost_usd: Number(
+        ((prev?.estimated_cost_usd ?? 0) + input.costUsd).toFixed(6),
+      ),
+      calls: (prev?.calls ?? 0) + 1,
+      updated_at: new Date().toISOString(),
+    } satisfies InstanceUsageDay).catch((e) => console.error("[instance-usage]", e));
+    return;
+  }
 
   const pk = userPk(input.userId);
   const sk = `USAGE#${input.day}`;

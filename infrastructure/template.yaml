@@ -77,6 +77,12 @@ Resources:
             ProjectionType: ALL
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
+      # Rate-limit counters (pk=RATE#…) write an `expires_at` epoch so DynamoDB
+      # reaps them itself. Without TTL enabled those rows accumulate forever —
+      # one per subject per window — and nothing else would ever delete them.
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
       Tags:
         - Key: Environment
           Value: !Ref Environment
