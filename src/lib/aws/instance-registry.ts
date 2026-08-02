@@ -37,6 +37,12 @@ export type InstanceProfile = {
   tenant_id: string;
   product_id: string;
   auth_provider: "aws_cognito";
+  /**
+   * Mirrored from the workspace project for display. Entitlement is decided
+   * from InstanceProject.plan (see isPaidPlan in lib/skills/library-store),
+   * never from here.
+   */
+  plan?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -53,6 +59,13 @@ export type InstanceProject = {
   completeness: number | null;
   hermes_runtime: "hermes+pal-rostr";
   active_skill_slugs: string[];
+  /** Stripe linkage, set once a subscription exists. */
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  /** Stripe's own status: active, past_due, canceled, … */
+  subscription_status?: string | null;
+  /** Period end, so the UI can say when access lapses. */
+  subscription_current_period_end?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -203,6 +216,81 @@ export async function getAwsInstanceProfile(userId: string) {
 
 export async function getAwsHermesAgent(userId: string) {
   return getItem<InstanceHermesAgent>(userPk(userId), "AGENT#hermes");
+}
+
+/**
+ * Set the workspace's plan and its Stripe linkage.
+ *
+ * Until now nothing could change a plan: it was written as the literal
+ * "starter" at project creation, and `syncInstanceRuntime` accepts only
+ * completeness / soulLoaded / activeSkillSlugs, so it preserved plan but could
+ * never set it. Billing needs a real mutator.
+ *
+ * Only the billing webhook should call this — it is the one place that has seen
+ * a signed Stripe event.
+ */
+export async function setWorkspacePlan(input: {
+  userId: string;
+  projectId: string;
+  /** Omit to update only the Stripe linkage and leave the plan untouched. */
+  plan?: string;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: string | null;
+  currentPeriodEnd?: string | null;
+}) {
+  const now = new Date().toISOString();
+  const pk = userPk(input.userId);
+  const sk = projectSk(input.projectId);
+
+  const project = await getItem<InstanceProject>(pk, sk);
+  if (!project) return null;
+
+  const next: InstanceProject = {
+    ...project,
+    plan: input.plan ?? project.plan,
+    // `undefined` means "leave as is"; `null` means "clear".
+    stripe_customer_id:
+      input.stripeCustomerId !== undefined
+        ? input.stripeCustomerId
+        : (project.stripe_customer_id ?? null),
+    stripe_subscription_id:
+      input.stripeSubscriptionId !== undefined
+        ? input.stripeSubscriptionId
+        : (project.stripe_subscription_id ?? null),
+    subscription_status:
+      input.subscriptionStatus !== undefined
+        ? input.subscriptionStatus
+        : (project.subscription_status ?? null),
+    subscription_current_period_end:
+      input.currentPeriodEnd !== undefined
+        ? input.currentPeriodEnd
+        : (project.subscription_current_period_end ?? null),
+    updated_at: now,
+  };
+  await putItem(next);
+
+  // Keep the user profile's plan in step — the auth callback writes it once at
+  // signup and other code reads it there.
+  if (input.plan !== undefined) {
+    const profile = await getItem<InstanceProfile>(pk, "PROFILE");
+    if (profile) {
+      await putItem({ ...profile, plan: input.plan, updated_at: now });
+    }
+  }
+
+  return next;
+}
+
+/** Find the workspace behind a Stripe customer, for webhooks that only carry the customer id. */
+export async function findProjectByStripeCustomer(
+  userId: string,
+  projectId: string,
+  stripeCustomerId: string,
+) {
+  const project = await getItem<InstanceProject>(userPk(userId), projectSk(projectId));
+  if (!project) return null;
+  return project.stripe_customer_id === stripeCustomerId ? project : null;
 }
 
 /** Sync PAL completeness + active skills onto the instance record */

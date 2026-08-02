@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { ROUTES, PRICING } from "@/lib/constants";
+import { UpgradeButton } from "@/components/billing/UpgradeButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -129,8 +130,20 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
+                {/* Paid tiers open Stripe Checkout; the free tier signs up.
+                    All three used to link to the identical /signup, so the $0
+                    and $99 buttons differed only in label text. */}
+                {tier.price > 0 ? (
+                  <div className="mt-8">
+                    <UpgradeButton
+                      plan={tier === PRICING.workspace ? "workspace" : "agency"}
+                      label={tier.cta}
+                      className={`btn btn--md ${tier.featured ? "btn--primary" : "btn--outline"}`}
+                    />
+                  </div>
+                ) : (
                 <Link
-                  href={tier.featured ? ROUTES.signup : tier.price === null ? "/contact" : ROUTES.signup}
+                  href={ROUTES.signup}
                   className={`mt-8 block rounded-lg px-4 py-3 text-center text-sm font-semibold transition-colors ${
                     tier.featured
                       ? "bg-crimson text-white hover:bg-crimson-dark"
@@ -139,6 +152,7 @@ export default function PricingPage() {
                 >
                   {tier.cta}
                 </Link>
+                )}
               </div>
             ))}
           </div>

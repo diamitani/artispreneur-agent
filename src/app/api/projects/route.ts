@@ -3,6 +3,9 @@ import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb, tableName } from "@/lib/db/client";
 import { userPk, projectSk } from "@/lib/db/schema";
 import { getApiUser } from "@/lib/auth/api-utils";
+import { getAwsInstanceProject } from "@/lib/aws/instance-registry";
+import { defaultProjectId } from "@/lib/tenancy/hierarchy";
+import { maxProjectsFor } from "@/lib/billing/plans";
 import type { Project, ProjectView } from "@/types/project";
 
 function isDbAvailable(): boolean {
@@ -76,6 +79,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
+  // The Free plan advertises "1 active project"; nothing enforced it before.
+  if (isDbAvailable()) {
+    const project = await getAwsInstanceProject(user.userId, defaultProjectId(user.userId)).catch(
+      () => null,
+    );
+    const limit = maxProjectsFor(project?.plan);
+    if (limit !== null) {
+      const existing = await ddb().send(
+        new QueryCommand({
+          TableName: tableName(),
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :skPrefix)",
+          ExpressionAttributeValues: {
+            ":pk": userPk(user.userId),
+            ":skPrefix": "PROJECT#",
+          },
+          Select: "COUNT",
+        }),
+      );
+      if ((existing.Count ?? 0) >= limit) {
+        return NextResponse.json(
+          {
+            error: `Your plan includes ${limit} active project. Upgrade for unlimited projects.`,
+            code: "plan_limit",
+            upgrade: "/dashboard/settings",
+          },
+          { status: 402 },
+        );
+      }
+    }
+  }
+
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
 
@@ -94,7 +128,13 @@ export async function POST(request: NextRequest) {
   };
 
   if (!isDbAvailable()) {
-    return NextResponse.json(project, { status: 201 });
+    // Previously this returned 201 with a project that was never persisted —
+    // the user saw success and lost the data on the next page load.
+    console.error("[projects] DYNAMODB_TABLE is not configured; refusing to fake a write");
+    return NextResponse.json(
+      { error: "Storage is not configured on this deployment." },
+      { status: 503 },
+    );
   }
 
   try {

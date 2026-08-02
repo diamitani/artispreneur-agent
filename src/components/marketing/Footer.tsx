@@ -8,14 +8,15 @@ const FOOTER_LINKS = {
     { label: "Pricing", href: ROUTES.pricing },
     { label: "Skills", href: ROUTES.skills },
   ],
+  // /blog and /careers were listed here and both 404'd. A dead link in the
+  // footer is worse than a shorter footer — put them back when the pages exist.
   Company: [
     { label: "About", href: ROUTES.about },
-    { label: "Blog", href: "/blog" },
-    { label: "Careers", href: "/careers" },
+    { label: "Contact", href: ROUTES.contact },
   ],
   Legal: [
-    { label: "Privacy", href: "/privacy" },
-    { label: "Terms", href: "/terms" },
+    { label: "Privacy", href: ROUTES.privacy },
+    { label: "Terms", href: ROUTES.terms },
   ],
 };
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { brand } from "@/lib/brand";
 import { PRICING } from "@/lib/constants";
 import { HeroChat } from "@/components/marketing/HeroChat";
+import { UpgradeButton } from "@/components/billing/UpgradeButton";
 import { LandingNav } from "./LandingNav";
 import { FaqAccordion } from "./FaqAccordion";
 import { AGENT_SPECS, TOTAL_SKILL_COUNT } from "@/lib/agents/roster";
@@ -573,14 +574,26 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={SIGNUP_HREF}
-                className={`btn btn--md btn--block mt-8 ${
-                  tier.featured ? "btn--primary" : "btn--outline"
-                }`}
-              >
-                {tier.cta}
-              </a>
+              {/* Paid tiers open Stripe Checkout rather than repeating the
+                  free-signup link. */}
+              {tier.price > 0 ? (
+                <div className="mt-8">
+                  <UpgradeButton
+                    plan={tier === PRICING.workspace ? "workspace" : "agency"}
+                    label={tier.cta}
+                    className={`btn btn--md ${tier.featured ? "btn--primary" : "btn--outline"}`}
+                  />
+                </div>
+              ) : (
+                <a
+                  href={SIGNUP_HREF}
+                  className={`btn btn--md btn--block mt-8 ${
+                    tier.featured ? "btn--primary" : "btn--outline"
+                  }`}
+                >
+                  {tier.cta}
+                </a>
+              )}
             </div>
           ))}
         </div>
