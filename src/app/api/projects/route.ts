@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, tableName } from "@/lib/db/client";
+import { ddb, isDbConfigured, tableName } from "@/lib/db/client";
 import { userPk, projectSk } from "@/lib/db/schema";
 import { getApiUser } from "@/lib/auth/api-utils";
 import { getAwsInstanceProject } from "@/lib/aws/instance-registry";
 import { defaultProjectId } from "@/lib/tenancy/hierarchy";
 import { maxProjectsFor } from "@/lib/billing/plans";
 import type { Project, ProjectView } from "@/types/project";
-
-function isDbAvailable(): boolean {
-  return !!process.env.DYNAMODB_TABLE;
-}
 
 const COLOR_PALETTE = [
   "#CC0000", "#FED001", "#3B82F6", "#10B981", "#8B5CF6",
@@ -23,7 +19,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json([]);
   }
 
@@ -80,7 +76,7 @@ export async function POST(request: NextRequest) {
   }
 
   // The Free plan advertises "1 active project"; nothing enforced it before.
-  if (isDbAvailable()) {
+  if (isDbConfigured()) {
     const project = await getAwsInstanceProject(user.userId, defaultProjectId(user.userId)).catch(
       () => null,
     );
@@ -127,7 +123,7 @@ export async function POST(request: NextRequest) {
     updatedAt: now,
   };
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     // Previously this returned 201 with a project that was never persisted —
     // the user saw success and lost the data on the next page load.
     console.error("[projects] DYNAMODB_TABLE is not configured; refusing to fake a write");

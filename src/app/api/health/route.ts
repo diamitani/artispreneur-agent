@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sessionSecretIssue } from "@/lib/auth/session";
 import { isCognitoConfigured } from "@/lib/auth/config";
 import { isBedrockConfigured } from "@/lib/agent/bedrock";
+import { productionEnvIssues } from "@/lib/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -85,12 +86,23 @@ export function GET() {
   const failing = criticalKeys.filter((k) => !checks[k].ok);
   const ok = isProd ? failing.length === 0 : true;
 
+  // The full env audit, so a staging or local deploy can be asked "would this
+  // configuration be safe in production?" before anyone promotes it. Names and
+  // explanations only — never a value.
+  const env_issues = productionEnvIssues().map((i) => ({
+    key: i.key,
+    level: i.level,
+    message: i.message,
+  }));
+
   return NextResponse.json(
     {
       ok,
       environment: process.env.NODE_ENV ?? "development",
+      production_ready: env_issues.every((i) => i.level !== "error"),
       failing: failing.length ? failing : undefined,
       checks,
+      env_issues,
     },
     { status: ok ? 200 : 503 },
   );

@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GetCommand, UpdateCommand, QueryCommand, BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, tableName } from "@/lib/db/client";
+import { ddb, isDbConfigured, tableName } from "@/lib/db/client";
 import { userPk, projectSk } from "@/lib/db/schema";
 import { getApiUser } from "@/lib/auth/api-utils";
 import type { Project, ProjectStatus, ProjectView } from "@/types/project";
-
-function isDbAvailable(): boolean {
-  return !!process.env.DYNAMODB_TABLE;
-}
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +15,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
 
@@ -69,7 +65,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
 
@@ -173,7 +169,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
 

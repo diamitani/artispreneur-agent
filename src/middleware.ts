@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { SESSION_COOKIE, isAuthDevBypass } from "@/lib/auth/config";
 
 /**
  * Middleware for route protection.
@@ -7,7 +8,6 @@ import { NextRequest, NextResponse } from "next/server";
  */
 
 const PROTECTED_PREFIXES = ["/dashboard", "/onboarding", "/deploy"];
-const SESSION_COOKIE = "aa_session"; // must match src/lib/auth/config.ts
 
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
@@ -21,8 +21,12 @@ export function middleware(request: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
-  // Dev bypass — skip auth for local development without Cognito
-  if (process.env.AUTH_DEV_BYPASS === "1") {
+  // Dev bypass. Uses the same strict predicate as getSession() and
+  // getSessionUser() — isAuthDevBypass() also requires NODE_ENV !== production
+  // and Cognito to be unconfigured. A bare AUTH_DEV_BYPASS check here meant
+  // that with the flag left on in a production deploy, middleware waved every
+  // request through to a page whose own session check would then refuse it.
+  if (isAuthDevBypass()) {
     return NextResponse.next();
   }
 

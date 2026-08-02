@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, tableName } from "@/lib/db/client";
+import { ddb, isDbConfigured, tableName } from "@/lib/db/client";
 import { userPk, projectSk, taskSk } from "@/lib/db/schema";
 import { getApiUser } from "@/lib/auth/api-utils";
 import type { Task, TaskStatus, TaskPriority, TaskAssignee, NpaoPhase } from "@/types/task";
-
-function isDbAvailable(): boolean {
-  return !!process.env.DYNAMODB_TABLE;
-}
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +15,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json([]);
   }
 
@@ -118,7 +114,7 @@ export async function POST(
     updatedAt: now,
   };
 
-  if (!isDbAvailable()) {
+  if (!isDbConfigured()) {
     return NextResponse.json(task, { status: 201 });
   }
 

@@ -49,49 +49,95 @@ curl -X POST http://localhost:3000/api/agent/provision
 
 ### 1. Set Environment Variables in Vercel
 
+Do not paste real values into this file. Everything below is a placeholder.
+
+> **Rotate first.** An earlier revision of this document contained a live
+> `AWS_ACCESS_KEY_ID`. It is in git history. Rotate that key pair in IAM before
+> this deployment handles anyone's data.
+
+#### Required — the deploy is not safe for real users without these
+
 ```bash
-vercel env add COGNITO_REGION production
-# us-east-1
+# Session cookie encryption. 32+ chars, and NOT the .env.example placeholder —
+# that string is published in this repo, and the session cookie is a
+# self-contained blob with no server-side store, so anyone could forge one.
+#   openssl rand -base64 48
+vercel env add SESSION_SECRET production
 
+# Absolute origin. Logout and Stripe Checkout return URLs are built from it;
+# unset, they point at localhost and a paying user lands on a dead page.
+vercel env add APP_URL production            # https://app.artispreneur.ai
+
+# Auth
 vercel env add COGNITO_USER_POOL_ID production
-# us-east-1_VyKGNlV9r
-
 vercel env add COGNITO_CLIENT_ID production
-# 6dfqmemi0kvha7u3vbu2rq8n4h
+vercel env add COGNITO_DOMAIN production     # https://<domain>.auth.<region>.amazoncognito.com
+vercel env add COGNITO_CLIENT_SECRET production   # only if the app client has one
 
-vercel env add COGNITO_DOMAIN production
-# https://artispreneur-agent.auth.us-east-1.amazoncognito.com
+# Control plane. DYNAMODB_TABLE is the canonical name — this document used to
+# set only DYNAMODB_INSTANCE_TABLE, which left every project and task write
+# throwing while the instance registry worked. Either name is accepted now;
+# prefer this one.
+vercel env add DYNAMODB_TABLE production     # artispreneur-prod
 
-vercel env add HUB_BACKEND production
-# s3
-
+# Durable workspace storage. The default `fs` backend writes under
+# process.cwd(), which is read-only on Vercel — onboarding output, the usage
+# ledger, and workspace API keys all silently vanish without these two.
+vercel env add HUB_BACKEND production        # s3
 vercel env add S3_HUB_BUCKET production
-# artispreneur-agent-hub
 
-vercel env add DYNAMODB_INSTANCE_TABLE production
-# artispreneur-agent-instances
-
-vercel env add AWS_REGION production
-# us-east-1
-
+# Inference
+vercel env add AWS_REGION production         # us-east-1
 vercel env add AWS_ACCESS_KEY_ID production
-# AKIASFIXC3DLDCZ66B5F
-
 vercel env add AWS_SECRET_ACCESS_KEY production
-# [your-secret-key]
-
-vercel env add AWS_BEARER_TOKEN_BEDROCK production
-# [your-bedrock-bearer-token]
-
 vercel env add BEDROCK_MODEL_ID production
-# deepseek.v3-v1:0
 ```
+
+#### Required to take payments
+
+```bash
+vercel env add STRIPE_SECRET_KEY production
+# Create ONE endpoint at https://<domain>/api/billing/webhook subscribed to
+# checkout.session.completed, customer.subscription.created / updated /
+# deleted, and invoice.payment_failed, then copy its signing secret.
+# Without it a payment succeeds and the plan never changes.
+vercel env add STRIPE_WEBHOOK_SECRET production
+```
+
+Price IDs are optional — Checkout uses inline `price_data` derived from
+`PRICING` in `src/lib/constants.ts`.
+
+#### Required if you use the Cognito PostConfirmation hook
+
+```bash
+vercel env add PAL_WEBHOOK_SECRET production
+```
+
+`/api/webhooks/signup` returns 503 without it rather than provisioning a
+workspace for any `userId` a stranger posts.
+
+#### Must NOT be set
+
+`AUTH_DEV_BYPASS`. It is ignored in production, but its presence means a
+development env file reached the deployment.
 
 ### 2. Deploy
 
 ```bash
 vercel --prod
 ```
+
+### 2a. Verify before pointing anyone at it
+
+```bash
+curl -s https://<your-domain>/api/health | jq
+```
+
+Unauthenticated by design — which is the point, because a bad `SESSION_SECRET`
+makes signing in impossible, so an authenticated check could never catch it. It
+returns booleans and explanations only, never a value. `ok: false` (HTTP 503)
+means something in the required list above is missing; `env_issues` names each
+one and says what breaks.
 
 ### 3. Update Cognito Callback URLs
 
