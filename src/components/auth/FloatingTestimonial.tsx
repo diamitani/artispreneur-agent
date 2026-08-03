@@ -37,7 +37,7 @@ export function FloatingTestimonial() {
     return () => clearInterval(interval);
   }, []);
 
-  const t = testimonials[current];
+  const t = testimonials[current]!;
 
   return (
     <div className="relative">

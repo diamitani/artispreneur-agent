@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/marketing/Nav";
-import { Footer } from "@/components/marketing/Footer";
+import { Footer } from "@/components/marketing/footer";
 import { CheckoutButton } from "@/components/skills/CheckoutButton";
 import { SkillViewTracker } from "@/components/skills/SkillViewTracker";
 import {

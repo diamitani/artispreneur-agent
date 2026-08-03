@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Nav } from "@/components/marketing/Nav";
-import { Footer } from "@/components/marketing/Footer";
+import { Footer } from "@/components/marketing/footer";
 import { getSkillBySlug } from "@/lib/skills/catalog";
 import { fulfillStripeSession } from "@/lib/skills/fulfill";
 

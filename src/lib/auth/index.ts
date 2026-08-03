@@ -5,16 +5,21 @@ export {
   SESSION_COOKIE,
 } from "./config";
 export {
-  verifyIdToken,
-  exchangeAuthCode,
-  buildHostedLoginUrl,
-  buildLogoutUrl,
-  type CognitoClaims,
+  verifyToken,
+  exchangeCode,
+  buildAuthUrl,
+  refreshTokens,
+  generateCodeVerifier,
+  generateCodeChallenge,
+  type CognitoIdTokenPayload,
+  type BuildAuthUrlOptions,
+  type TokenSet,
 } from "./cognito";
 export {
-  getSessionUser,
-  requireSessionUser,
-  setSessionCookies,
-  clearSessionCookies,
-  type SessionUser,
+  getSession,
+  getSession as getSessionUser,
+  createSession,
+  clearSession,
+  type SessionTokens,
 } from "./session";
+export type { Session } from "@/types/user";

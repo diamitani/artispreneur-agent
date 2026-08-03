@@ -224,7 +224,7 @@ function goalToTasks(goal: string, stageName: string): NpaoTask[] {
     ],
   };
 
-  return [...base, ...(byGoal[goal] ?? byGoal.release)];
+  return [...base, ...(byGoal[goal] ?? byGoal.release ?? [])];
 }
 
 function buildMasterSoul(cfg: WorkspaceConfig, intent: PalIntent, answers: IntakeAnswers): string {

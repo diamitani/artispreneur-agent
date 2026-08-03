@@ -23,7 +23,7 @@ export function CommandBar() {
   const { view, agentId, sidebarOpen, setSidebarOpen, chatOpen, setChatOpen, setPaletteOpen } =
     useWorkspace();
   const agent = getAgent(agentId);
-  const meta = titles[view] ?? titles.briefing;
+  const meta = (titles[view] ?? titles.briefing)!;
 
   return (
     <header className="z-20 flex h-14 flex-shrink-0 items-center justify-between gap-4 border-b border-[color:var(--line)] bg-[color:var(--ink)] px-4">

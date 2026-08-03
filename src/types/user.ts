@@ -11,7 +11,10 @@ export interface User {
 
 export interface Session {
   userId: string;
+  sub: string;
   email: string;
   name: string;
   plan: string;
+  projectId: string;
+  workspacePath: string;
 }

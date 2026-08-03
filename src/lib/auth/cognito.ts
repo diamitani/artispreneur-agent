@@ -92,10 +92,11 @@ export function buildAuthUrl(options: BuildAuthUrlOptions): string {
     params.set("state", options.returnTo);
   }
 
-  const baseUrl = `https://${domain}`;
-  const path = options.signup ? "/signup" : "/oauth2/authorize";
+  if (options.signup) {
+    params.set("screen_hint", "signUp");
+  }
 
-  return `${baseUrl}${path}?${params.toString()}`;
+  return `https://${domain}/oauth2/authorize?${params.toString()}`;
 }
 
 // ─── Token exchange ────────────────────────────────────────────────────────────

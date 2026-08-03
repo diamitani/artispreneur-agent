@@ -37,3 +37,4 @@ next-env.d.ts
 
 # local hub storage
 .data/
+.gstack/

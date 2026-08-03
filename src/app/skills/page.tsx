@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Nav } from "@/components/marketing/Nav";
-import { Footer } from "@/components/marketing/Footer";
+import { Footer } from "@/components/marketing/footer";
 import { SkillCard } from "@/components/skills/SkillCard";
 import { brand } from "@/lib/brand";
 import { SKILLS_CATALOG, SKILL_CATEGORIES } from "@/lib/skills/catalog";

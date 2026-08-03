@@ -107,9 +107,12 @@ export async function createSession(tokens: SessionTokens): Promise<Session> {
 
   const session: Session = {
     userId: payload.sub,
+    sub: payload.sub,
     email: payload.email ?? "",
     name: payload.name ?? payload["cognito:username"] ?? "",
     plan: "starter",
+    projectId: payload.sub,
+    workspacePath: `/workspace/${payload.sub}`,
   };
 
   const sessionData = JSON.stringify({
@@ -142,9 +145,12 @@ export async function getSession(): Promise<Session | null> {
   if (process.env.AUTH_DEV_BYPASS === "1") {
     return {
       userId: "dev-user-001",
+      sub: "dev-user-001",
       email: "dev@artispreneur.ai",
       name: "Dev User",
       plan: "workspace",
+      projectId: "dev-user-001",
+      workspacePath: "/workspace/dev-user-001",
     };
   }
 
@@ -156,11 +162,15 @@ export async function getSession(): Promise<Session | null> {
   try {
     const decrypted = await decrypt(cookie.value);
     const data = JSON.parse(decrypted);
+    const userId = data.userId ?? data.sub ?? "";
     return {
-      userId: data.userId,
-      email: data.email,
-      name: data.name,
-      plan: data.plan,
+      userId,
+      sub: userId,
+      email: data.email ?? "",
+      name: data.name ?? "",
+      plan: data.plan ?? "starter",
+      projectId: data.projectId ?? userId,
+      workspacePath: data.workspacePath ?? `/workspace/${userId}`,
     };
   } catch {
     return null;

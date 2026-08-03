@@ -42,7 +42,7 @@ export function LandingHero() {
 
       <div className="container-page relative z-10 flex min-h-[100dvh] flex-col justify-center pb-16 pt-32 md:pb-20 md:pt-28">
         {/* Two-column split — left copy, right live chat widget */}
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_480px] xl:gap-16">
+        <div className="grid items-center gap-8 lg:grid-cols-[1fr_500px] lg:gap-10">
 
           {/* LEFT — copy */}
           <div className="max-w-xl">
@@ -169,7 +169,7 @@ export function LandingHero() {
 
           {/* RIGHT — live chat widget */}
           <motion.div
-            className="flex justify-center lg:justify-end"
+            className="flex justify-center lg:justify-start"
             initial={reduce ? false : { opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.75, delay: 0.2, ease }}

@@ -110,7 +110,7 @@ export function OnboardingWizard() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PalCompilationResult | null>(null);
 
-  const step = ONBOARDING_STEPS[stepIdx];
+  const step = ONBOARDING_STEPS[stepIdx]!;
   const progress = ((stepIdx + (result ? 1 : 0)) / (ONBOARDING_STEPS.length + 1)) * 100;
 
   const missingRequired = useMemo(() => {

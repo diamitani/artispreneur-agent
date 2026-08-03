@@ -152,5 +152,5 @@ export const AGENTS: Agent[] = [
 ];
 
 export function getAgent(id: AgentId) {
-  return AGENTS.find((a) => a.id === id) ?? AGENTS[0];
+  return AGENTS.find((a) => a.id === id) ?? AGENTS[0]!;
 }
